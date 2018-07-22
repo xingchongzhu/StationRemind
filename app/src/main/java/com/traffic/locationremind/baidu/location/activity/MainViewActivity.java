@@ -279,18 +279,22 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                         double dis = 0;
                         if (currentCityNo != null) {
                             String shpno = CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CITYNO);
+                            List<LineInfo> tempList = mLineInfoList;
                             if(!shpno.equals(""+currentCityNo)){
                                 CommonFuction.writeSharedPreferences(MainViewActivity.this,CommonFuction.CITYNO,""+currentCityNo);
-                            }else{
-
+                                tempList = mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
+                                if(tempList != null) {
+                                    for (LineInfo lineInfo : tempList) {
+                                        lineInfo.setStationInfoList(mDataHelper.QueryByStationLineNo(lineInfo.getLineid(), currentCityNo.getCityNo()));
+                                    }
+                                }
                             }
-
-                            ArrayList<LineInfo> mLineInfoList = mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
+                            mLineInfoList = tempList;
                             Log.d(TAG,"locationCurrentStation mLineInfoList = "+mLineInfoList.size());
                             if(mLineInfoList != null) {
                                 for (LineInfo lineInfo:mLineInfoList) {
-                                    lineInfo.setStationInfoList(mDataHelper.QueryByStationLineNo(lineInfo.getLineid(), currentCityNo.getCityNo()));
-                                    Log.d(TAG, "locationCurrentStation lineid = "+lineInfo.lineid+" linename = " + lineInfo.linename);
+                                    //lineInfo.setStationInfoList(mDataHelper.QueryByStationLineNo(lineInfo.getLineid(), currentCityNo.getCityNo()));
+                                   // Log.d(TAG, "locationCurrentStation lineid = "+lineInfo.lineid+" linename = " + lineInfo.linename);
                                     for (StationInfo stationInfo : lineInfo.getStationInfoList()) {
                                         longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
                                         latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
@@ -306,13 +310,12 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             }
                         }
 
-
                         if(currentLineInfo != null){
                             currentIndex = currentLineInfo.getLineid();
                         }
                         Log.d(TAG,"locationCurrentStation currentStationInfo = "+currentStationInfo);
                         if(currentStationInfo != null){
-                            currentStationInfo
+                            //currentStationInfo
                             Log.d(TAG,"locationCurrentStation lineid = "+currentStationInfo.lineid+" name = "+currentStationInfo.getCname());
                         }
                         initLineMap(currentIndex);
