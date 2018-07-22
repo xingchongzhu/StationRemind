@@ -1,0 +1,10 @@
+git init
+git remote add origin https://xxx@xx.git
+git fetch
+git branch master origin/master
+git checkout master
+然后你就可以用 
+git add . 
+git commit -m “提交信息” 
+git push origin master 
+对你的代码进行提交上传了。
