@@ -1,6 +1,8 @@
 package com.traffic.locationremind.manager.bean;
 
 
+import android.text.TextUtils;
+
 public class StationInfo {
 
     public static String ID = "id";
@@ -134,6 +136,13 @@ public class StationInfo {
 
     public String getTransfer(){
         return transfer;
+    }
+
+    public boolean canTransfer(){
+        if(TextUtils.isEmpty(transfer) || transfer.equals("0")){
+            return false;
+        }
+        return true;
     }
 
 }

@@ -8,7 +8,10 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -58,6 +61,8 @@ public class LineMapView extends View {
     private boolean full_screen = false;//全局图
     private Context context;
     private boolean isOnpause = false;
+    private final int DIS_BAR_HEIGHT = 20;
+    private final float Icon_size = 1.5f;
 
     private List<MarkObject> markList = new ArrayList<MarkObject>();
 
@@ -162,13 +167,13 @@ public class LineMapView extends View {
         mStartPoint = new PointF();
         mapCenter = new PointF();
         mBitmapStart = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_start),
-                MarkObject.size*2,MarkObject.size*2);
+                (int)(MarkObject.size*Icon_size),(int)(MarkObject.size*Icon_size));
         mBitmapEnd = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_end),
-                MarkObject.size*2,MarkObject.size*2);
+                (int)(MarkObject.size*Icon_size),(int)(MarkObject.size*Icon_size));
         mBitmapCurrent = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.bus_station),
-                MarkObject.size*2,MarkObject.size*2);
+                (int)(MarkObject.size*Icon_size),(int)(MarkObject.size*Icon_size));
         mBitmapLocationCurrent = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_location),
-                MarkObject.size*2,MarkObject.size*2);
+                (int)(MarkObject.size*Icon_size),(int)(MarkObject.size*Icon_size));
     }
 
     public float getViewWidth() {
@@ -186,7 +191,7 @@ public class LineMapView extends View {
         mCurrentScale = mCurrentScaleMin;
         mCurrentScaleMax = mCurrentScaleMin * MAXSCALE;
         mapCenter.set(mBitmap.getWidth() * mCurrentScale / 2,
-                mBitmap.getHeight() * mCurrentScale / 2);
+                mBitmap.getHeight() * mCurrentScale / 2+DIS_BAR_HEIGHT);
         float bitmapRatio = mBitmap.getHeight() / mBitmap.getWidth();
         float winRatio = windowHeight / windowWidth;
         // 判断屏幕铺满的情况，isShu为true表示屏幕横向被铺满，为false表示屏幕纵向被铺满
@@ -195,6 +200,7 @@ public class LineMapView extends View {
         } else {
             isShu = false;
         }
+        postInvalidate();
     }
 
     /**
@@ -208,6 +214,10 @@ public class LineMapView extends View {
 
     public void clearMark() {
         markList.clear();
+        mCurrentScale = mCurrentScaleMin;
+        mStatus = Status.NONE;
+        full_screen = false;//全局图
+        postInvalidate();
     }
 
     /**
@@ -378,14 +388,14 @@ public class LineMapView extends View {
                 if (isOnpause) {
                     return;
                 }
-                canvas.drawColor(Color.WHITE);
                 Matrix matrix = new Matrix();
+                canvas.drawColor(Color.WHITE);
                 matrix.setScale(mCurrentScale, mCurrentScale,
                         mBitmap.getWidth() / 2, mBitmap.getHeight() / 2);
                 matrix.postTranslate(mapCenter.x - mBitmap.getWidth() / 2,
                         mapCenter.y - mBitmap.getHeight() / 2);
                 canvas.drawBitmap(mBitmap, matrix, mPaint);
-                if (!full_screen) {
+                if(!full_screen) {
                     float x;
                     float y;
                     float px = 0;
@@ -408,7 +418,7 @@ public class LineMapView extends View {
                         y = mapCenter.y - location.getHeight()
                                 - mBitmap.getHeight() * mCurrentScale / 2
                                 + mBitmap.getHeight() * object.getMapY()
-                                * mCurrentScale;
+                                * mCurrentScale+DIS_BAR_HEIGHT;
                        // y=y*2;
                         object.setX(x);
                         object.setY(y);
@@ -449,7 +459,7 @@ public class LineMapView extends View {
                         matrix.postTranslate(object.getX(), object.getY());
                         canvas.drawBitmap(object.getmBitmap(), matrix, mPaint);
                         matrix.setScale(1.0f, 1.0f);
-                        matrix.postTranslate(object.getX()-object.getmBitmap().getWidth()/2, object.getY()-mBitmapStart.getHeight()/2-object.getmBitmap().getHeight()/3);
+                        matrix.postTranslate(object.getX()-object.getmBitmap().getWidth()/4, object.getY()-mBitmapStart.getHeight()/2-object.getmBitmap().getHeight()/3+DIS_BAR_HEIGHT/2);
                         if(object.isStartStation){
                             canvas.drawBitmap(mBitmapStart, matrix, mPaint);
                         }
@@ -481,23 +491,7 @@ public class LineMapView extends View {
         // TODO Auto-generated method stub
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                if (event.getPointerCount() == 1) {
-                    // 如果两次点击时间间隔小于一定值，则默认为双击事件
-                    if (event.getEventTime() - lastClickTime < DOUBLE_CLICK_TIME_SPACE) {
-                        if (mCurrentScale < mCurrentScaleMax) {
-                            zoomIn();
-                        }else{
-                            mCurrentScale = mCurrentScaleMin;
-                            zoomOut();
-                        }
-                        return true;
-                    } else {
-                        mStartPoint.set(event.getX(), event.getY());
-                        mStatus = Status.DRAG;
-                    }
-                }
 
-                lastClickTime = event.getEventTime();
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -522,6 +516,24 @@ public class LineMapView extends View {
                     if (!full_screen)
                         clickAction(event);
                 }
+                if (event.getPointerCount() == 1) {
+                    // 如果两次点击时间间隔小于一定值，则默认为双击事件
+                    if (event.getEventTime() - lastClickTime < DOUBLE_CLICK_TIME_SPACE) {
+                        if (mCurrentScale < mCurrentScaleMax) {
+                            zoomIn();
+                        }else{
+                            mCurrentScale = mCurrentScaleMin;
+                            zoomOut();
+                        }
+                        return true;
+                    } else {
+                        mStartPoint.set(event.getX(), event.getY());
+                        mStatus = Status.DRAG;
+                    }
+                }
+
+                lastClickTime = event.getEventTime();
+                break;
 
             case MotionEvent.ACTION_POINTER_UP:
                 oldRate = mCurrentScale;
@@ -552,10 +564,10 @@ public class LineMapView extends View {
         if (mBitmapStart != null) {
             mBitmapStart.recycle();
         }
-        markList.clear();
-    }
+        if (mBitmapLocationCurrent != null) {
+            mBitmapLocationCurrent.recycle();
+        }
 
-    public void clearData(){
         markList.clear();
     }
 

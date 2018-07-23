@@ -173,21 +173,14 @@ public class LineMapColorView extends View {
             }
         }
         markList.clear();
+        postInvalidate();
     }
 
     @Override
     protected void onFinishInflate() {
         // TODO Auto-generated method stub
         super.onFinishInflate();
-        if (mBitmap != null) {
-            mBitmap.recycle();
-        }
-        for (MarkObject object : markList) {
-            if (object.getmBitmap() != null) {
-                object.getmBitmap().recycle();
-            }
-        }
-        markList.clear();
+        releaseSource();
     }
 
 }

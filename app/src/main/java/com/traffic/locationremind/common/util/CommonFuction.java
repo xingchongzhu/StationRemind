@@ -23,6 +23,7 @@ public class CommonFuction {
 	public static final String CURRENTCITYNO = "currentcityno";//城市号
 	public static final String ISREMINDER = "isreminder";//正在后台
 	public static final String CURRENTLINEID = "currentLineId";//线路名
+	public static final String INITCURRENTLINEID = "initcurrentLineId";//线路名
 	public static final String CURRENTSTATIONNAME = "currentstationname";//站名
 	public static final String STARTSTATIONNAME = "startstationname";//起始站
 	public static final String ENDSTATIONNAME = "endstationname";//目标站
@@ -42,6 +43,13 @@ public class CommonFuction {
 		editor.commit();
 	}
 
+    public static void writeBooleanSharedPreferences(Context context,String key,boolean value){
+        SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putBoolean(key, value);
+        editor.commit();
+    }
+
 	public static void writeIntSharedPreferences(Context context,String key,int value){
 		SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sp.edit();
@@ -54,6 +62,12 @@ public class CommonFuction {
 		String name = sp.getString(key, "");
 		return name;
 	}
+
+    public static boolean getSharedPreferencesBooleanValue(Context context,String key){
+        SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);
+        boolean state = sp.getBoolean(key, false);
+        return state;
+    }
 
 	public static int getSharedPreferencesIntValue(Context context,String key){
 		SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);

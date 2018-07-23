@@ -17,6 +17,7 @@ import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -36,6 +37,7 @@ import com.traffic.locationremind.baidu.location.view.LineMapView;
 import com.traffic.locationremind.baidu.location.view.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.view.SettingReminderDialog.NoticeDialogListener;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.NotificationUtil;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.ExitInfo;
@@ -165,6 +167,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         hintText = (TextView) findViewById(R.id.hint);
         btnLinearLayout = (LinearLayout) findViewById(R.id.mainmap_zoom_area);
 
+        screenbtn.setOnClickListener(this);
         scaleMorebtn.setOnClickListener(this);
         scaleLessbtn.setOnClickListener(this);
         button_location.setOnClickListener(this);
@@ -188,10 +191,10 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         Intent bindIntent = new Intent(MainViewActivity.this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
         isOncreate = true;
-        if (CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.ISREMINDER).equals(CommonFuction.FALSE)) {
-            start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.start_location));
-        } else {
+        if (CommonFuction.getSharedPreferencesBooleanValue(MainViewActivity.this, CommonFuction.ISREMINDER)) {
             start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stop_location));
+        } else {
+            start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.start_location));
         }
     }
 
@@ -210,7 +213,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 sceneMap.setInitScale();
                 Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.shenzhen);
                 sceneMap.setBitmap(bitmap2);
-                sceneMap.postInvalidate();
             }
         } else if (v.getId() == R.id.button_location) {
             locationCurrentStation();
@@ -223,7 +225,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 }else{
                     mRemonderLocationService.startLocationService();
                 }
-                if (CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.ISREMINDER).equals(CommonFuction.TRUE)) {
+                if (!CommonFuction.getSharedPreferencesBooleanValue(MainViewActivity.this, CommonFuction.ISREMINDER)) {
                     start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.start_location));
                     mRemonderLocationService.setCancleReminder();
                     sceneMap.resetMardEndState();
@@ -261,7 +263,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 if (mRemonderLocationService != null && location != null) {
                     //CityInfo currentCityInfo = null;
                     LineInfo currentLineInfo = null;
-                    StationInfo currentStationInfo = null;
+                    StationInfo nerstStationInfo = null;
                     Log.d(TAG,"locationCurrentStation location.getCityCode() = "+location.getCityCode()+" lot = "+location.getLatitude()+" lat = "+location.getLongitude());
                     if (location != null) {
                         for (CityInfo cityInfo : cityInfoList) {
@@ -301,8 +303,9 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                                         dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(),location.getLatitude());
                                         if (min > dis) {
                                             min = dis;
-                                            currentStationInfo = stationInfo;
-                                            Log.d(TAG,"locationCurrentStation dis = "+dis+" lineid = "+stationInfo.lineid+" name= "+stationInfo.getCname());
+                                            nerstStationInfo = stationInfo;
+                                            //currentStationInfo = stationInfo;
+                                            //Log.d(TAG,"locationCurrentStation dis = "+dis+" lineid = "+stationInfo.lineid+" name= "+stationInfo.getCname());
                                             currentLineInfo = lineInfo;
                                         }
                                     }
@@ -312,16 +315,14 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
                         if(currentLineInfo != null){
                             currentIndex = currentLineInfo.getLineid();
+                            CommonFuction.writeSharedPreferences(MainViewActivity.this,CommonFuction.CURRENTLINEID,""+currentIndex);
                         }
-                        Log.d(TAG,"locationCurrentStation currentStationInfo = "+currentStationInfo);
-                        if(currentStationInfo != null){
-                            //currentStationInfo
-                            Log.d(TAG,"locationCurrentStation lineid = "+currentStationInfo.lineid+" name = "+currentStationInfo.getCname());
+                        Log.d(TAG,"locationCurrentStation currentStationInfo = "+nerstStationInfo);
+                        if(nerstStationInfo != null){
+                            CommonFuction.writeSharedPreferences(MainViewActivity.this,CommonFuction.INITCURRENTLINEID,nerstStationInfo.getCname());
+                            Log.d(TAG,"locationCurrentStation lineid = "+nerstStationInfo.lineid+" name = "+nerstStationInfo.getCname());
                         }
-                        initLineMap(currentIndex);
-                        Message msg = new Message();
-                        msg.what = 1;
-                        mHandler.sendMessage(msg);
+                        initData();
                     }
                 }
 
@@ -344,6 +345,9 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         super.onResume();
         sceneMap.setPauseState(false);
         sceneMap.postInvalidate();
+        if (mRemonderLocationService != null) {
+            mRemonderLocationService.cancleNotification();
+        }
     }
 
     @Override
@@ -362,7 +366,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     public void onStop() {
         super.onStop();
         RemonderLocationService.state = false;
-        Log.d(TAG, "onStop mRemonderLocationService = " + mRemonderLocationService);
         if (mRemonderLocationService != null) {
             mRemonderLocationService.setNotification(true);
         }
@@ -412,23 +415,24 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     mLineInfoList.get(n).getStationInfoList().get(i).colorId = mLineInfoList.get(n).colorid;
                 }
             }
+            currentIndex = CommonFuction.convertToInt(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTLINEID),
+                    mLineInfoList.get(0).getLineid());
+            //单一线路-------------------------------------
+            initLineMap(currentIndex);
+            if (CommonFuction.getSharedPreferencesBooleanValue(MainViewActivity.this, CommonFuction.ISREMINDER)) {
 
-            if (isOncreate && CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.ISREMINDER).equals(CommonFuction.TRUE)) {
-                currentIndex = CommonFuction.convertToInt(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTLINEID),
-                        mLineInfoList.get(0).getLineid());
-                //单一线路-------------------------------------
-                initLineMap(currentIndex);
                 sceneMap.setMardStartState(true, CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.STARTSTATIONNAME));
                 sceneMap.setMardEndState(true, CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.ENDSTATIONNAME));
                 sceneMap.setCurrentStation(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTSTATIONNAME));
-            } else {
+            }
+           /* else {
                 if(mLineInfoList.size() >0){
                     currentIndex = mLineInfoList.get(0).getLineid();
                     //单一线路-------------------------------------
                     initLineMap(currentIndex);
                 }
-            }
-            isOncreate = false;
+            }*/
+            //isOncreate = false;
 
             Message msg = new Message();
             msg.what = 1;
@@ -437,6 +441,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     }
 
     private void initLineColorMap() {
+        lineMap.releaseSource();
         int colorRow = mLineInfoList.size() / LineMapColorView.ROWMAXCOUNT + 1;
 
         int height = MarkObject.rectSizeHeight * colorRow * 3;
@@ -514,6 +519,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         float initX = 1f / LineMapView.ROWMAXCOUNT / 2f;
         float initY = 1f / countRow / 2;
 
+        String currentStationName = CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.INITCURRENTLINEID);
         final int mStationInfoList_size = mStationInfoList.size();// Moved  mStationInfoList.size() call out of the loop to local variable mStationInfoList_size
         for (int n = 0; n < mStationInfoList_size; n++) {
             MarkObject markObject = new MarkObject();
@@ -527,10 +533,15 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             markObject.setMapY(y);
             markObject.mStationInfo = mStationInfoList.get(n);
             markObject.setName(mStationInfoList.get(n).getCname().split(" ")[0]);
+            //Log.d(TAG,"initLineMap currentStationName = "+currentStationName+" markObject.getName() = "+markObject.getName());
+            if(!TextUtils.isEmpty(currentStationName) && !TextUtils.isEmpty(markObject.getName()) &&
+                    currentStationName.equals(markObject.getName())){
+                markObject.isCurrentLocationStation = true;
+            }
             markObject.setColorId(mStationInfoList.get(n).colorId);
             markObject.setRadius(MarkObject.size / 3);
             markObject.setCurrentsize(MarkObject.size + MarkObject.DIFF);
-            boolean canTransfer = Integer.parseInt(markObject.mStationInfo.getTransfer()) > 0;
+            boolean canTransfer = markObject.mStationInfo.canTransfer();
             if (canTransfer) {
                 markObject.setmBitmap(CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_route_map_pin_dottransfer), MarkObject.size + MarkObject.DIFF, MarkObject.size + MarkObject.DIFF));
             } else {
@@ -601,8 +612,18 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     }
 
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
+        CommonFuction.writeBooleanSharedPreferences(this,CommonFuction.ISREMINDER,false);
         ReadExcelDataUtil.getInstance().removeDbWriteFinishListener(this);
         lineMap.releaseSource();
         sceneMap.releaseSource();
@@ -705,6 +726,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                         sceneMap.resetMardEndState();
                     }
                 });
+                locationCurrentStation();
             }
 
         }

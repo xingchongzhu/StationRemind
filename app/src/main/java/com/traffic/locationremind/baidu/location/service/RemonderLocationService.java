@@ -211,7 +211,7 @@ public class RemonderLocationService extends Service {
 
     public void setStartReminder(){
         isReminder = true;
-        CommonFuction.writeSharedPreferences(this,CommonFuction.ISREMINDER,CommonFuction.TRUE);
+        CommonFuction.writeBooleanSharedPreferences(this,CommonFuction.ISREMINDER,true);
     }
     public void setCallback(Callback callback) {
         this.callback = callback;
@@ -219,13 +219,17 @@ public class RemonderLocationService extends Service {
 
     public void setCancleReminder(){
         isReminder = false;
-        CommonFuction.writeSharedPreferences(this,CommonFuction.ISREMINDER,CommonFuction.FALSE);
+        CommonFuction.writeBooleanSharedPreferences(this,CommonFuction.ISREMINDER,false);
+        mNotificationUtil.cancel(NotificationUtil.notificationId);
+    }
+
+    public void cancleNotification(){
         mNotificationUtil.cancel(NotificationUtil.notificationId);
     }
 
     public void setNotification(boolean state) {
         mNotificationUtil = new NotificationUtil(this);
-        boolean ismark = CommonFuction.getSharedPreferencesValue(this,CommonFuction.ISREMINDER).equals(CommonFuction.TRUE);
+        boolean ismark = CommonFuction.getSharedPreferencesBooleanValue(this,CommonFuction.ISREMINDER);
         Log.d(TAG,"isremark = "+ismark);
         if(ismark){
             NotificationObject mNotificationObject = new NotificationObject("1号地铁","老街","机场东","华强北","2分钟");
