@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +35,7 @@ import com.traffic.locationremind.baidu.location.view.LineMap;
 import com.traffic.locationremind.baidu.location.view.LineMapColor;
 import com.traffic.locationremind.baidu.location.view.LineMapColorView;
 import com.traffic.locationremind.baidu.location.view.LineMapView;
+import com.traffic.locationremind.baidu.location.view.SelectLineDialog;
 import com.traffic.locationremind.baidu.location.view.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.view.SettingReminderDialog.NoticeDialogListener;
 import com.traffic.locationremind.common.util.CommonFuction;
@@ -78,6 +80,8 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     private RemonderLocationService mRemonderLocationService;
     private boolean isOncreate = false;
     public int canSetReminder = 0;
+
+    SelectLineDialog mSelectLineDialog;
 
 	private Handler mHandler = new Handler() {
         @Override
@@ -253,6 +257,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         new Thread() {
             @Override
             public void run() {
+                Looper.prepare();
                 BDLocation location = mRemonderLocationService.getCurrentLocation();
                 if(!MainViewActivity.this.getPersimmions()){
                     //Toast.makeText(this,this.getString(R.string.please_set_permission),Toast.LENGTH_SHORT).show();
@@ -291,7 +296,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                                     }
                                 }
                             }
-                            mLineInfoList = tempList;
                             Log.d(TAG,"locationCurrentStation mLineInfoList = "+mLineInfoList.size());
                             if(mLineInfoList != null) {
                                 for (LineInfo lineInfo:mLineInfoList) {
@@ -313,19 +317,36 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             }
                         }
 
-                        if(currentLineInfo != null){
-                            currentIndex = currentLineInfo.getLineid();
-                            CommonFuction.writeSharedPreferences(MainViewActivity.this,CommonFuction.CURRENTLINEID,""+currentIndex);
-                        }
+
                         Log.d(TAG,"locationCurrentStation currentStationInfo = "+nerstStationInfo);
                         if(nerstStationInfo != null){
                             CommonFuction.writeSharedPreferences(MainViewActivity.this,CommonFuction.INITCURRENTLINEID,nerstStationInfo.getCname());
                             Log.d(TAG,"locationCurrentStation lineid = "+nerstStationInfo.lineid+" name = "+nerstStationInfo.getCname());
                         }
-                        initData();
+                        if(nerstStationInfo != null){
+                            if(nerstStationInfo.canTransfer()){
+                                if(mSelectLineDialog != null){
+                                    mSelectLineDialog.dismiss();
+                                }
+                                mSelectLineDialog = new SelectLineDialog(MainViewActivity.this,R.style.Dialog,new NoticeDialogListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        initData();
+                                    }
+                                    },nerstStationInfo,mLineInfoList);
+                                mSelectLineDialog.show();
+                            }else{
+                                if(currentLineInfo != null){
+                                    currentIndex = currentLineInfo.getLineid();
+                                    CommonFuction.writeSharedPreferences(MainViewActivity.this,CommonFuction.CURRENTLINEID,""+currentIndex);
+                                    initData();
+                                }
+                            }
+                        }
+
                     }
                 }
-
+                Looper.loop();
             }
         }.start();
     }
