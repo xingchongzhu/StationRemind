@@ -1,13 +1,4 @@
-/**
- * Copyright (C) 2015~2050 by foolstudio. All rights reserved.
- * 
- * ��Դ�ļ��д��벻����������������ҵ��;�����߱�������Ȩ��
- * 
- * ���ߣ�������
- * 
- * �������䣺foolstudio@qq.com
- * 
-*/
+
 
 package com.traffic.locationremind.common.util;
 
@@ -32,6 +23,7 @@ public class CommonFuction {
 	private static final double EARTH_RADIUS = 6378137.0;
 	public static final String SHNAME = "subwab_info";
 	public static final String CITYNO = "cityno";
+	public static final String TRANSFER_SPLIT = ",";
 	public final static String HEAD = "head";
 	public final static String TAIL = "tail";
 

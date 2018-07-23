@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-              android:layout_margin="10dp"
+    android:layout_margin="10dp"
     android:background="@color/white"
     android:orientation="vertical">
 
@@ -118,33 +118,6 @@
             android:textColor="@color/white"
             android:textSize="15dp" />
     </LinearLayout>
-    <!--<LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/cancel_action"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:background="@color/white"
-            android:text="@string/cancle_btn"
-            android:textSize="16dp" />
-
-        <Button
-            android:id="@+id/save_action"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:background="@color/white"
-            android:text="@string/save_btn"
-            android:textSize="16dp" />
-
-    </LinearLayout>-->
 
 
 </LinearLayout>

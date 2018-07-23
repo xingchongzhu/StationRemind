@@ -55,4 +55,8 @@
     <string name="arrived_reminder">到站提醒</string>
     <string name="please_set_target">请设置目标站点</string>
     <string name="please_set_permission">请设置权限</string>
+    <string name="select_line_title">定位结果</string>
+    <string name="location_line_select">最近站台:</string>
+    <string name="select_line_info">选择线路</string>
+    <string name="line_tail">%d号线</string>
 </resources>
