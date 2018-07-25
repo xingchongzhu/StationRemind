@@ -22,17 +22,18 @@ import com.traffic.locationremind.manager.bean.StationInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class SelectLineDialog extends Dialog {
     Context context;
     private StationInfo station;
-    private List<LineInfo> tempList;
+    private Map<Integer, LineInfo> tempList;
     private List<String> selectList = new ArrayList<>();
     private SettingReminderDialog.NoticeDialogListener listener;
 
 
-    public SelectLineDialog(Context context, int theme,SettingReminderDialog.NoticeDialogListener listener, StationInfo station, List<LineInfo> tempList) {
+    public SelectLineDialog(Context context, int theme, SettingReminderDialog.NoticeDialogListener listener, StationInfo station, Map<Integer, LineInfo> tempList) {
         super(context, theme);
         this.context = context;
         this.station = station;
@@ -55,36 +56,36 @@ public class SelectLineDialog extends Dialog {
                 final int size = lines.length;
                 String lineTail = context.getResources().getString(R.string.line_tail);
                 for (int i = 0; i < size; i++) {
-                     for (LineInfo lineInfo:tempList){
-                         if(lineInfo.lineid == CommonFuction.convertToInt(lines[i],0)){
-                             for (StationInfo stationInfo:lineInfo.getStationInfoList()){
-                                 if(stationInfo.getCname().equals(station.getCname())){
-                                     allLines+= String.format(lineTail,""+lineInfo.lineid)+"  ";
-                                     selectList.add(String.format(lineTail,String.format(lineTail,""+lineInfo.lineid))+" ->"+
-                                             lineInfo.linename+" :"+lineInfo.lineinfo);
-                                     break;
-                                 }
-                             }
-                         }
-                     }
+                    LineInfo lineInfo = tempList.get(CommonFuction.convertToInt(lines[i], 0));
+                    if (lineInfo != null) {
+                        List<StationInfo> tmpStationList = lineInfo.getStationInfoList();
+                        for (StationInfo stationInfo : tmpStationList) {
+                            if (stationInfo.getCname().equals(station.getCname())) {
+                                allLines += String.format(lineTail, "" + lineInfo.lineid) + "  ";
+                                selectList.add(String.format(lineTail, "" + lineInfo.lineid) + " ->" +
+                                        lineInfo.linename + " :" + lineInfo.lineinfo);
+                                break;
+                            }
+                        }
+                    }
                 }
-
-                stationTextView.setText(station.getCname()+"("+allLines+")");
+                stationTextView.setText(station.getCname() + "(" + allLines + ")");
                 String[] strArr = new String[selectList.size()];
                 selectList.toArray(strArr);
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.item, R.id.tv_name, strArr);
                 //设置数据适配器 要会触类旁通
                 listView.setAdapter(adapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        if(lines.length > position){
-                            CommonFuction.writeSharedPreferences(context,CommonFuction.CURRENTLINEID,lines[position]);
+                        if (lines.length > position) {
+                            CommonFuction.writeSharedPreferences(context, CommonFuction.CURRENTLINEID, lines[position]);
                             notificationListern(null);
                             dismiss();
                         }
                     }
                 });
+
             }
 
         }
@@ -96,8 +97,8 @@ public class SelectLineDialog extends Dialog {
         getWindow().setAttributes(p);
     }
 
-    public void notificationListern(View v){
-        if(listener != null){
+    public void notificationListern(View v) {
+        if (listener != null) {
             listener.onClick(v);
         }
     }

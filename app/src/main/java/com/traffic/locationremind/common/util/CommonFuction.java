@@ -7,6 +7,15 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.text.TextUtils;
+import com.baidu.location.BDLocation;
+import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
+import com.traffic.locationremind.manager.bean.CityInfo;
+import com.traffic.locationremind.manager.bean.LineInfo;
+import com.traffic.locationremind.manager.database.DataHelper;
+
+import java.util.List;
+import java.util.Map;
 
 public class CommonFuction {
 	public static final String TRUE = "true";
@@ -27,6 +36,7 @@ public class CommonFuction {
 	public final static String HEAD = "head";
 	public final static String TAIL = "tail";
 
+	public final static double INVALE_DATA = 4.9E-324D;
 
 	public static void writeSharedPreferences(Context context,String key,String value){
 		SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);
@@ -167,5 +177,61 @@ public class CommonFuction {
 		} catch (Exception e) {
 			return defaultValue;
 		}
+	}
+
+	public static String getSubwayShowText(Context context, DataHelper mDataHelper, LineInfo mLineInfo) {
+		String str = "";
+		List<CityInfo> cityList = mDataHelper.QueryCityByCityNo(mLineInfo.getCityNo());
+		if (cityList != null && cityList.size() > 0) {
+			str += cityList.get(0).getCityName();
+		}
+		str += context.getResources().getString(R.string.subway) + mLineInfo.getLineid() +
+				context.getResources().getString(R.string.subway_tail) +
+				"(" + mLineInfo.getLinename() + ")" + "\n" + mLineInfo.getLineinfo();
+		return str;
+	}
+
+	public static boolean isvalidLocation(BDLocation location){
+		if(location == null || location.getLongitude() == CommonFuction.INVALE_DATA ||
+				location.getLatitude() == CommonFuction.INVALE_DATA){
+			return false;
+		}
+		return true;
+	}
+
+
+	/**
+	 * 获取map中第一个key值
+	 *
+	 * @param map 数据源
+	 * @return
+	 */
+	public static String getKeyOrNull(Map<String, CityInfo> map) {
+		String obj = null;
+		for (Map.Entry<String, CityInfo> entry : map.entrySet()) {
+			obj = entry.getKey();
+			if (obj != null) {
+				break;
+			}
+		}
+		return  obj;
+	}
+
+
+	/**
+	 * 获取map中第一个数据值
+	 *
+	 * @param map 数据源
+	 * @return
+	 */
+	public static CityInfo getFirstOrNull(Map<String, CityInfo> map) {
+		CityInfo obj = null;
+		for (Map.Entry<String, CityInfo> entry : map.entrySet()) {
+			obj = entry.getValue();
+			if (obj != null) {
+				break;
+			}
+		}
+		return  obj;
 	}
 }

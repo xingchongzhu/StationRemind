@@ -5,6 +5,7 @@ import android.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class LineInfo {
     public static String ID = "id";
@@ -29,7 +30,7 @@ public class LineInfo {
         return cityNo;
     }
 
-    private List<StationInfo> mStationInfoList = new ArrayList<StationInfo>();//地图站台信息
+    private List<StationInfo> mStationInfoList;//地图站台信息
 
     public void setStationInfoList(List<StationInfo> mStationInfoList){
         if(this.mStationInfoList != null){
@@ -55,7 +56,7 @@ public class LineInfo {
         return rgbColor;
     }
 
-    public List<StationInfo>  getStationInfoList(){
+    public List<StationInfo> getStationInfoList(){
         return mStationInfoList;
     }
 

@@ -6,8 +6,10 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import android.widget.Toast;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
+import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.LocationApplication;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
@@ -37,10 +39,7 @@ public class RemonderLocationService extends Service {
      * Timer实时更新数据的
      */
     private double longitude,latitude;
-    /**
-     *
-     */
-    //private StationInfo currentStationInfo = new StationInfo();
+
     BDLocation currentLocation;
     private List<MarkObject> mStationInfoList = null;//地图站台信息
 
@@ -113,7 +112,12 @@ public class RemonderLocationService extends Service {
     }
 
     public BDLocation getCurrentLocation(){
-        return  currentLocation;
+        /*if(!CommonFuction.isvalidLocation(currentLocation)){
+            if(callback != null){
+                callback.errorHint(RemonderLocationService.this.getResources().getString(R.string.location_errot));
+            }
+        }*/
+        return currentLocation;
     }
     /*****
      *
@@ -126,21 +130,31 @@ public class RemonderLocationService extends Service {
         public void onReceiveLocation(BDLocation location) {
             // TODO Auto-generated method stub
 
-            double lot =0,lat = 0;
+            //double lot =0,lat = 0;
             if (null != location
                     && location.getLocType() != BDLocation.TypeServerError) {
-                StringBuffer sb = new StringBuffer(256);
+                //StringBuffer sb = new StringBuffer(256);
                 /**
                  * 时间也可以使用systemClock.elapsedRealtime()方法 获取的是自从开机以来，每次回调的时间；
                  * location.getTime() 是指服务端出本次结果的时间，如果位置不发生变化，则时间不变
                  */
-                //sb.append("\nlatitude : ");// 纬度
-                lot = location.getLongitude();
+
+                if(!CommonFuction.isvalidLocation(location)){
+                    Log.d(TAG,"BDAbstractLocationListener location invale ");
+                    currentLocation = null;
+                    return;
+                }
+               // Log.d(TAG,"BDAbstractLocationListener location = "+location+" callback");
                 currentLocation = location;
+                if(isReminder && callback != null){
+                    callback.loactionStation(location);
+                }
+                //lot = location.getLongitude();
+                //lat = location.getLatitude();
+                //sb.append("\nlatitude : ");// 纬度
                 //currentStationInfo.setLat(""+location.getLatitude());
                 //sb.append(location.getLatitude());
                 //sb.append("\nlontitude : ");// 经度
-                lat = location.getLatitude();
                 //Log.d(TAG,"BDAbstractLocationListener lot ="+lot+" lat = "+lat);
                 //currentStationInfo.setLot(""+location.getLongitude());
                 //sb.append(location.getLongitude());
@@ -161,7 +175,8 @@ public class RemonderLocationService extends Service {
                  */
                 //mStationInfo.setStationInfo(sb.toString());
                 //callback.setCurrentStation(mStationInfo);//
-                if(mStationInfoList != null && isReminder){
+
+                /*if(mStationInfoList != null && isReminder){
                     double dis = 0;
                     String startStation="",endStation="",currentStation="";
                     final int mStationInfoList_size = mStationInfoList.size();// Moved  mStationInfoList.size() call out of the loop to local variable mStationInfoList_size
@@ -198,7 +213,7 @@ public class RemonderLocationService extends Service {
                             continue;
                         }
                     }
-                }
+                }*/
 
             }
         }
@@ -256,6 +271,8 @@ public class RemonderLocationService extends Service {
          */
         void setCurrentStation(String startCname, String endName, String current);
         void arriaved(boolean state);
+        void loactionStation(BDLocation location);
+        void errorHint(String error);
     }
     /**
      * 服务销毁的时候调用
@@ -272,6 +289,7 @@ public class RemonderLocationService extends Service {
             locationService.unregisterListener(mListener); // 注销掉监听
             locationService.stop(); // 停止定位服务
         }
+        setCancleReminder();
         Log.d(TAG,"onDestroy ");
     }
 

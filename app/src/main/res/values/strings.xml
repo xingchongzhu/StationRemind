@@ -59,4 +59,5 @@
     <string name="location_line_select">最近站台:</string>
     <string name="select_line_info">选择线路</string>
     <string name="line_tail">地铁%s号线</string>
+    <string name="location_errot">请检测网络或gps定位是否开启！</string>
 </resources>

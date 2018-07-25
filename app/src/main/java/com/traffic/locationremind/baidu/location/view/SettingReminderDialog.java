@@ -3,8 +3,10 @@ package com.traffic.locationremind.baidu.location.view;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,15 +25,7 @@ public class SettingReminderDialog extends Dialog implements OnClickListener{
     public interface NoticeDialogListener {
         public void onClick(View view);
     }
-    public SettingReminderDialog(Context context) {
-        super(context);
-        // TODO Auto-generated constructor stub
-        this.context = context;
-    }
-    public SettingReminderDialog(Context context, int theme){
-        super(context, theme);
-        this.context = context;
-    }
+
     public SettingReminderDialog(Context context, int theme, NoticeDialogListener listener
             , String transferInfo, String exitInfo, String lineId, String city, String station){
         super(context, theme);
@@ -50,8 +44,7 @@ public class SettingReminderDialog extends Dialog implements OnClickListener{
         TextView title = (TextView) findViewById(R.id.title);
         TextView transfer = (TextView) findViewById(R.id.transfer);
         TextView exit_info = (TextView) findViewById(R.id.exit_info);
-       // Button cancel_action = (Button) findViewById(R.id.cancel_action);
-       // Button save_action = (Button) findViewById(R.id.save_action);
+
         Button start = (Button) findViewById(R.id.start);
         Button end = (Button) findViewById(R.id.end);
 
@@ -59,13 +52,14 @@ public class SettingReminderDialog extends Dialog implements OnClickListener{
         transfer.setText(transferInfo);
         exit_info.setText(exitInfo);
 
-       // cancel_action.setOnClickListener(this);
-       // save_action.setOnClickListener(this);
-
         start.setOnClickListener(this);
         end.setOnClickListener(this);
-
-        setCanceledOnTouchOutside(false);
+        setCanceledOnTouchOutside(true);
+        WindowManager m = getWindow().getWindowManager();
+        Display d = m.getDefaultDisplay();
+        WindowManager.LayoutParams p = getWindow().getAttributes();
+        p.width = d.getWidth();
+        getWindow().setAttributes(p);
 
     }
     private String convertString() {

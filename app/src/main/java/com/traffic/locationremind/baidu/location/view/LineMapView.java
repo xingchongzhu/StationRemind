@@ -16,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.common.util.CommonFuction;
 
@@ -470,7 +471,7 @@ public class LineMapView extends View {
                             canvas.drawBitmap(mBitmapCurrent, matrix, mPaint);
                         }
 
-                        if(object.isCurrentLocationStation){
+                        if(object.isCurrentLocationStation && !CommonFuction.getSharedPreferencesBooleanValue(context, CommonFuction.ISREMINDER)){
                             canvas.drawBitmap(mBitmapLocationCurrent, matrix, mPaint);
                         }
                         int length = (int) (object.getName().length() * 3);
@@ -588,6 +589,12 @@ public class LineMapView extends View {
     }
 
 
+    public int getCurrentLineId(){
+        if(markList != null && markList.size() >0){
+            return markList.get(0).mStationInfo.lineid;
+        }
+        return 0;
+    }
     // 获得状态栏高度
     private int getStatusBarHeight() {
         Class<?> c = null;
