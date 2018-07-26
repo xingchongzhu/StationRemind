@@ -87,7 +87,8 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     private List<StationInfo> currentAllStationList = new ArrayList<StationInfo>();//正在导航线路
 
     private Map<String, StationInfo> allTransferList;//所有可以换乘站台
-    private Map<Integer, Map<Integer,StationInfo>> allLineCane = new HashMap<Integer, Map<Integer,StationInfo>>();//(1,(2,3,4,5)),(2,(3,4,6,8)),(3,(3,4,6,8))
+    private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//(1,(2,3,4,5)),(2,(3,4,6,8)),(3,(3,4,6,8))
+    private int maxLineid = 0;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -157,7 +158,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         city_select.setOnClickListener(this);
 
         mDataHelper = DataHelper.getInstance(this);
-        cityInfoList = mDataHelper.getAllCityInfo();
+
         ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
         if (ReadExcelDataUtil.getInstance().hasWrite) {
             initData();
@@ -312,6 +313,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     }
 
     private void initData() {
+        Log.d(TAG,"initData");
         minitDataThread = new initDataThread();
         minitDataThread.start();
     }
@@ -319,7 +321,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     class initDataThread extends Thread {
         @Override
         public void run() {
-
+            cityInfoList = mDataHelper.getAllCityInfo();
             String shpno = CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CITYNO);
             allTransferList = mDataHelper.QueryByStationAllTransfer(CommonFuction.CITYNO);
             if (!TextUtils.isEmpty(shpno)) {
@@ -328,23 +330,23 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             if (currentCityNo == null) {
                 currentCityNo = CommonFuction.getFirstOrNull(cityInfoList);
             }
+            if(currentCityNo == null){
+                return;
+            }
             mLineInfoList = mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
             Log.d(TAG, "currentCityNo = " + currentCityNo.getCityNo() + " mLineInfoList.size = " + mLineInfoList.size());
             int firstLineid = -1;
             for (Map.Entry<Integer,LineInfo> entry : mLineInfoList.entrySet()) {
                 if(firstLineid < 0)
                     firstLineid = entry.getKey();
-                //Map<Integer, Map<Integer,StationInfo>>
                 List<StationInfo> list = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());
-                allLineCane.put(firstLineid,getLineAllLined(list));
-                entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
-                int size = entry.getValue().getStationInfoList().size();
-                for (int i = 0; i < size; i++) {
-                    entry.getValue().getStationInfoList().get(i).colorId = entry.getValue().colorid;
+                allLineCane.put(entry.getKey(),getLineAllLined(list));
+                if(entry.getKey() > maxLineid){
+                    maxLineid = entry.getKey();
                 }
-
+                entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
             }
-
+            maxLineid+= 1;//找出路线最大编号加一
             currentIndex = CommonFuction.convertToInt(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTLINEID),
                     firstLineid);
             //单一线路-------------------------------------
@@ -372,7 +374,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             int size = lineList.length;
             for(int i = 0;i < size;i++){
                 int line = CommonFuction.convertToInt(lineList[i],-1);
-                if(!listStr.containsKey(line)){
+                if(!listStr.containsKey(line) && line != stationInfo.lineid){
                     listStr.put(line,line);
                     str.append(lineList[i]+"  ");
                 }
@@ -430,9 +432,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             @Override
                             public void run() {
                                 initLineMap(markObject.getLineid());
-                                Message msg = new Message();
-                                msg.what = 2;
-                                mHandler.sendMessage(msg);
                             }
                         }.start();
                     }
@@ -452,13 +451,14 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
     private void initLineMap(int lineId) {
 
-        sceneMap.setFullScree(false);
-        sceneMap.clearMark();
         LineInfo lineInfo = getLineInfoByLineid(mLineInfoList,lineId);
         if(lineInfo != null){
             mStationInfoList = lineInfo.getStationInfoList();
+        }else{
+            return;
         }
-
+        sceneMap.setFullScree(false);
+        sceneMap.clearMark();
         int countRow = mStationInfoList.size() / LineMapView.ROWMAXCOUNT + extraRow;
         float initX = 1f / LineMapView.ROWMAXCOUNT / 2f;
         float initY = 1f / countRow / 2;
@@ -472,17 +472,17 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
             float x = cloume / (LineMap.ROWMAXCOUNT) + initX;
             float y = row / countRow - initY;
-            //Log.d(TAG, "n = "+n+" row = "+row+" colume = "+cloume+" x = "+x+" y = "+y);
             markObject.setMapX(x);
             markObject.setMapY(y);
             markObject.mStationInfo = mStationInfoList.get(n);
-            markObject.setName(mStationInfoList.get(n).getCname().split(" ")[0]);
+            markObject.setName(markObject.mStationInfo.getCname().split(" ")[0]);
             //Log.d(TAG,"initLineMap currentStationName = "+currentStationName+" markObject.getName() = "+markObject.getName());
             if (!TextUtils.isEmpty(currentStationName) && !TextUtils.isEmpty(markObject.getName()) &&
                     currentStationName.equals(markObject.getName())) {
                 markObject.isCurrentLocationStation = true;
             }
-            markObject.setColorId(mStationInfoList.get(n).colorId);
+            markObject.mStationInfo.colorId = lineInfo.colorid;
+            markObject.setColorId(markObject.mStationInfo.colorId);
             markObject.setRadius(MarkObject.size / 3);
             markObject.setCurrentsize(MarkObject.size + MarkObject.DIFF);
             if(isReminder){
@@ -515,6 +515,10 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             });
             sceneMap.addMark(markObject);
         }
+
+        Message msg = new Message();
+        msg.what = 2;
+        mHandler.sendMessage(msg);
 
     }
 
@@ -667,9 +671,16 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         return -1;
     }
 
-    public void getReminderLines(StationInfo start,StationInfo end){
+    public void getReminderLines(StationInfo start,final StationInfo end){
         if(end == null){
             return;
+        }
+        currentAllStationList.clear();
+        final Integer allLineNodes[] = new Integer[maxLineid];
+        int n = 0;
+        for(int i = 0;i<maxLineid;i++){
+            //Log.d(TAG,"getReminderLines entry.key ="+entry.getKey()+" entry.value = "+entry.getValue());
+            allLineNodes[i] = i;
         }
         if(start == null && mRemonderLocationService != null){
             start = getNerastStation(mRemonderLocationService.getCurrentLocation());
@@ -691,53 +702,32 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     }
                 }
                 if(startStationInfo == null){//需要换乘才能找到路线,最近路线方案,最少换乘方案
-
-                    Map<Integer,Integer> startAllLined = allLineCane.get(start.lineid);
-                    Map<Integer,Integer> endAllLined = allLineCane.get(end.lineid);
-                    for (Map.Entry<Integer, Integer> entry : startAllLined.entrySet()) {
-                        //if()
+                    GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
+                }else{
+                    LineInfo currentLineInfo = getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
+                    if(currentLineInfo != null){
+                        Log.d(TAG,"getReminderLines current line = "+currentLineInfo.lineid+" line name = "+currentLineInfo.linename);
+                        findLinedStation(currentLineInfo,startStationInfo,end,currentAllStationList);
                     }
                 }
             }else{//找不到任何站台
                 return;
             }
-
-        }
-
-        currentAllStationList.clear();
-        if(start.lineid == end.lineid){//在一条线路上
-            LineInfo currentLineInfo = null;
-            currentLineInfo = getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
-            if(currentLineInfo != null){
-                Log.d(TAG,"getReminderLines current line = "+currentLineInfo.lineid+" line name = "+currentLineInfo.linename);
-                currentAllStationList.add(start);
-                List<StationInfo> stationInfoList = currentLineInfo.getStationInfoList();
-                if(start.pm < end.pm){
-                    for (StationInfo mStationInfo:stationInfoList){
-                        int next = currentAllStationList.get(currentAllStationList.size()-1).pm+1;
-                        if(next == mStationInfo.pm){
-                            currentAllStationList.add(mStationInfo);
-                        }
-                        if(next == end.pm){
-                            break;
-                        }
-                    }
-                }else{
-                    StationInfo mStationInfo = null;
-                    for (int i = stationInfoList.size()-1;i>=0;i--){
-                        mStationInfo = stationInfoList.get(i);
-                        int next = currentAllStationList.get(currentAllStationList.size()-1).pm-1;
-                        if(next == mStationInfo.pm){
-                            currentAllStationList.add(mStationInfo);
-                        }
-                        if(next == end.pm){
-                            break;
-                        }
-                    }
+        }else{
+            //在一条线路上
+            if(start.lineid == end.lineid){
+                LineInfo currentLineInfo = null;
+                currentLineInfo = getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
+                if(currentLineInfo != null){
+                    Log.d(TAG,"getReminderLines current line = "+currentLineInfo.lineid+" line name = "+currentLineInfo.linename);
+                    findLinedStation(currentLineInfo,start,end,currentAllStationList);
                 }
-
+            }else{
+                Log.d(TAG,"getReminderLines need transfer start.lineid = "+start.lineid+" start.name = "+start.getCname()+" end.lineid = "+end.lineid+" end.name = "+end.getCname());
+                GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
             }
         }
+
         StringBuffer str = new StringBuffer();
         for(StationInfo mStationInfo:currentAllStationList){
             str.append(mStationInfo.getCname()+" -> ");
@@ -746,23 +736,33 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         Log.d(TAG,"getReminderLines str = "+str);
     }
 
-    //递归查询要换路线
-    public int getLined(Map<Integer,Integer> startAllLined,Map<Integer,Integer> endAllLined){
-       /* int endid = -1;
-
-
-        for (Map.Entry<Integer, Integer> entry : endAllLined.entrySet()) {
-            endid = entry.getKey();
-            break;
-        }*/
-
-       /* if(startAllLined.containsKey(endid)){
-            return
-        }*/
-       /* for (Map.Entry<Integer, Integer> entry : startAllLined.entrySet()) {
-
-        }*/
-       return 0;
+    public void findLinedStation(LineInfo lineInfo,StationInfo start,StationInfo end,List<StationInfo> currentAllStationList){
+        List<StationInfo> stationInfoList = lineInfo.getStationInfoList();
+        if(!currentAllStationList.contains(start))
+            currentAllStationList.add(start);
+        if(start.pm < end.pm){
+            for (StationInfo mStationInfo:stationInfoList){
+                int next = currentAllStationList.get(currentAllStationList.size()-1).pm+1;
+                if(next == mStationInfo.pm && !currentAllStationList.contains(mStationInfo)){
+                    currentAllStationList.add(mStationInfo);
+                }
+                if(next == end.pm){
+                    break;
+                }
+            }
+        }else{
+            StationInfo mStationInfo = null;
+            for (int i = stationInfoList.size()-1;i>=0;i--){
+                mStationInfo = stationInfoList.get(i);
+                int next = currentAllStationList.get(currentAllStationList.size()-1).pm-1;
+                if(next == mStationInfo.pm && !currentAllStationList.contains(mStationInfo)){
+                    currentAllStationList.add(mStationInfo);
+                }
+                if(next == end.pm){
+                    break;
+                }
+            }
+        }
     }
 
     public LineInfo getLineInfoByLineid(Map<Integer,LineInfo> lineInfoList,int lineid){
@@ -847,7 +847,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                         StationInfo stationInfo = getNerastStation(location);
                         nerstStationInfo = stationInfo;
 
-                        Log.d(TAG,"loactionStation nearststationInfo.getCname = "+stationInfo.getCname());
+                        //Log.d(TAG,"loactionStation nearststationInfo.getCname = "+stationInfo.getCname());
                         if(stationInfo != null){
                             if(endStationInfo != null && endStationInfo.getCname().equals(stationInfo.getCname())){
                                 Log.d(TAG,"loactionStation has arrived target");
@@ -865,7 +865,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                                         if(mStationInfo != null){
                                             sceneMap.setCurrentStation(stationInfo.getCname());
                                             currentStationInfo = mStationInfo;
-                                            Log.d(TAG,"loactionStation current line = "+currentStationInfo.lineid+" current station name = "+currentStationInfo.getCname());
+                                            //Log.d(TAG,"loactionStation current line = "+currentStationInfo.lineid+" current station name = "+currentStationInfo.getCname());
                                         }
                                     }
                                 }else{//不是一条线路需要换乘
@@ -883,7 +883,9 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                         ToastUitl.showText(MainViewActivity.this, error, Toast.LENGTH_LONG, true);
                     }
                 });
-                locationCurrentStation();
+                if (ReadExcelDataUtil.getInstance().hasWrite) {
+                    locationCurrentStation();
+                }
             }
 
         }
