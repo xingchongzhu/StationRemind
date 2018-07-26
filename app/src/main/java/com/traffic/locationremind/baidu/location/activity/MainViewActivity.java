@@ -53,6 +53,10 @@ import java.util.Map;
 public class MainViewActivity extends CommonActivity implements ReadExcelDataUtil.DbWriteFinishListener, View.OnClickListener {
 
     private final static String TAG = "MainViewActivity";
+
+    private final static int INITMAPCOLOR = 1;//初始化当前城市地铁显示
+    private final static int SHOWCURRENTLINED = 2;//当前选择路线
+    private final static int STARTLOCATION = 3;//开始定位
     private LineMapView sceneMap;
     private LineMapColorView lineMap;
     private GifView gif;
@@ -84,7 +88,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     SettingReminderDialog mSettingReminderDialog;
     StationInfo startStationInfo, currentStationInfo, endStationInfo,nerstStationInfo;
 
-    private List<StationInfo> currentAllStationList = new ArrayList<StationInfo>();//正在导航线路
+    private Map<List<Integer>,List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
 
     private Map<String, StationInfo> allTransferList;//所有可以换乘站台
     private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//(1,(2,3,4,5)),(2,(3,4,6,8)),(3,(3,4,6,8))
@@ -96,41 +100,42 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
             super.handleMessage(msg);
             switch (msg.what) {
-                case 1:
+                case INITMAPCOLOR:
                     if (mLineInfoList != null && mLineInfoList.size() > 0) {
                         //线路颜色-------------------------------------
                         initLineColorMap();
-                        mStationInfoList = mLineInfoList.get(currentIndex).getStationInfoList();
-                        currentLineInfoText.setText(CommonFuction.getSubwayShowText(MainViewActivity.this, mDataHelper, mLineInfoList.get(currentIndex)));
-                        currentLineInfoText.setBackgroundColor(mLineInfoList.get(currentIndex).colorid);
-                        int countRow = mStationInfoList.size() / LineMap.ROWMAXCOUNT + 1;
-                        Bitmap bitmap = Bitmap.createBitmap((int) sceneMap.getViewWidth(), MarkObject.ROWHEIGHT * countRow,
-                                Bitmap.Config.ARGB_8888);
-                        bitmap.eraseColor(MainViewActivity.this.getResources().getColor(R.color.white));//填充颜色
-                        sceneMap.setBitmap(bitmap);
-                        sceneMap.postInvalidate();
+                        showSelectLine();
                         //----------------------------------------
                         gif.setVisibility(View.GONE);
                         setViewVisible(View.VISIBLE);
                         hintText.setVisibility(View.GONE);
                     }
                     break;
-                case 2:
-                    mStationInfoList = mLineInfoList.get(currentIndex).getStationInfoList();
-                    currentLineInfoText.setText(CommonFuction.getSubwayShowText(MainViewActivity.this, mDataHelper, mLineInfoList.get(currentIndex)));
-                    currentLineInfoText.setBackgroundColor(mLineInfoList.get(currentIndex).colorid);
-                    int countRow = mStationInfoList.size() / LineMap.ROWMAXCOUNT + 1;
-                    Bitmap bitmap = Bitmap.createBitmap((int) sceneMap.getViewWidth(), MarkObject.ROWHEIGHT * countRow,
-                            Bitmap.Config.ARGB_8888);
-                    bitmap.eraseColor(MainViewActivity.this.getResources().getColor(R.color.white));//填充颜色
-                    sceneMap.setBitmap(bitmap);
-                    sceneMap.postInvalidate();
+                case SHOWCURRENTLINED:
+                    showSelectLine();
+                    break;
+
+                case STARTLOCATION:
+                    mRemonderLocationService.setStartReminder();
+                    mRemonderLocationService.setStationInfoList(sceneMap.getMarkList());
+                    start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stop_location));
                     break;
             }
 
         }
     };
 
+    private void showSelectLine(){
+        mStationInfoList = mLineInfoList.get(currentIndex).getStationInfoList();
+        currentLineInfoText.setText(CommonFuction.getSubwayShowText(MainViewActivity.this, mDataHelper, mLineInfoList.get(currentIndex)));
+        currentLineInfoText.setBackgroundColor(mLineInfoList.get(currentIndex).colorid);
+        int countRow = mStationInfoList.size() / LineMap.ROWMAXCOUNT + 1;
+        Bitmap bitmap = Bitmap.createBitmap((int) sceneMap.getViewWidth(), MarkObject.ROWHEIGHT * countRow,
+                Bitmap.Config.ARGB_8888);
+        bitmap.eraseColor(MainViewActivity.this.getResources().getColor(R.color.white));//填充颜色
+        sceneMap.setBitmap(bitmap);
+        sceneMap.postInvalidate();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -222,10 +227,12 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     endStationInfo = null;
                     currentStationInfo = null;
                 } else if (endStationInfo != null) {
-                    getReminderLines(startStationInfo,endStationInfo);
-                    mRemonderLocationService.setStartReminder();
-                    mRemonderLocationService.setStationInfoList(sceneMap.getMarkList());
-                    start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stop_location));
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            getReminderLines(startStationInfo,endStationInfo);
+                        }
+                    }.start();
                 } else {
                     Toast.makeText(MainViewActivity.this, MainViewActivity.this.getString(R.string.please_set_target), Toast.LENGTH_SHORT).show();
                 }
@@ -359,7 +366,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             }
 
             Message msg = new Message();
-            msg.what = 1;
+            msg.what = INITMAPCOLOR;
             mHandler.sendMessage(msg);
         }
     }
@@ -517,7 +524,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         }
 
         Message msg = new Message();
-        msg.what = 2;
+        msg.what = SHOWCURRENTLINED;
         mHandler.sendMessage(msg);
 
     }
@@ -659,56 +666,37 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         return nerstStationInfo;
     }
 
-    //查询站台是否与目标线路有相同线路
-    private int getSameLine(StationInfo start,int lined){
-        final String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
-        int size = lines.length;
-        for(int i = 0;i < size;i++){//找出和终点站相同点不用换乘
-            if(CommonFuction.convertToInt(lines[i],0) == lined){//找到相同线路站不用换乘
-                return CommonFuction.convertToInt(lines[i],0);
-            }
-        }
-        return -1;
-    }
-
     public void getReminderLines(StationInfo start,final StationInfo end){
         if(end == null){
             return;
         }
-        currentAllStationList.clear();
+        List<List<Integer>> transferLine = new ArrayList<List<Integer>>();//所有换乘路线
         final Integer allLineNodes[] = new Integer[maxLineid];
-        int n = 0;
-        for(int i = 0;i<maxLineid;i++){
-            //Log.d(TAG,"getReminderLines entry.key ="+entry.getKey()+" entry.value = "+entry.getValue());
+        for(int i = 0;i<maxLineid;i++){//初始化所有线路
             allLineNodes[i] = i;
         }
+        boolean isFind = false;
         if(start == null && mRemonderLocationService != null){
             start = getNerastStation(mRemonderLocationService.getCurrentLocation());
             if(start != null){
                 Log.d(TAG,"getReminderLines start.getTransfer() = "+start.getTransfer()+" start.lineid = "+start.lineid+" start.name = "+start.getCname()+" end.lineid = "+end.lineid+" end.name = "+end.getCname());
                 if(start.lineid == end.lineid){//可以直达
                     startStationInfo = start;
-                }else if(start.canTransfer()){//可以换乘
-                    int lined = getSameLine(start,end.lineid);
+                    List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+                    list.add(start.lineid);
+                    transferLine.add(list);
+                    isFind = true;
+                }else if(start.canTransfer()){//可以换乘，可以直达
+                    int lined = PathSerachUtil.isSameLine(start,end.lineid);
                     if(lined != -1){
-                        LineInfo lineInfo = getLineInfoByLineid(mLineInfoList,lined);//先找线路
-                        if(lineInfo != null){
-                            StationInfo stationInfo= getStationInfoByLineidAndName(lineInfo.getStationInfoList(),start.getCname());//再找相同站台
-                            if(stationInfo != null){
-                                start = startStationInfo = stationInfo;
-                                Log.d(TAG,"getReminderLines findStation lineid = "+startStationInfo.lineid+" name = "+startStationInfo.getCname());
-                            }
-                        }
+                        isFind = true;
+                        List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+                        list.add(lined);
+                        transferLine.add(list);
                     }
                 }
-                if(startStationInfo == null){//需要换乘才能找到路线,最近路线方案,最少换乘方案
-                    GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
-                }else{
-                    LineInfo currentLineInfo = getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
-                    if(currentLineInfo != null){
-                        Log.d(TAG,"getReminderLines current line = "+currentLineInfo.lineid+" line name = "+currentLineInfo.linename);
-                        findLinedStation(currentLineInfo,startStationInfo,end,currentAllStationList);
-                    }
+                if(!isFind){//需要换乘才能找到路线,最近路线方案,最少换乘方案
+                    transferLine = GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
                 }
             }else{//找不到任何站台
                 return;
@@ -716,53 +704,98 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         }else{
             //在一条线路上
             if(start.lineid == end.lineid){
-                LineInfo currentLineInfo = null;
-                currentLineInfo = getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
-                if(currentLineInfo != null){
-                    Log.d(TAG,"getReminderLines current line = "+currentLineInfo.lineid+" line name = "+currentLineInfo.linename);
-                    findLinedStation(currentLineInfo,start,end,currentAllStationList);
-                }
+                List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+                list.add(start.lineid);
+                transferLine.add(list);
             }else{
                 Log.d(TAG,"getReminderLines need transfer start.lineid = "+start.lineid+" start.name = "+start.getCname()+" end.lineid = "+end.lineid+" end.name = "+end.getCname());
-                GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
+                transferLine = GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
             }
         }
-
-        StringBuffer str = new StringBuffer();
-        for(StationInfo mStationInfo:currentAllStationList){
-            str.append(mStationInfo.getCname()+" -> ");
+        if(start != null && end != null){
+            //找出所有路径
+            StringBuffer str = new StringBuffer();
+            currentAllStationList.clear();
+            Log.d(TAG,"getReminderLines transferLine.size = "+transferLine.size());
+            for(List<Integer> list:transferLine){//取出一条路线
+                StationInfo startStation = null,  endStation = null;
+                int size = list.size();
+                Log.d(TAG,"getReminderLines list = "+list);
+                List<StationInfo> oneLineMap = new ArrayList<StationInfo>();
+                for(int i = 0 ; i < size ; i++){//分段查找所有站
+                    int lined = list.get(i);
+                    LineInfo lineInfo = getLineInfoByLineid(mLineInfoList,lined);
+                    if(size == 1){//不用换乘
+                        startStation = start;
+                        endStation = end;
+                        startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
+                    }else if(startStation == null) {//需要换乘，从开始起点走
+                        startStation = start;
+                        if(startStation != null)
+                            startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
+                        if(list.size() > i+1){
+                            List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
+                            endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
+                        }else{
+                            endStation = end;
+                        }
+                    }else{
+                        startStation = endStation;
+                        if(startStation != null)
+                            startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
+                        if(list.size() > i+1){
+                            List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
+                            endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
+                        }else{
+                            endStation = end;
+                        }
+                    }
+                    PathSerachUtil.findLinedStation(lineInfo,startStation,endStation,oneLineMap);
+                }
+                str.delete(0,str.length());
+                currentAllStationList.put(list,oneLineMap);
+                for(StationInfo stationInfo:oneLineMap){
+                    str.append(stationInfo.getCname()+"->");
+                }
+                Log.d(TAG,"getReminderLines "+str.toString());
+            }
 
         }
-        Log.d(TAG,"getReminderLines str = "+str);
+
+
+        Message msg = new Message();
+        msg.what = STARTLOCATION;
+        mHandler.sendMessage(msg);
+        transferLine.clear();
     }
 
-    public void findLinedStation(LineInfo lineInfo,StationInfo start,StationInfo end,List<StationInfo> currentAllStationList){
-        List<StationInfo> stationInfoList = lineInfo.getStationInfoList();
-        if(!currentAllStationList.contains(start))
-            currentAllStationList.add(start);
-        if(start.pm < end.pm){
-            for (StationInfo mStationInfo:stationInfoList){
-                int next = currentAllStationList.get(currentAllStationList.size()-1).pm+1;
-                if(next == mStationInfo.pm && !currentAllStationList.contains(mStationInfo)){
-                    currentAllStationList.add(mStationInfo);
-                }
-                if(next == end.pm){
-                    break;
-                }
+    public StationInfo gitNearestStation(List<StationInfo> stationInfoList,StationInfo stationInfo){
+        if(stationInfoList == null || stationInfoList.size() <=0 ){
+            return null;
+        }
+        StationInfo minStationInfo = stationInfoList.get(0);
+        int min = 0;
+        for(StationInfo station:stationInfoList){
+            int dis = Math.abs(station.pm-stationInfo.pm);
+            if(min > dis){
+                minStationInfo = station;
             }
-        }else{
-            StationInfo mStationInfo = null;
-            for (int i = stationInfoList.size()-1;i>=0;i--){
-                mStationInfo = stationInfoList.get(i);
-                int next = currentAllStationList.get(currentAllStationList.size()-1).pm-1;
-                if(next == mStationInfo.pm && !currentAllStationList.contains(mStationInfo)){
-                    currentAllStationList.add(mStationInfo);
-                }
-                if(next == end.pm){
-                    break;
+        }
+        return minStationInfo;
+    }
+
+    public List<StationInfo> getTwoLineCommonStation(Map<Integer,LineInfo> mLineInfoList,int line1,int line2){
+        List<StationInfo> stationlist = new ArrayList<StationInfo>();
+        LineInfo lineInfo1 = getLineInfoByLineid(mLineInfoList,line1);
+        for(StationInfo stationInfo:lineInfo1.getStationInfoList()){
+            if(stationInfo.canTransfer()){
+                int lined = PathSerachUtil.isSameLine(stationInfo,line2);
+                if(lined > 0){
+                    stationlist.add(stationInfo);
                 }
             }
         }
+        return stationlist;
     }
 
     public LineInfo getLineInfoByLineid(Map<Integer,LineInfo> lineInfoList,int lineid){
