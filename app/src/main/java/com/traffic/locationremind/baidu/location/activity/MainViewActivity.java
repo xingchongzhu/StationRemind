@@ -45,10 +45,7 @@ import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MainViewActivity extends CommonActivity implements ReadExcelDataUtil.DbWriteFinishListener, View.OnClickListener {
 
@@ -88,9 +85,9 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     SettingReminderDialog mSettingReminderDialog;
     StationInfo startStationInfo, currentStationInfo, endStationInfo,nerstStationInfo;
 
-    private Map<List<Integer>,List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
+    //private Map<List<Integer>,List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
+    List<Map.Entry<List<Integer>,List<StationInfo>>> lastLinesLast;
 
-    private Map<String, StationInfo> allTransferList;//所有可以换乘站台
     private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//(1,(2,3,4,5)),(2,(3,4,6,8)),(3,(3,4,6,8))
     private int maxLineid = 0;
 
@@ -330,7 +327,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         public void run() {
             cityInfoList = mDataHelper.getAllCityInfo();
             String shpno = CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CITYNO);
-            allTransferList = mDataHelper.QueryByStationAllTransfer(CommonFuction.CITYNO);
             if (!TextUtils.isEmpty(shpno)) {
                 currentCityNo = cityInfoList.get(shpno);
             }
@@ -458,7 +454,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
     private void initLineMap(int lineId) {
 
-        LineInfo lineInfo = getLineInfoByLineid(mLineInfoList,lineId);
+        LineInfo lineInfo = PathSerachUtil.getLineInfoByLineid(mLineInfoList,lineId);
         if(lineInfo != null){
             mStationInfoList = lineInfo.getStationInfoList();
         }else{
@@ -675,141 +671,108 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         for(int i = 0;i<maxLineid;i++){//初始化所有线路
             allLineNodes[i] = i;
         }
-        boolean isFind = false;
-        if(start == null && mRemonderLocationService != null){
+        if(start == null && mRemonderLocationService != null) {
             start = getNerastStation(mRemonderLocationService.getCurrentLocation());
-            if(start != null){
-                Log.d(TAG,"getReminderLines start.getTransfer() = "+start.getTransfer()+" start.lineid = "+start.lineid+" start.name = "+start.getCname()+" end.lineid = "+end.lineid+" end.name = "+end.getCname());
-                if(start.lineid == end.lineid){//可以直达
-                    startStationInfo = start;
+        }
+        if(start!= null){
+            if(!start.canTransfer() && !end.canTransfer()) {//都不能换乘
+                if(start.lineid == end.lineid){//在一条线路
                     List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
                     list.add(start.lineid);
                     transferLine.add(list);
-                    isFind = true;
-                }else if(start.canTransfer()){//可以换乘，可以直达
-                    int lined = PathSerachUtil.isSameLine(start,end.lineid);
-                    if(lined != -1){
-                        isFind = true;
-                        List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
-                        list.add(lined);
-                        transferLine.add(list);
+                }else{
+                    transferLine = GrfAllEdge.createGraph(allLineNodes, allLineCane, start.lineid, end.lineid);
+                }
+            }else if(start.canTransfer() && !end.canTransfer()){
+                int lined = PathSerachUtil.isSameLine(start,end.lineid);
+                if(lined > 0){//在一条线路
+                    List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+                    list.add(lined);
+                    transferLine.add(list);
+                }else{
+                    String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    for(int i = 0;i < lines.length;i++){
+                        int startid= CommonFuction.convertToInt(lines[i],-1);
+                        if(startid >= 0) {
+                            List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, startid, end.lineid);
+                            transferLine.addAll(temp);
+                        }
                     }
                 }
-                if(!isFind){//需要换乘才能找到路线,最近路线方案,最少换乘方案
-                    transferLine = GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
+            }else if(!start.canTransfer() && end.canTransfer()){
+                int lined = PathSerachUtil.isSameLine(end,start.lineid);
+                if(lined > 0){//在一条线路
+                    List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+                    list.add(lined);
+                    transferLine.add(list);
+                }else{
+                    String lines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    for(int i = 0;i < lines.length;i++){
+                        int startid= CommonFuction.convertToInt(lines[i],-1);
+                        if(startid >= 0) {
+                            List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane,start.lineid , startid);
+                            transferLine.addAll(temp);
+                        }
+                    }
                 }
-            }else{//找不到任何站台
-                return;
-            }
-        }else{
-            //在一条线路上
-            if(start.lineid == end.lineid){
-                List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
-                list.add(start.lineid);
-                transferLine.add(list);
             }else{
-                Log.d(TAG,"getReminderLines need transfer start.lineid = "+start.lineid+" start.name = "+start.getCname()+" end.lineid = "+end.lineid+" end.name = "+end.getCname());
-                transferLine = GrfAllEdge.createGraph(allLineNodes,allLineCane,start.lineid,end.lineid);
-            }
-        }
-        if(start != null && end != null){
-            //找出所有路径
-            StringBuffer str = new StringBuffer();
-            currentAllStationList.clear();
-            Log.d(TAG,"getReminderLines transferLine.size = "+transferLine.size());
-            for(List<Integer> list:transferLine){//取出一条路线
-                StationInfo startStation = null,  endStation = null;
-                int size = list.size();
-                Log.d(TAG,"getReminderLines list = "+list);
-                List<StationInfo> oneLineMap = new ArrayList<StationInfo>();
-                for(int i = 0 ; i < size ; i++){//分段查找所有站
-                    int lined = list.get(i);
-                    LineInfo lineInfo = getLineInfoByLineid(mLineInfoList,lined);
-                    if(size == 1){//不用换乘
-                        startStation = start;
-                        endStation = end;
-                        startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
-                    }else if(startStation == null) {//需要换乘，从开始起点走
-                        startStation = start;
-                        if(startStation != null)
-                            startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
-                        if(list.size() > i+1){
-                            List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
-                            endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
-                        }else{
-                            endStation = end;
-                        }
-                    }else{
-                        startStation = endStation;
-                        if(startStation != null)
-                            startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
-                        if(list.size() > i+1){
-                            List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
-                            endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
-                        }else{
-                            endStation = end;
+                int lined = PathSerachUtil.isTwoStationSameLine(start,end);
+                if(lined > 0){//在一条线路
+                    List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+                    list.add(lined);
+                    transferLine.add(list);
+                }else{
+                    String startLines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    String endLines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    for(int i = 0;i < startLines.length;i++){//遍历所有情况
+                        int startid= CommonFuction.convertToInt(startLines[i],-1);
+                        if(startid > 0){
+                            for(int j = 0;j < endLines.length;j++){
+                                int endid= CommonFuction.convertToInt(endLines[j],-1);
+                                if(endid > 0){
+                                    List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, startid, endid);
+                                    transferLine.addAll(temp);
+                                }
+                            }
                         }
                     }
-                    PathSerachUtil.findLinedStation(lineInfo,startStation,endStation,oneLineMap);
                 }
-                str.delete(0,str.length());
-                currentAllStationList.put(list,oneLineMap);
-                for(StationInfo stationInfo:oneLineMap){
-                    str.append(stationInfo.getCname()+"->");
-                }
-                Log.d(TAG,"getReminderLines "+str.toString());
             }
+        }
+        Collections.sort(transferLine, new Comparator<List<Integer>>(){
+            /*
+             * int compare(Person p1, Person p2) 返回一个基本类型的整型，
+             * 返回负数表示：p1 小于p2，
+             * 返回0 表示：p1和p2相等，
+             * 返回正数表示：p1大于p2
+             */
+            public int compare(List<Integer> p1, List<Integer> p2) {
+                //按照换乘次数
+                if(p1.size() > p2.size()){
+                    return 1;
+                }
+                if(p1.size() == p2.size()){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+
+        if(start != null || end != null){
+            //找出所有路径
+            Log.d(TAG,"getReminderLines find all line = "+transferLine.size()+" start = "+start.getCname()+" end = "+end.getCname());
+            lastLinesLast = PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mLineInfoList,transferLine,start,end));//查询最终线路
+            PathSerachUtil.printAllRecomindLine(lastLinesLast);//打印所有路线
+            Message msg = new Message();
+            msg.what = STARTLOCATION;
+            mHandler.sendMessage(msg);
+        }else{
 
         }
 
-
-        Message msg = new Message();
-        msg.what = STARTLOCATION;
-        mHandler.sendMessage(msg);
         transferLine.clear();
     }
 
-    public StationInfo gitNearestStation(List<StationInfo> stationInfoList,StationInfo stationInfo){
-        if(stationInfoList == null || stationInfoList.size() <=0 ){
-            return null;
-        }
-        StationInfo minStationInfo = stationInfoList.get(0);
-        int min = 0;
-        for(StationInfo station:stationInfoList){
-            int dis = Math.abs(station.pm-stationInfo.pm);
-            if(min > dis){
-                minStationInfo = station;
-            }
-        }
-        return minStationInfo;
-    }
-
-    public List<StationInfo> getTwoLineCommonStation(Map<Integer,LineInfo> mLineInfoList,int line1,int line2){
-        List<StationInfo> stationlist = new ArrayList<StationInfo>();
-        LineInfo lineInfo1 = getLineInfoByLineid(mLineInfoList,line1);
-        for(StationInfo stationInfo:lineInfo1.getStationInfoList()){
-            if(stationInfo.canTransfer()){
-                int lined = PathSerachUtil.isSameLine(stationInfo,line2);
-                if(lined > 0){
-                    stationlist.add(stationInfo);
-                }
-            }
-        }
-        return stationlist;
-    }
-
-    public LineInfo getLineInfoByLineid(Map<Integer,LineInfo> lineInfoList,int lineid){
-        return lineInfoList.get(lineid);
-    }
-
-    public StationInfo getStationInfoByLineidAndName(List<StationInfo> stationInfoList,String name) {
-        for (StationInfo mStationInfo:stationInfoList){//查询最站台和当前路线相同站
-            if(mStationInfo.getCname().equals(name)){
-                return mStationInfo;
-            }
-        }
-        return null;
-    }
 
     private void selectLocationLine(StationInfo nerstStationInfo) {
         if (nerstStationInfo != null) {
@@ -891,10 +854,10 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             }
                             if(startStationInfo != null && endStationInfo != null){
                                 if(startStationInfo.lineid == endStationInfo.lineid){//在一条线路上
-                                    LineInfo currentLineInfo = getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
+                                    LineInfo currentLineInfo = PathSerachUtil.getLineInfoByLineid(mLineInfoList,startStationInfo.lineid);
 
                                     if(currentLineInfo != null){
-                                        StationInfo mStationInfo = getStationInfoByLineidAndName(currentLineInfo.getStationInfoList(),stationInfo.getCname());
+                                        StationInfo mStationInfo = PathSerachUtil.getStationInfoByLineidAndName(currentLineInfo.getStationInfoList(),stationInfo.getCname());
                                         if(mStationInfo != null){
                                             sceneMap.setCurrentStation(stationInfo.getCname());
                                             currentStationInfo = mStationInfo;

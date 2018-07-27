@@ -29,7 +29,7 @@ public class GrfAllEdge {
     // 图的邻接矩阵
     private int[][] matirx;
     private boolean stop = false;
-    private final int MAXTRANSFERNUM = 5;//最多换乘3次,包含起点终点
+    private final int MAXTRANSFERNUM = 4;//最多换乘3次,包含起点终点
 
     StringBuffer str = new StringBuffer();
 
@@ -162,11 +162,11 @@ public class GrfAllEdge {
         grf.initGrf(allLineCane);
         grf.printMatrix();
 
-        Log.d(TAG, "\n------ 寻找起点到终点的所有路径开始 ------origin = " + origin + " goal = " + goal);
+        //Log.d(TAG, "\n------ 寻找起点到终点的所有路径开始 ------origin = " + origin + " goal = " + goal);
         Stack<Integer> stack = new Stack<Integer>();
         stack.push(origin);
         grf.dfsStack( goal, stack);
-        Log.d(TAG, "\n------ 寻找起点到终点的所有路径结束 ------");
+        //Log.d(TAG, "\n------ 寻找起点到终点的所有路径结束 ------");
         Log.d(TAG, "总共寻找到换乘小于4条线路径总共为 grf.allLine.lenght = "+grf.allLine.size());
         Collections.sort(grf.allLine, new Comparator<List<Integer>>(){
             /*
@@ -176,7 +176,7 @@ public class GrfAllEdge {
              * 返回正数表示：p1大于p2
              */
             public int compare(List<Integer> p1, List<Integer> p2) {
-                //按照Person的年龄进行升序排列
+                //按照换乘次数
                 if(p1.size() > p2.size()){
                     return 1;
                 }
@@ -186,10 +186,10 @@ public class GrfAllEdge {
                 return -1;
             }
         });
-
-        for(List<Integer> list:grf.allLine){
-            Log.d(TAG, "list.size = "+list.size()+" list = "+list);
-        }
+        int n =0;
+        /*for(List<Integer> list:grf.allLine){
+            Log.d(TAG, (n++)+" list = "+list);
+        }*/
         return grf.allLine;
     }
 
