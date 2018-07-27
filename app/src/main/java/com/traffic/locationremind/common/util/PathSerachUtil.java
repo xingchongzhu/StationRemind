@@ -140,7 +140,17 @@ public class PathSerachUtil {
 		});
 		List<Map.Entry<List<Integer>,List<StationInfo>>> lastLinesLast = new ArrayList<Map.Entry<List<Integer>,List<StationInfo>>>();
 		if(lastLines.size() > MAXRECOMENDLINENUMBER){//最终保留推荐线路不超过5条
+
 			int size = lastLines.size();
+			lastLinesLast.add(lastLines.get(0));
+			for (int i = 1;i < size;i++) {
+				if(lastLines.get(i).getKey().size() == lastLinesLast.get(0).getKey().size()){
+					lastLinesLast.add(lastLines.get(i));
+				}
+			}
+			lastLines.removeAll(lastLinesLast);
+			size = lastLines.size();
+
 			for (int i = 0;i < size;i++) {
 				Map.Entry<List<Integer>,List<StationInfo>> entry = lastLines.get(i);
 				if(i < MAXRECOMENDLINENUMBER){
@@ -244,17 +254,20 @@ public class PathSerachUtil {
 		return lineInfoList.get(lineid);
 	}
 
-	public static  void printAllRecomindLine(List<Map.Entry<List<Integer>,List<StationInfo>>> lastLines){
+	public static String printAllRecomindLine(List<Map.Entry<List<Integer>,List<StationInfo>>> lastLines){
 		StringBuffer str = new StringBuffer();
 		Log.d(TAG,"------------------------devide-----------------------lastLines.size = "+lastLines.size());
 		for(Map.Entry<List<Integer>,List<StationInfo>> entry:lastLines){
-			str.delete(0,str.length());
+			str.append(entry.getKey().toString()+":");
 			for(StationInfo stationInfo:entry.getValue()){
 				str.append(stationInfo.getCname()+"->");
 			}
-			Log.d(TAG,"key = "+entry.getKey()+" change = "+entry.getKey().size()+" stationnumber = "+entry.getValue().size()+" station = "+str.toString());
+			str.append("\n");
+			//Log.d(TAG,"key = "+entry.getKey()+" change = "+entry.getKey().size()+" stationnumber = "+entry.getValue().size()+" station = "+str.toString());
 		}
+		Log.d(TAG,str.toString());
 		Log.d(TAG,"------------------------end-----------------------");
+		return str.toString();
 	}
 
 	//查询站台是否与目标线路有相同线路

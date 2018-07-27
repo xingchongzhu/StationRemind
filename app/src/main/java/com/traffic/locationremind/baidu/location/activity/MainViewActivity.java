@@ -68,11 +68,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     private TextView hintText;
 
     private int currentIndex = 1;//当前线路
-    private DataHelper mDataHelper;//数据库
-    private CityInfo currentCityNo = null;
-    private Map<String,CityInfo> cityInfoList;//所有城市信息
-    private Map<Integer,LineInfo> mLineInfoList;//地图线路
-    private List<StationInfo> mStationInfoList ;//地图站台信息
+
 
     private initDataThread minitDataThread;
     private int extraRow = 1;
@@ -83,12 +79,15 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
     SelectLineDialog mSelectLineDialog;
     SettingReminderDialog mSettingReminderDialog;
+
+    private DataHelper mDataHelper;//数据库
+    private CityInfo currentCityNo = null;
+    private Map<String,CityInfo> cityInfoList;//所有城市信息
+    private Map<Integer,LineInfo> mLineInfoList;//地图线路
+    private List<StationInfo> mStationInfoList ;//地图站台信息
     StationInfo startStationInfo, currentStationInfo, endStationInfo,nerstStationInfo;
-
-    //private Map<List<Integer>,List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
-    List<Map.Entry<List<Integer>,List<StationInfo>>> lastLinesLast;
-
-    private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//(1,(2,3,4,5)),(2,(3,4,6,8)),(3,(3,4,6,8))
+    List<Map.Entry<List<Integer>,List<StationInfo>>> lastLinesLast;//最终查询得到路线
+    private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//用于初始化路线矩阵
     private int maxLineid = 0;
 
     private Handler mHandler = new Handler() {
@@ -116,6 +115,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     mRemonderLocationService.setStartReminder();
                     mRemonderLocationService.setStationInfoList(sceneMap.getMarkList());
                     start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stop_location));
+                    currentLineInfoText.setText(PathSerachUtil.printAllRecomindLine(lastLinesLast));//打印所有路线);
                     break;
             }
 
@@ -762,7 +762,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             //找出所有路径
             Log.d(TAG,"getReminderLines find all line = "+transferLine.size()+" start = "+start.getCname()+" end = "+end.getCname());
             lastLinesLast = PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mLineInfoList,transferLine,start,end));//查询最终线路
-            PathSerachUtil.printAllRecomindLine(lastLinesLast);//打印所有路线
             Message msg = new Message();
             msg.what = STARTLOCATION;
             mHandler.sendMessage(msg);

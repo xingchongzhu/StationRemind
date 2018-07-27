@@ -492,7 +492,10 @@ public class LineMapView extends View {
         // TODO Auto-generated method stub
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-
+                if (mStatus != Status.ZOOM) {
+                    if (!full_screen)
+                        clickAction(event);
+                }
                 break;
 
             case MotionEvent.ACTION_POINTER_DOWN:
@@ -501,6 +504,7 @@ public class LineMapView extends View {
                     mStatus = Status.ZOOM;
                     oldDist = distance;
                 }
+
                 break;
 
             case MotionEvent.ACTION_MOVE:
@@ -513,10 +517,7 @@ public class LineMapView extends View {
                 postInvalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                if (mStatus != Status.ZOOM) {
-                    if (!full_screen)
-                        clickAction(event);
-                }
+
                 if (event.getPointerCount() == 1) {
                     // 如果两次点击时间间隔小于一定值，则默认为双击事件
                     if (event.getEventTime() - lastClickTime < DOUBLE_CLICK_TIME_SPACE) {
