@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.traffic.locationremind.baidu.location.activity.MainActivity">
+
+    <include
+        android:id="@+id/serach_view"
+        layout="@layout/serach_layout" />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/search_all_height"
+        android:layout_marginBottom="@dimen/bottom_navigation_height"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <ListView
+        android:id="@+id/main_lv_search_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:layout_marginTop="@dimen/search_listview_top"
+        android:visibility="gone"
+        android:layout_marginBottom="@dimen/bottom_navigation_height"
+        android:background="@color/white">
+    </ListView>
+    <com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView
+        android:id="@+id/tab"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_navigation_height"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/tab_background"
+        android:elevation="8dp" />
+
+</FrameLayout>

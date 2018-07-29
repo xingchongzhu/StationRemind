@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/search_start_input"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/search_height"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/search_edittext_shape_top"
+                android:drawableLeft="@drawable/start_green_route"
+                android:drawablePadding="5dp"
+                android:hint="起点站"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:textColor="@color/blue"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/search_start_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/iv_delete_bg"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_marginTop="1dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/search_end_input"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/search_height"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/search_edittext_shape_bottom"
+                android:drawableLeft="@drawable/end_red_route"
+                android:drawablePadding="5dp"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:hint="终点站"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:textColor="@color/blue"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/search_end_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/iv_delete_bg"
+                android:visibility="gone" />
+        </FrameLayout>
+
+    </LinearLayout>
+</LinearLayout>

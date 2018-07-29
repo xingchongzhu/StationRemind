@@ -1,4 +1,4 @@
-package com.traffic.locationremind.baidu.location.activity;
+package com.traffic.locationremind.baidu.location.utils;
 
 
 import android.app.Notification;

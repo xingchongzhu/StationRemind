@@ -69,7 +69,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
     private int currentIndex = 1;//当前线路
 
-
     private initDataThread minitDataThread;
     private int extraRow = 1;
 
@@ -84,6 +83,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     private CityInfo currentCityNo = null;
     private Map<String,CityInfo> cityInfoList;//所有城市信息
     private Map<Integer,LineInfo> mLineInfoList;//地图线路
+
     private List<StationInfo> mStationInfoList ;//地图站台信息
     StationInfo startStationInfo, currentStationInfo, endStationInfo,nerstStationInfo;
     List<Map.Entry<List<Integer>,List<StationInfo>>> lastLinesLast;//最终查询得到路线

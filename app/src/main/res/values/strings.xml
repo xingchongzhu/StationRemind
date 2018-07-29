@@ -42,12 +42,16 @@
     <string name="select_city">切换城市</string>
     <string name="full_subway">全局图</string>
     <string name="scal_btn">放大</string>
+    <string name="full_subway_title">全图</string>
+    <string name="line_title">路线</string>
+    <string name="remind_title">提醒</string>
+    <string name="city_title">城市</string>
     <string name="narrow_btn">缩小</string>
     <string name="cancle_btn">取消</string>
     <string name="save_btn">保存</string>
     <string name="start">设为起点</string>
     <string name="end">设为终点</string>
-    <string name="transfer_hint">你可以在此处换乘:</string>
+    <string name="transfer_hint">输入站台</string>
     <string name="station_exit">站台出口:</string>
     <string name="start_location">开始定位</string>
     <string name="stop_location">停止定位</string>
