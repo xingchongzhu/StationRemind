@@ -63,6 +63,10 @@
     <string name="location_line_select">最近站台:</string>
     <string name="select_line_info">选择线路</string>
     <string name="line_tail">地铁%s号线</string>
+    <string name="change_number">换乘%s次：</string>
+    <string name="station_number">总%s站</string>
+    <string name="start_station">起点站：</string>
+    <string name="end_station">终点站：</string>
     <string name="location_errot">请检测网络或gps定位是否开启！</string>
     <string name="search_history">搜索历史</string>
     <string name="current_location">我的位置</string>

@@ -52,6 +52,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
      * 弹出列表
      */
     private ListView lvTips;
+    private ListView result;
 
     /*
      *最近搜索记录
@@ -83,6 +84,9 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     public ListView getLvTips() {
         return lvTips;
     }
+    public ListView getResultListview() {
+        return result;
+    }
 
     public GridView getRecentSerachGrid() {
         return recentSerachGrid;
@@ -108,6 +112,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         change = (ImageView) findViewById(R.id.change);
         serach = (ImageView) findViewById(R.id.serach);
 
+        result = (ListView) findViewById(R.id.result);
         startInput.addTextChangedListener(new StartEditChangedListener());
         startInput.setOnClickListener(this);
         startInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {

@@ -8,6 +8,7 @@ import android.widget.*;
 
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
 import com.traffic.locationremind.baidu.location.search.model.Bean;
@@ -30,10 +31,13 @@ public class SearchManager implements SearchView.SearchViewListener{
      * 搜索结果列表view
      */
     private ListView lvResults;
+    private ListView serachResults;
     private GridView recentSerachGrid;
     private SearchView searchView;
 
     GridViewAdapter mGridViewAdapter;
+
+    CardAdapter mCardAdapter = null;
 
     private List<String> recentList = new ArrayList<>();
     /**
@@ -56,6 +60,7 @@ public class SearchManager implements SearchView.SearchViewListener{
     public void initViews(final Context context, final SearchView searchView) {
         activity = (MainActivity)context;
         this.searchView = searchView;
+        serachResults = searchView.getResultListview();
         lvResults = searchView.getLvTips();
         recentSerachGrid = searchView.getRecentSerachGrid();
         autoCompleteAdapter = new SearchAdapter(context, autoCompleteData, R.layout.item_bean_list);
@@ -80,6 +85,8 @@ public class SearchManager implements SearchView.SearchViewListener{
                 searchView.setRecentSelectStation(recentList.get(position));
             }
         });
+
+
     }
 
     /**
@@ -201,6 +208,12 @@ public class SearchManager implements SearchView.SearchViewListener{
         Log.d(TAG,"onSearch start = "+start+" end = "+end);
         List<Map.Entry<List<Integer>,List<StationInfo>>>  lastLinesLast = PathSerachUtil.getReminderLines(startStation,endStation,
                 mDataManager.getMaxLineid(),activity.getBDLocation(),mDataManager.getLineInfoList(),mDataManager.getAllLineCane());
+        if(mCardAdapter == null) {
+            mCardAdapter = new CardAdapter(context, lastLinesLast, R.layout.serach_result_item_layout);
+            serachResults.setAdapter(mCardAdapter);
+        }else{
+            mCardAdapter.setData(lastLinesLast);
+        }
         PathSerachUtil.printAllRecomindLine(lastLinesLast);
     }
 
