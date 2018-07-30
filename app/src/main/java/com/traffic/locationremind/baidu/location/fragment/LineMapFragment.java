@@ -33,7 +33,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private ImageView button_location;
     private LinearLayout btnLinearLayout;
     private Button screenbtn;
-    private Button city_select;
     private Button start_location_reminder;
     private TextView currentLineInfoText;
     private TextView hintText;
@@ -56,7 +55,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
         screenbtn = (Button) activity.findViewById(R.id.full_screen);
         start_location_reminder = (Button) activity.findViewById(R.id.start_location_reminder);
-        city_select = (Button) activity.findViewById(R.id.city_select);
         gif = (GifView) activity.findViewById(R.id.gif);
         hintText = (TextView) activity.findViewById(R.id.hint);
         btnLinearLayout = (LinearLayout) activity.findViewById(R.id.mainmap_zoom_area);
@@ -66,7 +64,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         scaleLessbtn.setOnClickListener(this);
         button_location.setOnClickListener(this);
         start_location_reminder.setOnClickListener(this);
-        city_select.setOnClickListener(this);
     }
 
     @Override

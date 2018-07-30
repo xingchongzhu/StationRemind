@@ -64,4 +64,6 @@
     <string name="select_line_info">选择线路</string>
     <string name="line_tail">地铁%s号线</string>
     <string name="location_errot">请检测网络或gps定位是否开启！</string>
+    <string name="search_history">搜索历史</string>
+    <string name="current_location">我的位置</string>
 </resources>

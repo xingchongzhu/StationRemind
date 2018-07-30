@@ -11,11 +11,13 @@ import android.widget.Toast;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +27,10 @@ public class DataManager{
 	private Map<String,CityInfo> cityInfoList;//所有城市信息
 	private Map<Integer,LineInfo> mLineInfoList;//地图线路
 	private CityInfo currentCityNo = null;
+	private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//用于初始化路线矩阵
 	private Object mLock = new Object();
+
+	private int maxLineid = 0;
 
 	private static DataManager mDataManager;
 
@@ -41,6 +46,25 @@ public class DataManager{
 		return mDataManager;
 	}
 
+	public Map<Integer, Map<Integer,Integer>> getAllLineCane(){
+		return allLineCane;
+	}
+
+	public Map<String,CityInfo> getCityInfoList(){
+		return cityInfoList;
+	}
+
+	public Map<Integer,LineInfo> getLineInfoList(){
+		return mLineInfoList;
+	}
+
+	public int getMaxLineid(){
+		return maxLineid;
+	}
+	public DataHelper getDataHelper(){
+		return mDataHelper;
+	}
+
 	class MyAsyncTask extends AsyncTask<Context,Void,Map<Integer,LineInfo>> {
 
 		//onPreExecute用于异步处理前的操作
@@ -54,7 +78,6 @@ public class DataManager{
 		protected Map<Integer,LineInfo> doInBackground(Context... params) {
 			cityInfoList = mDataHelper.getAllCityInfo();
 			//获取传进来的参数
-			Context contexts = params[0];
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CommonFuction.CITYNO);
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
@@ -65,7 +88,14 @@ public class DataManager{
 			Map<Integer,LineInfo> list= mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
 			for (Map.Entry<Integer,LineInfo> entry : list.entrySet()) {
 				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
+				List<StationInfo> canTransferlist = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());
+				allLineCane.put(entry.getKey(), PathSerachUtil.getLineAllLined(canTransferlist));
+				if(entry.getKey() > maxLineid){
+					maxLineid = entry.getKey();
+				}
 			}
+			maxLineid+= 1;//找出路线最大编号加一
+			mLineInfoList = list;
 			return list;
 		}
 
@@ -73,7 +103,6 @@ public class DataManager{
 		@Override
 		protected void onPostExecute(Map<Integer,LineInfo> list) {
 			super.onPostExecute(list);
-			mLineInfoList = list;
 		}
 	}
 

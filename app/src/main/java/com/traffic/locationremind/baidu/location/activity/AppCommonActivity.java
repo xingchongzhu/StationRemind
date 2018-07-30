@@ -3,17 +3,13 @@ package com.traffic.locationremind.baidu.location.activity;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ListView;
+import android.support.v7.app.AppCompatActivity;
 import com.baidu.mapapi.SDKInitializer;
-import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /***
  * 本类代码同定位业务本身无关，负责现实列表
@@ -21,7 +17,7 @@ import java.util.List;
  * @author baidu
  *
  */
-public class CommonActivity extends Activity {
+public class AppCommonActivity extends AppCompatActivity {
     private final String TAG = "CommonActivity";
     private final int SDK_PERMISSION_REQUEST = 127;
 

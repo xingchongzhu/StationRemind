@@ -1,99 +1,83 @@
 package com.traffic.locationremind.manager.serach;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.*;
 
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
 import com.traffic.locationremind.baidu.location.search.model.Bean;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
+import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.PathSerachUtil;
+import com.traffic.locationremind.manager.bean.LineInfo;
+import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SearchManager implements SearchView.SearchViewListener{
+
+    private final static String TAG = "SearchManager";
     /**
      * 搜索结果列表view
      */
     private ListView lvResults;
-
-    /**
-     * 搜索view
-     */
+    private GridView recentSerachGrid;
     private SearchView searchView;
 
+    GridViewAdapter mGridViewAdapter;
 
-    /**
-     * 热搜框列表adapter
-     */
-    private ArrayAdapter<String> hintAdapter;
-
+    private List<String> recentList = new ArrayList<>();
     /**
      * 自动补全列表adapter
      */
-    private ArrayAdapter<String> autoCompleteAdapter;
+    private SearchAdapter autoCompleteAdapter;
 
-    /**
-     * 搜索结果列表adapter
-     */
-    private SearchAdapter resultAdapter;
-
-    private List<Bean> dbData;
-
-    /**
-     * 热搜版数据
-     */
-    private List<String> hintData;
+    private Map<String,StationInfo> allstations = new HashMap<>();
+    private DataManager mDataManager;
+    private MainActivity activity;
 
     /**
      * 搜索过程中自动补全数据
      */
-    private List<String> autoCompleteData;
-
-    /**
-     * 搜索结果的数据
-     */
-    private List<Bean> resultData;
-
-    /**
-     * 默认提示框显示项的个数
-     */
-    private static int DEFAULT_HINT_SIZE = 4;
-
-    /**
-     * 提示框显示项的个数
-     */
-    private static int hintSize = DEFAULT_HINT_SIZE;
-
-    /**
-     * 设置提示框显示项的个数
-     *
-     * hintSize 提示框显示个数
-     */
-    public static void setHintSize(int size) {
-        hintSize = size;
-    }
+    private List<StationInfo> autoCompleteData = new ArrayList<>();
 
     /**
      * 初始化视图
      */
-    public void initViews(final Context context, ListView listView, SearchView searchView) {
-        lvResults = listView;
-        searchView = searchView;
+    public void initViews(final Context context, final SearchView searchView) {
+        activity = (MainActivity)context;
+        this.searchView = searchView;
+        lvResults = searchView.getLvTips();
+        recentSerachGrid = searchView.getRecentSerachGrid();
+        autoCompleteAdapter = new SearchAdapter(context, autoCompleteData, R.layout.item_bean_list);
         //设置监听
         searchView.setSearchViewListener(this);
         //设置adapter
-        searchView.setTipsHintAdapter(hintAdapter);
         searchView.setAutoCompleteAdapter(autoCompleteAdapter);
-
+        lvResults.setAdapter(autoCompleteAdapter);
         lvResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Toast.makeText(context, position + "", Toast.LENGTH_SHORT).show();
+                searchView.setSelectStation(position);
+            }
+        });
+
+        getRecendData(context);
+        mGridViewAdapter = new GridViewAdapter(context,recentList);
+        recentSerachGrid.setAdapter(mGridViewAdapter);
+        recentSerachGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                searchView.setRecentSelectStation(recentList.get(position));
             }
         });
     }
@@ -101,37 +85,44 @@ public class SearchManager implements SearchView.SearchViewListener{
     /**
      * 初始化数据
      */
-    public void initData(Context context) {
+    public void initData(Context context, DataManager dataManager) {
+        this.mDataManager = dataManager;
         //从数据库获取数据
         getDbData();
-        //初始化热搜版数据
-        getHintData(context);
-        //初始化自动补全数据
         getAutoCompleteData(context,null);
-        //初始化搜索结果数据
-        getResultData(context,null);
+    }
+
+    private void getRecendData(Context context){
+        recentList.clear();
+       String string[] = CommonFuction.getRecentSearchHistory(context);
+       if(string != null && string.length > 0){
+           for(int i = 0;i<string.length;i++){
+               if(!TextUtils.isEmpty(string[i]))
+                    recentList.add(string[i]);
+           }
+       }
+    }
+
+    @Override
+    public void notificationRecentSerachChange(Context context){
+        getRecendData(context);
+        mGridViewAdapter.notifyDataSetChanged();
+        Log.d(TAG,"notificationRecentSerachChange");
     }
 
     /**
      * 获取db 数据
      */
     private void getDbData() {
-        int size = 100;
-        dbData = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            dbData.add(new Bean(R.drawable.icon, "android开发必备技能" + (i + 1), "Android自定义view——自定义搜索view", i * 20 + 2 + ""));
+        Map<Integer,LineInfo> allLines = mDataManager.getLineInfoList();
+        Log.d(TAG,"getDbData"+" allLines = "+allLines);
+        if(allLines != null){
+            for(Map.Entry<Integer,LineInfo> entry:allLines.entrySet()){
+                for(StationInfo stationInfo:entry.getValue().getStationInfoList()){
+                    allstations.put(stationInfo.getCname(),stationInfo);
+                }
+            }
         }
-    }
-
-    /**
-     * 获取热搜版data 和adapter
-     */
-    private void getHintData(Context context) {
-        hintData = new ArrayList<>(hintSize);
-        for (int i = 1; i <= hintSize; i++) {
-            hintData.add("热搜版" + i + "：Android自定义View");
-        }
-        hintAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, hintData);
     }
 
     /**
@@ -140,44 +131,22 @@ public class SearchManager implements SearchView.SearchViewListener{
     private void getAutoCompleteData(Context context,String text) {
         if (autoCompleteData == null) {
             //初始化
-            autoCompleteData = new ArrayList<>(hintSize);
+            autoCompleteData = new ArrayList<>();
         } else {
             // 根据text 获取auto data
             autoCompleteData.clear();
-            for (int i = 0, count = 0; i < dbData.size()
-                    && count < hintSize; i++) {
-                if (dbData.get(i).getTitle().contains(text.trim())) {
-                    autoCompleteData.add(dbData.get(i).getTitle());
-                    count++;
+
+            for (Map.Entry<String,StationInfo> entry:allstations.entrySet()) {
+                if (!TextUtils.isEmpty(text) && entry.getKey().contains(text.trim())) {
+                    Log.d(TAG,"getAutoCompleteData serach result = "+entry.getValue().getCname());
+                    autoCompleteData.add(entry.getValue());
                 }
             }
         }
         if (autoCompleteAdapter == null) {
-            autoCompleteAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, autoCompleteData);
+            autoCompleteAdapter = new SearchAdapter(context, autoCompleteData, R.layout.item_bean_list);
         } else {
             autoCompleteAdapter.notifyDataSetChanged();
-        }
-    }
-
-    /**
-     * 获取搜索结果data和adapter
-     */
-    private void getResultData(Context context,String text) {
-        if (resultData == null) {
-            // 初始化
-            resultData = new ArrayList<>();
-        } else {
-            resultData.clear();
-            for (int i = 0; i < dbData.size(); i++) {
-                if (dbData.get(i).getTitle().contains(text.trim())) {
-                    resultData.add(dbData.get(i));
-                }
-            }
-        }
-        if (resultAdapter == null) {
-            resultAdapter = new SearchAdapter(context, resultData, R.layout.item_bean_list);
-        } else {
-            resultAdapter.notifyDataSetChanged();
         }
     }
 
@@ -194,24 +163,45 @@ public class SearchManager implements SearchView.SearchViewListener{
     /**
      * 点击搜索键时edit text触发的回调
      *
-     * @param text
      */
     @Override
-    public void onSearch(Context context,String text) {
+    public void onSearch(Context context,String start,String end) {
         //更新result数据
-        getResultData(context,text);
-        lvResults.setVisibility(View.VISIBLE);
-        //第一次获取结果 还未配置适配器
-        if (lvResults.getAdapter() == null) {
-            //获取搜索数据 设置适配器
-            lvResults.setAdapter(resultAdapter);
-        } else {
-            //更新搜索数据
-            resultAdapter.notifyDataSetChanged();
+        //getAutoCompleteData(context,text);
+        lvResults.setVisibility(View.GONE);
+        StationInfo startStation = null,endStation = null;
+        if(TextUtils.isEmpty(start) || start.equals(context.getResources().getString(R.string.current_location))){
+            StationInfo stationInfo = activity.getLocationCurrentStation();
+            if(stationInfo != null){
+                startStation = stationInfo;
+            }
+        }else{
+            startStation = allstations.get(start);
         }
-        Toast.makeText(context, "完成搜素", Toast.LENGTH_SHORT).show();
 
-
+        if(TextUtils.isEmpty(end) || end.equals(context.getResources().getString(R.string.current_location))){
+            StationInfo stationInfo = activity.getLocationCurrentStation();
+            if(stationInfo != null){
+                endStation = stationInfo;
+            }
+        }else{
+            endStation = allstations.get(end);;
+        }
+        if(startStation == null){
+            Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(endStation == null){
+            Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(startStation.getCname().equals(endStation.getCname())){
+            Toast.makeText(context, "起始站和终点站不能相同", Toast.LENGTH_SHORT).show();
+        }
+        Log.d(TAG,"onSearch start = "+start+" end = "+end);
+        List<Map.Entry<List<Integer>,List<StationInfo>>>  lastLinesLast = PathSerachUtil.getReminderLines(startStation,endStation,
+                mDataManager.getMaxLineid(),activity.getBDLocation(),mDataManager.getLineInfoList(),mDataManager.getAllLineCane());
+        PathSerachUtil.printAllRecomindLine(lastLinesLast);
     }
 
 }

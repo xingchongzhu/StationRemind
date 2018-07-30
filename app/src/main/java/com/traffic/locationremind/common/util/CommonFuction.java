@@ -28,6 +28,8 @@ public class CommonFuction {
 	public static final String STARTSTATIONNAME = "startstationname";//起始站
 	public static final String ENDSTATIONNAME = "endstationname";//目标站
 
+	public static final String RECENTSERACHHISTORY = "recent_serach_history";//目标站
+
 	public static final double RANDDIS = 0.5;
 	private static final double EARTH_RADIUS = 6378137.0;
 	public static final String SHNAME = "subwab_info";
@@ -36,6 +38,8 @@ public class CommonFuction {
 	public final static String HEAD = "head";
 	public final static String TAIL = "tail";
 
+	public final static int MAXRECENTSERACHHISTORY = 10;
+
 	public final static double INVALE_DATA = 4.9E-324D;
 
 	public static void writeSharedPreferences(Context context,String key,String value){
@@ -43,6 +47,40 @@ public class CommonFuction {
 		SharedPreferences.Editor editor = sp.edit();
 		editor.putString(key, value);
 		editor.commit();
+	}
+
+	public static boolean saveNewKeyToRecentSerach(Context context,String str){
+		String string[] = getRecentSearchHistory(context);
+		if(string == null || string.length <= 0){
+			writeSharedPreferences(context,RECENTSERACHHISTORY,str);
+			return true;
+		}else{
+		    boolean hasExist = false;
+			for(int i = 0;i< string.length;i++){
+			    if (string[i].equals(str)){
+                    hasExist = true;
+                }
+            }
+            if(!hasExist){
+			    if(string.length < MAXRECENTSERACHHISTORY){
+                    StringBuffer newStr = new StringBuffer();
+                    for(int i = 0;i< string.length;i++){
+                        newStr.append(string[i]+TRANSFER_SPLIT);
+                    }
+                    newStr.append(str);
+                    writeSharedPreferences(context,RECENTSERACHHISTORY,newStr.toString());
+                }else{
+                    StringBuffer newStr = new StringBuffer();
+                    for(int i = 1;i< string.length;i++){
+                        newStr.append(string[i]+TRANSFER_SPLIT);
+                    }
+                    newStr.append(str);
+                    writeSharedPreferences(context,RECENTSERACHHISTORY,newStr.toString());
+                }
+                return true;
+            }
+            return false;
+		}
 	}
 
     public static void writeBooleanSharedPreferences(Context context,String key,boolean value){
@@ -63,6 +101,10 @@ public class CommonFuction {
 		SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);
 		String name = sp.getString(key, "");
 		return name;
+	}
+
+	public static String[] getRecentSearchHistory(Context context){
+		return getSharedPreferencesValue(context,RECENTSERACHHISTORY).split(TRANSFER_SPLIT);
 	}
 
     public static boolean getSharedPreferencesBooleanValue(Context context,String key){

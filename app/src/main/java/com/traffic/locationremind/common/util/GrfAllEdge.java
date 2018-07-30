@@ -187,9 +187,9 @@ public class GrfAllEdge {
             }
         });
         int n =0;
-        /*for(List<Integer> list:grf.allLine){
+        for(List<Integer> list:grf.allLine){
             Log.d(TAG, (n++)+" list = "+list);
-        }*/
+        }
         return grf.allLine;
     }
 

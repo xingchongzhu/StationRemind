@@ -16,7 +16,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Message;
 import android.util.Log;
+import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -296,5 +298,154 @@ public class PathSerachUtil {
 			}
 		}
 		return -1;
+	}
+
+	public static StationInfo getNerastStation(BDLocation location,Map<Integer,LineInfo> mLineInfoList){
+		double min = Double.MAX_VALUE;
+		double longitude = 0;
+		double latitude = 0;
+		double dis = 0;
+		StationInfo nerstStationInfo = null;
+		if (location != null && mLineInfoList != null) {
+			for (Map.Entry<Integer, LineInfo> entry : mLineInfoList.entrySet()) {
+				for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
+					longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
+					latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
+					dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(), location.getLatitude());
+					if (min > dis) {
+						min = dis;
+						nerstStationInfo = stationInfo;
+					}
+				}
+			}
+		}
+		return nerstStationInfo;
+	}
+
+	public static List<Map.Entry<List<Integer>,List<StationInfo>>> getReminderLines(StationInfo start,final StationInfo end,
+																					int maxLineid,BDLocation location,Map<Integer,LineInfo> mLineInfoList, Map<Integer, Map<Integer,Integer>> allLineCane){
+		List<Map.Entry<List<Integer>,List<StationInfo>>>  lastLinesLast = new ArrayList<Map.Entry<List<Integer>,List<StationInfo>>>();
+		if(end == null){
+			return lastLinesLast;
+		}
+		List<List<Integer>> transferLine = new ArrayList<List<Integer>>();//所有换乘路线
+		final Integer allLineNodes[] = new Integer[maxLineid];
+		for(int i = 0;i<maxLineid;i++){//初始化所有线路
+			allLineNodes[i] = i;
+		}
+		if(start == null ) {
+			start = PathSerachUtil.getNerastStation(location,mLineInfoList);
+		}
+		if(start!= null){
+			if(!start.canTransfer() && !end.canTransfer()) {//都不能换乘
+				if(start.lineid == end.lineid){//在一条线路
+					List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+					list.add(start.lineid);
+					transferLine.add(list);
+				}else{
+					transferLine = GrfAllEdge.createGraph(allLineNodes, allLineCane, start.lineid, end.lineid);
+				}
+			}else if(start.canTransfer() && !end.canTransfer()){
+				int lined = PathSerachUtil.isSameLine(start,end.lineid);
+				if(lined > 0){//在一条线路
+					List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+					list.add(lined);
+					transferLine.add(list);
+				}else{
+					String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+					for(int i = 0;i < lines.length;i++){
+						int startid= CommonFuction.convertToInt(lines[i],-1);
+						if(startid >= 0) {
+							List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, startid, end.lineid);
+							transferLine.addAll(temp);
+						}
+					}
+				}
+			}else if(!start.canTransfer() && end.canTransfer()){
+				int lined = PathSerachUtil.isSameLine(end,start.lineid);
+				if(lined > 0){//在一条线路
+					List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+					list.add(lined);
+					transferLine.add(list);
+				}else{
+					String lines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+					for(int i = 0;i < lines.length;i++){
+						int startid= CommonFuction.convertToInt(lines[i],-1);
+						if(startid >= 0) {
+							List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane,start.lineid , startid);
+							transferLine.addAll(temp);
+						}
+					}
+				}
+			}else{
+				int lined = PathSerachUtil.isTwoStationSameLine(start,end);
+				if(lined > 0){//在一条线路
+					List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
+					list.add(lined);
+					transferLine.add(list);
+				}else{
+					String startLines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+					String endLines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+					for(int i = 0;i < startLines.length;i++){//遍历所有情况
+						int startid= CommonFuction.convertToInt(startLines[i],-1);
+						if(startid > 0){
+							for(int j = 0;j < endLines.length;j++){
+								int endid= CommonFuction.convertToInt(endLines[j],-1);
+								if(endid > 0){
+									List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, startid, endid);
+									transferLine.addAll(temp);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		Collections.sort(transferLine, new Comparator<List<Integer>>(){
+			/*
+			 * int compare(Person p1, Person p2) 返回一个基本类型的整型，
+			 * 返回负数表示：p1 小于p2，
+			 * 返回0 表示：p1和p2相等，
+			 * 返回正数表示：p1大于p2
+			 */
+			public int compare(List<Integer> p1, List<Integer> p2) {
+				//按照换乘次数
+				if(p1.size() > p2.size()){
+					return 1;
+				}
+				if(p1.size() == p2.size()){
+					return 0;
+				}
+				return -1;
+			}
+		});
+
+		if(start != null || end != null) {
+			//找出所有路径
+			Log.d(TAG, "getReminderLines find all line = " + transferLine.size() + " start = " + start.getCname() + " end = " + end.getCname());
+			lastLinesLast = PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mLineInfoList, transferLine, start, end));//查询最终线路
+		}
+		transferLine.clear();
+		return lastLinesLast;
+	}
+
+	public static Map<Integer,Integer> getLineAllLined(List<StationInfo> list){
+		Map<Integer,Integer> listStr = new HashMap<Integer,Integer>();
+		if(list == null && list.size() <=0 )
+			return listStr;
+		StringBuffer str = new StringBuffer();
+		for(StationInfo stationInfo:list){
+			String lineList[] = stationInfo.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+			int size = lineList.length;
+			for(int i = 0;i < size;i++){
+				int line = CommonFuction.convertToInt(lineList[i],-1);
+				if(!listStr.containsKey(line) && line != stationInfo.lineid){
+					listStr.put(line,line);
+					str.append(lineList[i]+"  ");
+				}
+			}
+		}
+		Log.d(TAG,"getLineAllLined lineid = "+list.get(0).lineid+" all lined = "+str);
+		return listStr;
 	}
 }

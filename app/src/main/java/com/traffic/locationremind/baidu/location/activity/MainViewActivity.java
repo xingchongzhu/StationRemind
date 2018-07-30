@@ -133,6 +133,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         sceneMap.setBitmap(bitmap);
         sceneMap.postInvalidate();
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -277,7 +278,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             }
                             mLineInfoList = tempList;
                             Log.d(TAG, "locationCurrentStation mLineInfoList = " + mLineInfoList.size());
-                            nerstStationInfo = getNerastStation(location);
+                            nerstStationInfo = PathSerachUtil.getNerastStation(location,mLineInfoList);
                         }
 
                         //Log.d(TAG,"locationCurrentStation currentStationInfo = "+nerstStationInfo);
@@ -343,15 +344,14 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 if(firstLineid < 0)
                     firstLineid = entry.getKey();
                 List<StationInfo> list = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());
-                allLineCane.put(entry.getKey(),getLineAllLined(list));
+                allLineCane.put(entry.getKey(),PathSerachUtil.getLineAllLined(list));
                 if(entry.getKey() > maxLineid){
                     maxLineid = entry.getKey();
                 }
                 entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
             }
             maxLineid+= 1;//找出路线最大编号加一
-            currentIndex = CommonFuction.convertToInt(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTLINEID),
-                    firstLineid);
+            currentIndex = CommonFuction.convertToInt(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTLINEID), firstLineid);
             //单一线路-------------------------------------
             initLineMap(currentIndex);
             if (CommonFuction.getSharedPreferencesBooleanValue(MainViewActivity.this, CommonFuction.ISREMINDER)) {
@@ -367,25 +367,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         }
     }
 
-    public Map<Integer,Integer> getLineAllLined(List<StationInfo> list){
-        Map<Integer,Integer> listStr = new HashMap<Integer,Integer>();
-        if(list == null && list.size() <=0 )
-            return listStr;
-        StringBuffer str = new StringBuffer();
-        for(StationInfo stationInfo:list){
-            String lineList[] = stationInfo.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
-            int size = lineList.length;
-            for(int i = 0;i < size;i++){
-                int line = CommonFuction.convertToInt(lineList[i],-1);
-                if(!listStr.containsKey(line) && line != stationInfo.lineid){
-                    listStr.put(line,line);
-                    str.append(lineList[i]+"  ");
-                }
-            }
-        }
-        Log.d(TAG,"getLineAllLined lineid = "+list.get(0).lineid+" all lined = "+str);
-        return listStr;
-    }
+
 
     private void initLineColorMap() {
         lineMap.releaseSource();
@@ -640,28 +622,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         mSettingReminderDialog.show();
     }
 
-    private StationInfo getNerastStation(BDLocation location){
-        double min = Double.MAX_VALUE;
-        double longitude = 0;
-        double latitude = 0;
-        double dis = 0;
-        StationInfo nerstStationInfo = null;
-        if (location != null && mLineInfoList != null) {
-            for (Map.Entry<Integer, LineInfo> entry : mLineInfoList.entrySet()) {
-                for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
-                    longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
-                    latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
-                    dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(), location.getLatitude());
-                    if (min > dis) {
-                        min = dis;
-                        nerstStationInfo = stationInfo;
-                    }
-                }
-            }
-        }
-        return nerstStationInfo;
-    }
-
     public void getReminderLines(StationInfo start,final StationInfo end){
         if(end == null){
             return;
@@ -672,7 +632,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             allLineNodes[i] = i;
         }
         if(start == null && mRemonderLocationService != null) {
-            start = getNerastStation(mRemonderLocationService.getCurrentLocation());
+            start = PathSerachUtil.getNerastStation(mRemonderLocationService.getCurrentLocation(),mLineInfoList);
         }
         if(start!= null){
             if(!start.canTransfer() && !end.canTransfer()) {//都不能换乘
@@ -839,7 +799,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     public void loactionStation(BDLocation location) {
                         if(!CommonFuction.isvalidLocation(location))
                             return;
-                        StationInfo stationInfo = getNerastStation(location);
+                        StationInfo stationInfo = PathSerachUtil.getNerastStation(location,mLineInfoList);
                         nerstStationInfo = stationInfo;
 
                         //Log.d(TAG,"loactionStation nearststationInfo.getCname = "+stationInfo.getCname());
