@@ -1,29 +1,22 @@
 package com.traffic.locationremind.baidu.location.activity;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Looper;
 import android.support.annotation.ColorInt;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
@@ -33,6 +26,7 @@ import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.manager.RemindSetViewManager;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
@@ -43,8 +37,6 @@ import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 import com.traffic.locationremind.manager.serach.SearchManager;
 
-import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
 
 
@@ -55,7 +47,6 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     private RemonderLocationService.UpdateBinder mUpdateBinder;
     private RemonderLocationService mRemonderLocationService;
-
 
     private NavigationController mNavigationController;
     private SearchView searchView;
@@ -69,6 +60,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private SearchEditView editButton;
     private PageNavigationView pageBottomTabLayout;
 
+    private RemindSetViewManager mRemindSetViewManager;
+
     private CityInfo currentCityNo = null;
 
     @Override
@@ -78,13 +71,16 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         setStatusBar(Color.WHITE);
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
+        mRemindSetViewManager = new  RemindSetViewManager();
+        mRemindSetViewManager.initView(this);
+
         mDataManager = DataManager.getInstance(this);
         ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
 
         mNavigationController = pageBottomTabLayout.material()
-                .addItem(R.drawable.ic_restore_teal_24dp,getString(R.string.full_subway_title))
-                .addItem(R.drawable.ic_favorite_teal_24dp,getString(R.string.line_title))
-                .addItem(R.drawable.ic_nearby_teal_24dp,getString(R.string.remind_title))
+                .addItem(R.drawable.all_icon,getString(R.string.full_subway_title))
+                .addItem(R.drawable.line_icon,getString(R.string.line_title))
+                .addItem(R.drawable.remind_icon,getString(R.string.remind_title))
                 .build();
 
         root = (ViewGroup) findViewById(R.id.root);
@@ -104,6 +100,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         mSearchManager = new SearchManager();
         mSearchManager.initViews(this,searchView);
+        mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
         if (ReadExcelDataUtil.getInstance().hasWrite) {
             initData();
         }
@@ -111,6 +108,11 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private void initData(){
@@ -121,14 +123,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.edit_button:
-                hideSerach(editButton);
-                pageBottomTabLayout.setVisibility(View.GONE);
-                showSerach(serachLayoutRoot);
+                showSerachView();
                 break;
             case R.id.search_back:
-                hideSerach(serachLayoutRoot);
-                showSerach(editButton);
-                pageBottomTabLayout.setVisibility(View.VISIBLE);
+                hideSerachView();
                 break;
             case R.id.city_select:
                 break;
@@ -194,6 +192,17 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         return ColorUtils.calculateLuminance(color) >= 0.5;
     }
 
+    public void showSerachView(){
+        hideSerach(editButton);
+        pageBottomTabLayout.setVisibility(View.GONE);
+        showSerach(serachLayoutRoot);
+    }
+
+    public void hideSerachView(){
+        hideSerach(serachLayoutRoot);
+        showSerach(editButton);
+        pageBottomTabLayout.setVisibility(View.VISIBLE);
+    }
 
     @Override
     public void dbWriteFinishNotif() {
@@ -231,6 +240,23 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             location = mRemonderLocationService.getCurrentLocation();
         }
         return location;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if(mRemindSetViewManager.getRemindWindowState()){
+                mRemindSetViewManager.closeRemindWindow();
+                return true;
+            }
+            if(serachLayoutRoot.getVisibility() == View.VISIBLE){
+                hideSerachView();
+            }else{
+                moveTaskToBack(true);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 
@@ -276,6 +302,5 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
         return nerstStationInfo;
     }
-
 
 }

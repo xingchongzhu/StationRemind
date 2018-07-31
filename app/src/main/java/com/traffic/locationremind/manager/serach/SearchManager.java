@@ -8,6 +8,7 @@ import android.widget.*;
 
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
@@ -24,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SearchManager implements SearchView.SearchViewListener{
+public class SearchManager implements SearchView.SearchViewListener {
 
     private final static String TAG = "SearchManager";
     /**
@@ -34,6 +35,8 @@ public class SearchManager implements SearchView.SearchViewListener{
     private ListView serachResults;
     private GridView recentSerachGrid;
     private SearchView searchView;
+
+    private RemindSetViewListener mRemindSetViewListener;
 
     GridViewAdapter mGridViewAdapter;
 
@@ -45,7 +48,7 @@ public class SearchManager implements SearchView.SearchViewListener{
      */
     private SearchAdapter autoCompleteAdapter;
 
-    private Map<String,StationInfo> allstations = new HashMap<>();
+    private Map<String, StationInfo> allstations = new HashMap<>();
     private DataManager mDataManager;
     private MainActivity activity;
 
@@ -58,7 +61,7 @@ public class SearchManager implements SearchView.SearchViewListener{
      * 初始化视图
      */
     public void initViews(final Context context, final SearchView searchView) {
-        activity = (MainActivity)context;
+        activity = (MainActivity) context;
         this.searchView = searchView;
         serachResults = searchView.getResultListview();
         lvResults = searchView.getLvTips();
@@ -77,12 +80,22 @@ public class SearchManager implements SearchView.SearchViewListener{
         });
 
         getRecendData(context);
-        mGridViewAdapter = new GridViewAdapter(context,recentList);
+        mGridViewAdapter = new GridViewAdapter(context, recentList);
         recentSerachGrid.setAdapter(mGridViewAdapter);
         recentSerachGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 searchView.setRecentSelectStation(recentList.get(position));
+            }
+        });
+
+        serachResults.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                if (mRemindSetViewListener != null) {
+                    mRemindSetViewListener.openSetWindow(mCardAdapter.getItem(position));
+                }
+
             }
         });
 
@@ -96,37 +109,42 @@ public class SearchManager implements SearchView.SearchViewListener{
         this.mDataManager = dataManager;
         //从数据库获取数据
         getDbData();
-        getAutoCompleteData(context,null);
+        getAutoCompleteData(context, null);
     }
 
-    private void getRecendData(Context context){
+    private void getRecendData(Context context) {
         recentList.clear();
-       String string[] = CommonFuction.getRecentSearchHistory(context);
-       if(string != null && string.length > 0){
-           for(int i = 0;i<string.length;i++){
-               if(!TextUtils.isEmpty(string[i]))
+        String string[] = CommonFuction.getRecentSearchHistory(context);
+        if (string != null && string.length > 0) {
+            for (int i = 0; i < string.length; i++) {
+                if (!TextUtils.isEmpty(string[i]))
                     recentList.add(string[i]);
-           }
-       }
+            }
+        }
+    }
+
+    public void setRemindSetViewListener(RemindSetViewListener mRemindSetViewListener) {
+        this.mRemindSetViewListener = mRemindSetViewListener;
+
     }
 
     @Override
-    public void notificationRecentSerachChange(Context context){
+    public void notificationRecentSerachChange(Context context) {
         getRecendData(context);
         mGridViewAdapter.notifyDataSetChanged();
-        Log.d(TAG,"notificationRecentSerachChange");
+        Log.d(TAG, "notificationRecentSerachChange");
     }
 
     /**
      * 获取db 数据
      */
     private void getDbData() {
-        Map<Integer,LineInfo> allLines = mDataManager.getLineInfoList();
-        Log.d(TAG,"getDbData"+" allLines = "+allLines);
-        if(allLines != null){
-            for(Map.Entry<Integer,LineInfo> entry:allLines.entrySet()){
-                for(StationInfo stationInfo:entry.getValue().getStationInfoList()){
-                    allstations.put(stationInfo.getCname(),stationInfo);
+        Map<Integer, LineInfo> allLines = mDataManager.getLineInfoList();
+        Log.d(TAG, "getDbData" + " allLines = " + allLines);
+        if (allLines != null) {
+            for (Map.Entry<Integer, LineInfo> entry : allLines.entrySet()) {
+                for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
+                    allstations.put(stationInfo.getCname(), stationInfo);
                 }
             }
         }
@@ -135,7 +153,7 @@ public class SearchManager implements SearchView.SearchViewListener{
     /**
      * 获取自动补全data 和adapter
      */
-    private void getAutoCompleteData(Context context,String text) {
+    private void getAutoCompleteData(Context context, String text) {
         if (autoCompleteData == null) {
             //初始化
             autoCompleteData = new ArrayList<>();
@@ -143,9 +161,9 @@ public class SearchManager implements SearchView.SearchViewListener{
             // 根据text 获取auto data
             autoCompleteData.clear();
 
-            for (Map.Entry<String,StationInfo> entry:allstations.entrySet()) {
+            for (Map.Entry<String, StationInfo> entry : allstations.entrySet()) {
                 if (!TextUtils.isEmpty(text) && entry.getKey().contains(text.trim())) {
-                    Log.d(TAG,"getAutoCompleteData serach result = "+entry.getValue().getCname());
+                    Log.d(TAG, "getAutoCompleteData serach result = " + entry.getValue().getCname());
                     autoCompleteData.add(entry.getValue());
                 }
             }
@@ -159,62 +177,64 @@ public class SearchManager implements SearchView.SearchViewListener{
 
     /**
      * 当搜索框 文本改变时 触发的回调 ,更新自动补全数据
+     *
      * @param text
      */
     @Override
-    public void onRefreshAutoComplete(Context context,String text) {
+    public void onRefreshAutoComplete(Context context, String text) {
         //更新数据
-        getAutoCompleteData(context,text);
+        getAutoCompleteData(context, text);
     }
 
     /**
      * 点击搜索键时edit text触发的回调
-     *
      */
     @Override
-    public void onSearch(Context context,String start,String end) {
+    public void onSearch(Context context, String start, String end) {
         //更新result数据
         //getAutoCompleteData(context,text);
         lvResults.setVisibility(View.GONE);
-        StationInfo startStation = null,endStation = null;
-        if(TextUtils.isEmpty(start) || start.equals(context.getResources().getString(R.string.current_location))){
+        StationInfo startStation = null, endStation = null;
+        if (TextUtils.isEmpty(start) || start.equals(context.getResources().getString(R.string.current_location))) {
             StationInfo stationInfo = activity.getLocationCurrentStation();
-            if(stationInfo != null){
+            if (stationInfo != null) {
                 startStation = stationInfo;
             }
-        }else{
+        } else {
             startStation = allstations.get(start);
         }
 
-        if(TextUtils.isEmpty(end) || end.equals(context.getResources().getString(R.string.current_location))){
+        if (TextUtils.isEmpty(end) || end.equals(context.getResources().getString(R.string.current_location))) {
             StationInfo stationInfo = activity.getLocationCurrentStation();
-            if(stationInfo != null){
+            if (stationInfo != null) {
                 endStation = stationInfo;
             }
-        }else{
-            endStation = allstations.get(end);;
+        } else {
+            endStation = allstations.get(end);
+            ;
         }
-        if(startStation == null){
+        if (startStation == null) {
             Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(endStation == null){
+        if (endStation == null) {
             Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(startStation.getCname().equals(endStation.getCname())){
+        if (startStation.getCname().equals(endStation.getCname())) {
             Toast.makeText(context, "起始站和终点站不能相同", Toast.LENGTH_SHORT).show();
         }
-        Log.d(TAG,"onSearch start = "+start+" end = "+end);
-        List<Map.Entry<List<Integer>,List<StationInfo>>>  lastLinesLast = PathSerachUtil.getReminderLines(startStation,endStation,
-                mDataManager.getMaxLineid(),activity.getBDLocation(),mDataManager.getLineInfoList(),mDataManager.getAllLineCane());
-        if(mCardAdapter == null) {
+        Log.d(TAG, "onSearch start = " + start + " end = " + end);
+        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
+                mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
+        if (mCardAdapter == null) {
             mCardAdapter = new CardAdapter(context, lastLinesLast, R.layout.serach_result_item_layout);
             serachResults.setAdapter(mCardAdapter);
-        }else{
+        } else {
             mCardAdapter.setData(lastLinesLast);
         }
-        PathSerachUtil.printAllRecomindLine(lastLinesLast);
+
+        //PathSerachUtil.printAllRecomindLine(lastLinesLast);
     }
 
 }

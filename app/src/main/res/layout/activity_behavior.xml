@@ -30,9 +30,12 @@
             android:elevation="8dp"/>
 
     <include
-            android:id="@+id/serach_layout_root"
             layout="@layout/serach_layout_manager"
-            android:visibility="gone"
-    />
+            android:visibility="gone"/>
+
+    <include
+            android:id="@+id/set_remind_layout"
+            layout="@layout/remind_line_layout"
+            android:visibility="gone"/>
 
 </FrameLayout>
