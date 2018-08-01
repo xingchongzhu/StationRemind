@@ -13,8 +13,8 @@
             android:layout_height="wrap_content">
         <ImageButton
                 android:id="@+id/search_back"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/bick_btn_width"
+                android:layout_height="@dimen/bick_btn_width"
                 android:background="@drawable/button_back_select"
                 android:layout_centerHorizontal="true"
                 android:layout_alignParentLeft="true"
@@ -142,6 +142,7 @@
             android:visibility="visible"
             android:dividerHeight="3dp"
             android:divider="@null"
+            android:scrollbars="none"
             android:background="@color/white">
     </ListView>
 

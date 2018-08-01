@@ -30,6 +30,7 @@
             android:elevation="8dp"/>
 
     <include
+            android:id="@+id/serach_layout_manager_root"
             layout="@layout/serach_layout_manager"
             android:visibility="gone"/>
 

@@ -4,14 +4,15 @@
 <item
         android:state_enabled="true"
         android:state_pressed="true"
+        android:color="@color/gray"
         android:drawable="@drawable/setting_back" />
 <item
         android:state_enabled="false"
         android:drawable="@drawable/setting_back">
-    <color android:color="@color/gray" />
+    <color android:color="@color/white" />
 </item>
 <item android:drawable="@drawable/setting_back">
-    <color android:color="@color/gray" />
+    <color android:color="@color/white" />
 </item>
 
 </selector>

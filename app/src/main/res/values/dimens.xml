@@ -20,6 +20,11 @@
     <dimen name="serach_view_height">50dp</dimen>
     <dimen name="btn_height">40dp</dimen>
     <dimen name="btn_width">50dp</dimen>
+    <dimen name="bick_btn_width">30dp</dimen>
     <dimen name="delete_margin">55dp</dimen>
     <dimen name="serach_radius_corners">8dp</dimen>
+    <dimen name="remind_line_map_padding_left">40dp</dimen>
+    <dimen name="remind_line_map_padding_top">8dp</dimen>
+    <dimen name="line_node_width">100dp</dimen>
+    <dimen name="line_node_height">300dp</dimen>
 </resources>

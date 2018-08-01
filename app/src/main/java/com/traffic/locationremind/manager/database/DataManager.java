@@ -28,6 +28,7 @@ public class DataManager{
 	private Map<Integer,LineInfo> mLineInfoList;//地图线路
 	private CityInfo currentCityNo = null;
 	private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//用于初始化路线矩阵
+	private Map<Integer,Integer> lineColor = new HashMap<>();//路线对应颜色
 	private Object mLock = new Object();
 
 	private int maxLineid = 0;

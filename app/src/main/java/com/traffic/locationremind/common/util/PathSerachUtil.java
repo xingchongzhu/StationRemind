@@ -163,6 +163,33 @@ public class PathSerachUtil {
 		}else{
 			lastLinesLast.addAll(lastLines);
 		}
+		List<Map.Entry<List<Integer>,List<StationInfo>>> remove = new ArrayList<Map.Entry<List<Integer>,List<StationInfo>>>();
+		for(Map.Entry<List<Integer>,List<StationInfo>> entry:lastLinesLast){
+			int size = entry.getKey().size();
+			for(int i = 0 ;i < size;i++){
+				boolean needRemove = true;
+				for(StationInfo stationInfo:entry.getValue()){
+					if(entry.getKey().get(i) == stationInfo.lineid){
+						needRemove = false;
+						break;
+					}
+				}
+				if(needRemove){
+
+					remove.add(entry);
+					break;
+				}
+			}
+		}
+		for(Map.Entry<List<Integer>,List<StationInfo>> entry:remove){
+			Log.d("needRemove","need remove entry key ="+entry.getKey());
+			for(Map.Entry<List<Integer>,List<StationInfo>> entry1:lastLinesLast){
+				if(entry1.getKey() == entry.getKey()){
+					lastLinesLast.remove(entry1);
+					break;
+				}
+			}
+		}
 		lastLines.clear();
 		return lastLinesLast;
 	}

@@ -22,6 +22,8 @@ import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
+import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
+import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
@@ -37,11 +39,12 @@ import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 import com.traffic.locationremind.manager.serach.SearchManager;
 
+import java.util.List;
 import java.util.Map;
 
 
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
-        ReadExcelDataUtil.DbWriteFinishListener{
+        ReadExcelDataUtil.DbWriteFinishListener , GoToFragmentListener {
 
     private final static String TAG = "MainActivity";
 
@@ -68,13 +71,15 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_behavior);
+        mDataManager = DataManager.getInstance(this);
         setStatusBar(Color.WHITE);
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
         mRemindSetViewManager = new  RemindSetViewManager();
-        mRemindSetViewManager.initView(this);
+        mRemindSetViewManager.setGoToFragmentListener(this);
+        mRemindSetViewManager.initView(this,mDataManager);
 
-        mDataManager = DataManager.getInstance(this);
+
         ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
 
         mNavigationController = pageBottomTabLayout.material()
@@ -92,7 +97,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView)findViewById(R.id.edit_button);
-        serachLayoutRoot = (ViewGroup) findViewById(R.id.serach_layout_root);
+        serachLayoutRoot = (ViewGroup) findViewById(R.id.serach_layout_manager_root);
         searchBackButton = (ImageButton) findViewById(R.id.search_back);
         searchView = (SearchView) findViewById(R.id.search_root);
         searchBackButton.setOnClickListener(this);
@@ -107,7 +112,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
+    }
 
+    public DataManager getDataManager() {
+        return mDataManager;
     }
 
     @Override
@@ -143,6 +151,15 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mShowAction.setDuration(500);
         view.startAnimation(mShowAction);//开始动画
         searchView.setStartCurrentLocation();
+    }
+
+    @Override
+    public void openRemindFragment(List<StationInfo> list){
+        mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        RemindFragment remindFragment = (RemindFragment)mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        remindFragment.setData(list);
+        hideSerachView();
+        hideSetRemindView();
     }
 
     private void hideSerach(View view){
@@ -204,6 +221,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         pageBottomTabLayout.setVisibility(View.VISIBLE);
     }
 
+    public void hideSetRemindView(){
+        if(mRemindSetViewManager.getRemindWindowState()){
+            mRemindSetViewManager.closeRemindWindow();
+        }
+    }
+
     @Override
     public void dbWriteFinishNotif() {
         initData();
@@ -246,7 +269,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if(mRemindSetViewManager.getRemindWindowState()){
-                mRemindSetViewManager.closeRemindWindow();
+                hideSetRemindView();
                 return true;
             }
             if(serachLayoutRoot.getVisibility() == View.VISIBLE){

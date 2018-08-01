@@ -3,7 +3,9 @@ package com.traffic.locationremind.manager.serach;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.*;
 
 import com.traffic.location.remind.R;
@@ -63,6 +65,7 @@ public class SearchManager implements SearchView.SearchViewListener {
     public void initViews(final Context context, final SearchView searchView) {
         activity = (MainActivity) context;
         this.searchView = searchView;
+        ViewGroup serachLayoutManagerRoot = (ViewGroup)((MainActivity) context).findViewById(R.id.serach_layout_manager_root);
         serachResults = searchView.getResultListview();
         lvResults = searchView.getLvTips();
         recentSerachGrid = searchView.getRecentSerachGrid();
@@ -96,6 +99,13 @@ public class SearchManager implements SearchView.SearchViewListener {
                     mRemindSetViewListener.openSetWindow(mCardAdapter.getItem(position));
                 }
 
+            }
+        });
+
+        serachLayoutManagerRoot.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
             }
         });
 

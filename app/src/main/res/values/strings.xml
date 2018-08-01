@@ -64,6 +64,7 @@
     <string name="select_line_info">选择线路</string>
     <string name="line_tail">%s号线</string>
     <string name="change_number">换乘%s次：</string>
+    <string name="change_next_line">换乘%s号线</string>
     <string name="station_number">共%s站</string>
     <string name="start_station">起点：</string>
     <string name="end_station">终点：</string>

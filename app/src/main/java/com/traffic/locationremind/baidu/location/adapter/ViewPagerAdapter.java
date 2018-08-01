@@ -9,13 +9,17 @@ import com.traffic.locationremind.baidu.location.fragment.CityFragment;
 import com.traffic.locationremind.baidu.location.fragment.FullMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.LineMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
+import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewPagerAdapter extends FragmentPagerAdapter {
+public class ViewPagerAdapter extends FragmentPagerAdapter{
 
+    public static final int FULLMAPFRAGMENTINDEX = 0;
+    public static final int LINEMAPFRAGMENTINDEX = 1;
+    public static final int REMINDFRAGMENTINDEX = 2;
     NavigationController mNavigationController;
     private FragmentManager mFragmentManager;
     private List<Fragment> fragments = new ArrayList<>();
@@ -27,6 +31,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         fragments.add(new LineMapFragment());
         fragments.add(new RemindFragment());
         //fragments.add(new CityFragment());
+    }
+
+    public Fragment getFragment(int index){
+        return fragments.get(index);
     }
 
     @Override
