@@ -23,14 +23,15 @@ public class ViewPagerAdapter extends FragmentPagerAdapter{
     NavigationController mNavigationController;
     private FragmentManager mFragmentManager;
     private List<Fragment> fragments = new ArrayList<>();
-    public ViewPagerAdapter(FragmentManager mFragmentManager,NavigationController mNavigationController){
+    public ViewPagerAdapter(MainActivity activity,FragmentManager mFragmentManager,NavigationController mNavigationController){
         super(mFragmentManager);
         this.mFragmentManager = mFragmentManager;
         this.mNavigationController = mNavigationController;
+        RemindFragment remindFragment = new RemindFragment();
         fragments.add(new FullMapFragment());
         fragments.add(new LineMapFragment());
-        fragments.add(new RemindFragment());
-        //fragments.add(new CityFragment());
+        fragments.add(remindFragment);
+        activity.setLocationChangerListener(remindFragment);
     }
 
     public Fragment getFragment(int index){

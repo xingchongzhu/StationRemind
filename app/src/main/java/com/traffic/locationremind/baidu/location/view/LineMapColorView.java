@@ -124,16 +124,7 @@ public class LineMapColorView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         // TODO Auto-generated method stub
-		/*switch (event.getAction()) {
 
-		case MotionEvent.ACTION_POINTER_DOWN:
-
-			break;
-		case MotionEvent.ACTION_UP:
-			clickAction(event);
-		default:
-			break;
-		}*/
         clickAction(event);
         return true;
     }

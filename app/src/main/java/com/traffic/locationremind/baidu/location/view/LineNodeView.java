@@ -33,15 +33,35 @@ public class LineNodeView extends TextView implements View.OnClickListener {
 
     private StationInfo mStationInfo;
     private int color = Color.LTGRAY;
+    private Bitmap transFerBitmap;
+
+    public StationInfo getStationInfo(){
+        return mStationInfo;
+    }
 
     public void setBitMap(Bitmap bitmap){
+        if(this.bitmap != null){
+            this.bitmap.recycle();
+            this.bitmap = null;
+        }
         this.bitmap = bitmap;
+        invalidate();
     }
+
+    public void setTransFerBitmap(Bitmap bitmap){
+        if(this.transFerBitmap != null){
+            this.transFerBitmap.recycle();
+            this.transFerBitmap = null;
+        }
+        this.transFerBitmap = bitmap;
+        invalidate();
+    }
+
 
     public void setStation(StationInfo stationInfo){
         this.mStationInfo = stationInfo;
         color = stationInfo.colorId;
-        iconSize = (int)getResources().getDimension(R.dimen.line_node_width);
+        iconSize = (int)getResources().getDimension(R.dimen.current_bitmap_siez);
         invalidate();
     }
 
@@ -81,23 +101,28 @@ public class LineNodeView extends TextView implements View.OnClickListener {
             canvas.drawBitmap(bitmap,matrix,mPaint);
         }
         height+= iconSize;
-
-        height+= paddingLine;
+        height+= 2*paddingLine;
         mPaint.setColor(color);
         mPaint.setStrokeWidth(lineHeight);
         canvas.drawLine(0,height,getWidth(),height,mPaint);
         mPaint.setColor(Color.WHITE);
         mPaint.setStrokeWidth(norrowHeight);
 
-        int narroWidth = getWidth()/11;
-        int narroHeight = narroWidth/2;
-        int start = getWidth()/2-narroWidth/4-offset;
-        int end = start+narroWidth-offset;
-
-        //方向箭头
-        canvas.drawLine(start+narroWidth/2,height-narroHeight,end+offset,height+norrowHeight/2,mPaint);
-        canvas.drawLine(start,height+norrowHeight/2,end+5,height+norrowHeight/2,mPaint);
-        canvas.drawLine(start+narroWidth/2,height+narroHeight,end+offset,height+norrowHeight/2,mPaint);;
+        if(transFerBitmap != null){
+            Matrix matrix = new Matrix();
+            matrix.setScale(1.0f, 1.0f);
+            matrix.postTranslate(getWidth()/2-transFerBitmap.getWidth()/2,height-transFerBitmap.getHeight()/2);
+            canvas.drawBitmap(transFerBitmap,matrix,mPaint);
+        }else{
+            int narroWidth = getWidth()/11;
+            int narroHeight = narroWidth/2;
+            int start = getWidth()/2-narroWidth/4-offset;
+            int end = start+narroWidth-offset;
+            //方向箭头
+            canvas.drawLine(start+narroWidth/2,height-narroHeight,end+offset,height+norrowHeight/2,mPaint);
+            canvas.drawLine(start,height+norrowHeight/2,end+5,height+norrowHeight/2,mPaint);
+            canvas.drawLine(start+narroWidth/2,height+narroHeight,end+offset,height+norrowHeight/2,mPaint);;
+        }
 
         height+= 3*lineHeight;
 
@@ -105,7 +130,6 @@ public class LineNodeView extends TextView implements View.OnClickListener {
         mPaint.setTextSize(textSize);
         mPaint.setStrokeWidth(5);
         String text = mStationInfo.getCname();
-
 
         char s[] = text.toCharArray();
         int size = s.length;

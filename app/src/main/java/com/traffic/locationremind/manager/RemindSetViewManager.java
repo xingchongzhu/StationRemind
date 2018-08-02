@@ -1,6 +1,8 @@
 package com.traffic.locationremind.manager;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +11,9 @@ import android.widget.TextView;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
+import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.view.SelectlineMap;
+import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 

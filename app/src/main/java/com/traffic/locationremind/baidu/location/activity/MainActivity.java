@@ -18,16 +18,19 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import android.widget.Toast;
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
+import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.common.util.ToastUitl;
 import com.traffic.locationremind.manager.RemindSetViewManager;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
 import com.traffic.locationremind.common.util.CommonFuction;
@@ -39,6 +42,7 @@ import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 import com.traffic.locationremind.manager.serach.SearchManager;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +69,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     private RemindSetViewManager mRemindSetViewManager;
 
+    private List<LocationChangerListener> locationChangerListenerList = new ArrayList<>();
+
     private CityInfo currentCityNo = null;
 
     @Override
@@ -79,7 +85,6 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mRemindSetViewManager.setGoToFragmentListener(this);
         mRemindSetViewManager.initView(this,mDataManager);
 
-
         ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
 
         mNavigationController = pageBottomTabLayout.material()
@@ -90,10 +95,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         root = (ViewGroup) findViewById(R.id.root);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(),mNavigationController);
+        mViewPagerAdapter = new ViewPagerAdapter(this,getSupportFragmentManager(),mNavigationController);
         viewPager.setAdapter(mViewPagerAdapter);
-        mNavigationController.setupWithViewPager(viewPager);
 
+        mNavigationController.setupWithViewPager(viewPager);
 
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView)findViewById(R.id.edit_button);
@@ -160,6 +165,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         remindFragment.setData(list);
         hideSerachView();
         hideSetRemindView();
+    }
+
+    public void setLocationChangerListener(LocationChangerListener locationChangerListener){
+        locationChangerListenerList.add(locationChangerListener);
     }
 
     private void hideSerach(View view){
@@ -252,6 +261,15 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 if (mRemonderLocationService != null) {
                     mRemonderLocationService.startLocationService();
                 }
+
+                mRemonderLocationService.setLocationChangerListener(new LocationChangerListener() {
+                    @Override
+                    public void loactionStation(BDLocation location) {
+                        for(LocationChangerListener locationChangerListener:locationChangerListenerList){
+                            locationChangerListener.loactionStation(location);
+                        }
+                    }
+                });
             }
 
         }

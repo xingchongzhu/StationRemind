@@ -368,7 +368,6 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     }
 
 
-
     private void initLineColorMap() {
         lineMap.releaseSource();
         int colorRow = mLineInfoList.size() / LineMapColorView.ROWMAXCOUNT + 1;

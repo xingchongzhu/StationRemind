@@ -11,6 +11,7 @@ import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.LocationApplication;
+import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
 import com.traffic.locationremind.common.util.CommonFuction;
@@ -34,6 +35,7 @@ public class RemonderLocationService extends Service {
      * 回调
      */
     private Callback callback;
+    private LocationChangerListener mLocationChangerListener;
     public static boolean state = false;
     /**
      * Timer实时更新数据的
@@ -104,6 +106,10 @@ public class RemonderLocationService extends Service {
 
     }
 
+    public void setLocationChangerListener(LocationChangerListener locationChangerListener){
+        this.mLocationChangerListener = locationChangerListener;
+    }
+
     public void startLocationService(){
         if(locationService != null && !locationServiceHasStart){
             locationService.start();
@@ -112,13 +118,9 @@ public class RemonderLocationService extends Service {
     }
 
     public BDLocation getCurrentLocation(){
-        /*if(!CommonFuction.isvalidLocation(currentLocation)){
-            if(callback != null){
-                callback.errorHint(RemonderLocationService.this.getResources().getString(R.string.location_errot));
-            }
-        }*/
         return currentLocation;
     }
+
     /*****
      *
      * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
@@ -148,6 +150,9 @@ public class RemonderLocationService extends Service {
                 currentLocation = location;
                 if(isReminder && callback != null){
                     callback.loactionStation(location);
+                }
+                if(mLocationChangerListener != null){
+                    mLocationChangerListener.loactionStation(location);
                 }
                 //lot = location.getLongitude();
                 //lat = location.getLatitude();
