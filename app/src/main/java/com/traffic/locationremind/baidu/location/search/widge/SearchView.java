@@ -213,12 +213,6 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     private void hideSoftInput() {
         //隐藏软键盘
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-        boolean isOpen=imm.isActive();
-/*
-        if(isOpen)
-            imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-*/
-
         imm.hideSoftInputFromWindow(startInput.getWindowToken(), 0); //强制隐藏键盘
         imm.hideSoftInputFromWindow(endInput.getWindowToken(), 0); //强制隐藏键盘
     }

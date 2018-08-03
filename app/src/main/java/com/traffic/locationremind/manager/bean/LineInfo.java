@@ -13,12 +13,17 @@ public class LineInfo {
     public static String LINENAME = "linename";
     public static String LINEINFO = "lineinfo";
     public static String RGBCOOLOR = "rgbcolor";
+    public static String FORWARD = "forward";
+    public static String REVERSE = "reverse";
 
     public int lineid;//线路id
     public String linename;//线路名
     public String lineinfo;//线路信息
     public String rgbColor;
     public int colorid;
+
+    public String forward;
+    public String reverse;
 
     public String cityNo;//城市编码
 
@@ -84,4 +89,19 @@ public class LineInfo {
         this.lineinfo = lineinfo;
     }
 
+    public void setForward(String forward) {
+        this.forward = forward;
+    }
+
+    public String getForwad() {
+        return this.forward;
+    }
+
+    public void setReverse(String reverse){
+        this.reverse = reverse;
+    }
+
+    public String getReverse(){
+        return reverse;
+    }
 }

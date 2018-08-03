@@ -47,7 +47,6 @@
                     android:layout_height="wrap_content"
                     android:padding="@dimen/notif_text_pad"
                     android:textColor="@color/notif_text_color"
-                    android:text="深圳1号地铁"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textSize="@dimen/notif_size"/>
 
@@ -57,7 +56,6 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/notif_text_color"
                     android:padding="@dimen/notif_text_pad"
-                    android:text="起点:老街"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textSize="@dimen/notif_size"/>
 
@@ -67,7 +65,6 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/notif_text_color"
                     android:padding="@dimen/notif_text_pad"
-                    android:text="终点:西丽"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textSize="@dimen/notif_size"/>
 
@@ -84,7 +81,6 @@
                     android:layout_height="match_parent"
                     android:textColor="@color/notif_text_color"
                     android:padding="@dimen/notif_text_pad"
-                    android:text="下一站:华侨东"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textSize="@dimen/notif_size"/>
 
@@ -94,7 +90,6 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/notif_text_color"
                     android:padding="@dimen/notif_text_pad"
-                    android:text="时间:2分钟"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textSize="@dimen/notif_size"/>
 

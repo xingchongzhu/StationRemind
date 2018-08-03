@@ -22,16 +22,14 @@
                     android:id="@+id/start_and_end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
-                    android:text="ddd"
+                    android:textColor="@color/brown"
                     android:padding="5dp"
-                    android:textSize="18sp"/>
+                    android:textSize="16sp"/>
             <TextView
                     android:id="@+id/line_change_introduce"
                     android:layout_width="wrap_content"
-                    android:textColor="@color/black"
+                    android:textColor="@color/salmon"
                     android:layout_height="wrap_content"
-                    android:text="ddd"
                     android:padding="5dp"
                     android:textSize="12sp"/>
         </LinearLayout>
@@ -51,14 +49,10 @@
                     android:layout_marginBottom="10dp"
                     android:orientation="vertical">
 
-                <TextView
+                <com.traffic.locationremind.baidu.location.view.RemindLineColorView
                         android:id="@+id/line_color_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:textColor="@color/black"
-                        android:text="ddd"
-                        android:textSize="16sp"/>
+                        android:layout_height="wrap_content"/>
 
                 <View android:layout_width="match_parent"
                       android:background="@color/gray"
@@ -67,9 +61,8 @@
                 <TextView
                         android:id="@+id/current_info_text"
                         android:layout_width="match_parent"
-                        android:textColor="@color/black"
+                        android:textColor="@color/red"
                         android:layout_height="wrap_content"
-                        android:text="ddd"
                         android:layout_marginTop="5dp"
                         android:layout_marginLeft="5dp"
                         android:textSize="12sp"/>
@@ -119,7 +112,7 @@
                     android:drawableTop="@drawable/locationbar_fav_btn"
                     android:text="@string/collection_line"
                     android:layout_gravity="center"
-                    android:textSize="16sp"
+                    android:textSize="12sp"
                     android:gravity="center"
                     android:textColor="@color/blue"
             />
@@ -131,7 +124,7 @@
                     android:drawableTop="@drawable/favtor"
                     android:text="@string/falvetor"
                     android:layout_gravity="center"
-                    android:textSize="16sp"
+                    android:textSize="12sp"
                     android:gravity="center"
                     android:textColor="@color/blue"
             />
@@ -143,7 +136,7 @@
                     android:drawableTop="@drawable/set_remind"
                     android:text="@string/cancle_remind"
                     android:layout_gravity="center"
-                    android:textSize="16sp"
+                    android:textSize="12sp"
                     android:gravity="center"
                     android:textColor="@color/blue"
             />

@@ -25,7 +25,7 @@
     <dimen name="serach_radius_corners">8dp</dimen>
     <dimen name="remind_line_map_padding_left">40dp</dimen>
     <dimen name="remind_line_map_padding_top">8dp</dimen>
-    <dimen name="line_node_width">100dp</dimen>
+    <dimen name="line_node_width">80dp</dimen>
     <dimen name="line_node_height">300dp</dimen>
     <dimen name="current_bitmap_siez">30dp</dimen>
     <dimen name="transfer_bitmap_size">15dp</dimen>

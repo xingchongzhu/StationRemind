@@ -3,6 +3,7 @@ package com.traffic.locationremind.manager.database;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
+import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
@@ -17,12 +19,16 @@ import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DataManager{
 
+	private static final String TAG = "DataManager";
+
+	private List<LoadDataListener> mLoadDataListener = new ArrayList<>();
 	private DataHelper mDataHelper;//数据库
 	private Map<String,CityInfo> cityInfoList;//所有城市信息
 	private Map<Integer,LineInfo> mLineInfoList;//地图线路
@@ -37,9 +43,36 @@ public class DataManager{
 
 	public DataManager(Context context){
 		this.mDataHelper = DataHelper.getInstance(context);
+		//new MyAsyncTask().execute(context);
+	}
+
+	public void loadData(Context context){
+		if(cityInfoList != null){
+			cityInfoList.clear();
+		}
+		if(mLineInfoList != null){
+			mLineInfoList.clear();
+		}
+		if(allLineCane != null){
+			allLineCane.clear();
+		}
 		new MyAsyncTask().execute(context);
 	}
 
+	public void addLoadDataListener(LoadDataListener loadDataListener) {
+		mLoadDataListener.add(loadDataListener) ;
+	}
+
+	public void removeLoadDataListener(LoadDataListener loadDataListener) {
+		mLoadDataListener.remove(loadDataListener);
+	}
+
+	public void notificationUpdata(){
+		Log.d(TAG,"notificationUpdata");
+		for(LoadDataListener loadDataListener:mLoadDataListener){
+			loadDataListener.loadFinish();
+		}
+	}
 	public static DataManager getInstance(Context context){
 		if(mDataManager == null){
 			mDataManager = new DataManager(context);
@@ -104,6 +137,7 @@ public class DataManager{
 		@Override
 		protected void onPostExecute(Map<Integer,LineInfo> list) {
 			super.onPostExecute(list);
+			notificationUpdata();
 		}
 	}
 

@@ -24,7 +24,9 @@ import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
+import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
+import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
@@ -48,7 +50,7 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
-        ReadExcelDataUtil.DbWriteFinishListener , GoToFragmentListener {
+        ReadExcelDataUtil.DbWriteFinishListener , GoToFragmentListener,LoadDataListener {
 
     private final static String TAG = "MainActivity";
 
@@ -70,6 +72,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private RemindSetViewManager mRemindSetViewManager;
 
     private List<LocationChangerListener> locationChangerListenerList = new ArrayList<>();
+    private List<ActivityListener> activityListenerList = new ArrayList<>();
 
     private CityInfo currentCityNo = null;
 
@@ -78,6 +81,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_behavior);
         mDataManager = DataManager.getInstance(this);
+        mDataManager.addLoadDataListener(this);
         setStatusBar(Color.WHITE);
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
@@ -110,6 +114,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         mSearchManager = new SearchManager();
         mSearchManager.initViews(this,searchView);
+        mSearchManager.initData(this,mDataManager);
         mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
         if (ReadExcelDataUtil.getInstance().hasWrite) {
             initData();
@@ -129,7 +134,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     private void initData(){
-        mSearchManager.initData(this,mDataManager);
+        if(ReadExcelDataUtil.getInstance().hasWrite){
+            mDataManager.loadData(this);
+        }
     }
 
     @Override
@@ -237,8 +244,20 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     @Override
+    public void loadFinish() {
+        Log.d(TAG,"loadFinish");
+        mSearchManager.reloadData(this);
+    }
+
+    @Override
+    public void updataFinish() {
+
+    }
+
+    @Override
     public void dbWriteFinishNotif() {
         initData();
+        Log.d(TAG,"dbWriteFinishNotif ReadExcelDataUtil.getInstance().hasWrite = "+ReadExcelDataUtil.getInstance().hasWrite);
     }
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -283,23 +302,50 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         return location;
     }
 
+    public void addActivityListener(ActivityListener activityListener){
+        activityListenerList.add(activityListener);
+    }
+
+    public void notificationOnKeyDown(int keyCode, KeyEvent event){
+        for (ActivityListener activityListener:activityListenerList){
+            activityListener.onKeyDown(keyCode,event);
+        }
+    }
+
+    public void notificationMoveTaskToBack(){
+        for (ActivityListener activityListener:activityListenerList){
+            activityListener.moveTaskToBack();
+        }
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if(mRemindSetViewManager.getRemindWindowState()){
-                hideSetRemindView();
+        if(getRemindState()){
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if(mRemindSetViewManager.getRemindWindowState()){
+                    hideSetRemindView();
+                    return true;
+                }
+                if(serachLayoutRoot.getVisibility() == View.VISIBLE){
+                    hideSerachView();
+                }else{
+                    moveTaskToBack(true);
+                    notificationMoveTaskToBack();
+                }
                 return true;
             }
-            if(serachLayoutRoot.getVisibility() == View.VISIBLE){
-                hideSerachView();
-            }else{
-                moveTaskToBack(true);
+            if (keyCode == KeyEvent.KEYCODE_HOME) {
+                notificationMoveTaskToBack();
             }
-            return true;
         }
+
         return super.onKeyDown(keyCode, event);
     }
 
+    public boolean getRemindState(){
+        RemindFragment remindFragment = (RemindFragment)mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        return remindFragment.getRemindState();
+    }
 
     public StationInfo getLocationCurrentStation() {
         StationInfo nerstStationInfo = null;
@@ -313,10 +359,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         if (mRemonderLocationService != null) {
             BDLocation location = getBDLocation();
             if (location != null) {
-                Log.d(TAG, "locationCurrentStation location.getCityCode() = " + location.getCityCode() + " lot = " + location.getLatitude() + " lat = " + location.getLongitude());
+               // Log.d(TAG, "locationCurrentStation location.getCityCode() = " + location.getCityCode() + " lot = " + location.getLatitude() + " lat = " + location.getLongitude());
 
                 currentCityNo = mDataManager.getCityInfoList().get(location.getCityCode());
-                Log.d(TAG, "locationCurrentStation currentCityInfo CityName = " + currentCityNo.getCityName());
+               // Log.d(TAG, "locationCurrentStation currentCityInfo CityName = " + currentCityNo.getCityName());
                 if (currentCityNo != null) {
                     String shpno = CommonFuction.getSharedPreferencesValue(MainActivity.this, CommonFuction.CITYNO);
                     Map<Integer, LineInfo> tempList = mDataManager.getLineInfoList();
@@ -329,14 +375,14 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                             }
                         }
                     }
-                    Log.d(TAG, "locationCurrentStation mLineInfoList = " + tempList.size());
+                    //Log.d(TAG, "locationCurrentStation mLineInfoList = " + tempList.size());
                     nerstStationInfo = PathSerachUtil.getNerastStation(location, tempList);
                 }
 
                 //Log.d(TAG,"locationCurrentStation currentStationInfo = "+nerstStationInfo);
                 if (nerstStationInfo != null) {
                     CommonFuction.writeSharedPreferences(MainActivity.this, CommonFuction.INITCURRENTLINEID, nerstStationInfo.getCname());
-                    Log.d(TAG, "locationCurrentStation lineid = " + nerstStationInfo.lineid + " name = " + nerstStationInfo.getCname());
+                    //Log.d(TAG, "locationCurrentStation lineid = " + nerstStationInfo.lineid + " name = " + nerstStationInfo.getCname());
                 }
                 return nerstStationInfo;
             }

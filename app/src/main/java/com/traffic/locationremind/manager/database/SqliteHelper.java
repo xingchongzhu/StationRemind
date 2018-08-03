@@ -32,6 +32,8 @@ public class SqliteHelper extends SQLiteOpenHelper {
                 + LineInfo.LINENAME + " varchar,"
                 + LineInfo.LINEINFO + " varchar,"
                 + LineInfo.RGBCOOLOR + " varchar,"
+                + LineInfo.FORWARD + " varchar,"
+                + LineInfo.REVERSE + " varchar,"
                 + CityInfo.CITYNO + " varchar"
                 + ")");
 

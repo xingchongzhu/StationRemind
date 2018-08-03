@@ -75,7 +75,12 @@
     <string name="set_remind">设置提醒</string>
     <string name="falvetor">搜藏夹</string>
     <string name="cancle_remind">取消提醒</string>
-    <string name="current_station">当前所在站:</string>
+    <string name="current_station">当前站:</string>
     <string name="surples_station">剩%s站</string>
+    <string name="changet_hint_tile">换乘提醒</string>
+    <string name="arrive_station_title">到站提醒</string>
+    <string name="hint_arrive_end_station">你已抵达终点站</string>
+    <string name="direction">方向</string>
+    <string name="change_station_hint">请在%s站换乘%s号线</string>
 
 </resources>

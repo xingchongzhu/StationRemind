@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class DataHelper {
 
-    private static String DB_NAME = "shenzhenmetro.db";
+    private static String DB_NAME = "metroinfo.db";
     private String TAG = "DataHelper";
 
     private static int DB_VERSION = 1;
@@ -73,7 +73,9 @@ public class DataHelper {
                 lineInfo.setLinename(cursor.getString(1));
                 lineInfo.setLineinfo(cursor.getString(2));
                 lineInfo.setRGBCOOLOR(cursor.getString(3));
-                lineInfo.setCityNo(cursor.getString(4));
+                lineInfo.setForward(cursor.getString(4));
+                lineInfo.setReverse(cursor.getString(5));
+                lineInfo.setCityNo(cursor.getString(6));
                 lineList.put(cursor.getInt(0),lineInfo);
             }
 
@@ -94,7 +96,9 @@ public class DataHelper {
             lineInfo.setLinename(cursor.getString(1));
             lineInfo.setLineinfo(cursor.getString(2));
             lineInfo.setRGBCOOLOR(cursor.getString(3));
-            lineInfo.setCityNo(cursor.getString(4));
+            lineInfo.setForward(cursor.getString(4));
+            lineInfo.setReverse(cursor.getString(5));
+            lineInfo.setCityNo(cursor.getString(6));
             lineList.add(lineInfo);
         }
 
@@ -300,6 +304,8 @@ public class DataHelper {
         values.put(LineInfo.LINEINFO, lineInfo.getLineinfo());
         values.put(LineInfo.RGBCOOLOR, lineInfo.getRGBCOOLOR());
         values.put(CityInfo.CITYNO, lineInfo.getCityNo());
+        values.put(LineInfo.FORWARD, lineInfo.getForwad());
+        values.put(LineInfo.REVERSE, lineInfo.getReverse());
         long rowid = db.insert(SqliteHelper.TB_LINE, null, values);
         Log.d(TAG, "insetLineInfo rowid = " + rowid);
         if (rowid > 0)

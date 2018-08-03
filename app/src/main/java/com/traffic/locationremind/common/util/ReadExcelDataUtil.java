@@ -204,6 +204,12 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 									case 3:
 										mLineInfo.setRGBCOOLOR(FooFileUtil.rightTrim(value));
 										break;
+									case 4:
+										mLineInfo.setForward(FooFileUtil.rightTrim(value));
+										break;
+									case 5:
+										mLineInfo.setReverse(FooFileUtil.rightTrim(value));
+										break;
 									default:
 										mLineInfo.setCityNo(FooFileUtil.rightTrim(value));
 										break;
@@ -329,7 +335,7 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 	@Override
 	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
-		Log.d(TAG, "database init finish");
+		Log.d(TAG, "database init finish result = "+result);
 		if(result)
 			hasWrite = true;
 		notificationAll();

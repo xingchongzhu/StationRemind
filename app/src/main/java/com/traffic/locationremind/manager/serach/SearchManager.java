@@ -18,6 +18,7 @@ import com.traffic.locationremind.baidu.location.search.model.Bean;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
+import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
@@ -122,6 +123,11 @@ public class SearchManager implements SearchView.SearchViewListener {
         getAutoCompleteData(context, null);
     }
 
+    public void reloadData(Context context){
+        getDbData();
+        getAutoCompleteData(context, null);
+    }
+
     private void getRecendData(Context context) {
         recentList.clear();
         String string[] = CommonFuction.getRecentSearchHistory(context);
@@ -151,6 +157,7 @@ public class SearchManager implements SearchView.SearchViewListener {
     private void getDbData() {
         Map<Integer, LineInfo> allLines = mDataManager.getLineInfoList();
         Log.d(TAG, "getDbData" + " allLines = " + allLines);
+        allstations.clear();
         if (allLines != null) {
             for (Map.Entry<Integer, LineInfo> entry : allLines.entrySet()) {
                 for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {

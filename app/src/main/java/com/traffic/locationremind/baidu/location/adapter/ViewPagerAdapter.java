@@ -32,6 +32,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter{
         fragments.add(new LineMapFragment());
         fragments.add(remindFragment);
         activity.setLocationChangerListener(remindFragment);
+        activity.addActivityListener(remindFragment);
     }
 
     public Fragment getFragment(int index){
