@@ -1,42 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/white"
+              android:orientation="vertical">
+    <TextView
+            android:id="@+id/hint_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@color/brown"
+            android:text="@string/set_remind_hint"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textSize="25sp"/>
+    <RelativeLayout
+            android:id="@+id/remind_root"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white"
+                android:layout_marginBottom="@dimen/search_height"
                 android:orientation="vertical">
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:layout_marginBottom="@dimen/search_height"
-            android:orientation="vertical">
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:background="@color/light_gray"
-                android:orientation="vertical">
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:background="@color/light_gray"
+                    android:orientation="vertical">
 
-            <TextView
-                    android:id="@+id/start_and_end"
-                    android:layout_width="wrap_content"
+                <TextView
+                        android:id="@+id/start_and_end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/brown"
+                        android:padding="5dp"
+                        android:textSize="16sp"/>
+                <TextView
+                        android:id="@+id/line_change_introduce"
+                        android:layout_width="wrap_content"
+                        android:textColor="@color/salmon"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:textSize="12sp"/>
+            </LinearLayout>
+            -
+            <android.support.v7.widget.CardView
+                    android:layout_alignParentTop="true"
+                    android:id="@+id/cardView"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/brown"
-                    android:padding="5dp"
-                    android:textSize="16sp"/>
-            <TextView
-                    android:id="@+id/line_change_introduce"
-                    android:layout_width="wrap_content"
-                    android:textColor="@color/salmon"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:textSize="12sp"/>
+                    app:cardCornerRadius="5dp"
+                    android:layout_margin="5dp"
+                    app:cardUseCompatPadding="true"
+                    app:cardPreventCornerOverlap="false">
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="vertical">
+
+                    <com.traffic.locationremind.baidu.location.view.RemindLineColorView
+                            android:id="@+id/line_color_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+
+                    <View android:layout_width="match_parent"
+                          android:background="@color/gray"
+                          android:layout_height="1dp">
+                    </View>
+                    <TextView
+                            android:id="@+id/current_info_text"
+                            android:layout_width="match_parent"
+                            android:textColor="@color/red"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginLeft="5dp"
+                            android:textSize="12sp"/>
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+            -
+            <HorizontalScrollView
+                    android:layout_below="@id/cardView"
+                    android:layout_centerInParent="true"
+                    android:paddingTop="10dp"
+                    android:id="@+id/horizontalScrollView"
+                    android:scrollbars="none"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                <LinearLayout
+                        android:id="@+id/linearlayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                </LinearLayout>
+            </HorizontalScrollView>
+
         </LinearLayout>
-        -
+
         <android.support.v7.widget.CardView
-                android:layout_alignParentTop="true"
-                android:id="@+id/cardView"
+                android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="5dp"
@@ -46,100 +116,45 @@
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:orientation="vertical">
-
-                <com.traffic.locationremind.baidu.location.view.RemindLineColorView
-                        android:id="@+id/line_color_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
-
-                <View android:layout_width="match_parent"
-                      android:background="@color/gray"
-                      android:layout_height="1dp">
-                </View>
-                <TextView
-                        android:id="@+id/current_info_text"
-                        android:layout_width="match_parent"
-                        android:textColor="@color/red"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginLeft="5dp"
-                        android:textSize="12sp"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-        -
-        <HorizontalScrollView
-                android:layout_below="@id/cardView"
-                android:layout_centerInParent="true"
-                android:paddingTop="10dp"
-                android:id="@+id/horizontalScrollView"
-                android:scrollbars="none"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            <LinearLayout
-                    android:id="@+id/linearlayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
+                    android:padding="5dp"
                     android:orientation="horizontal">
-
+                <TextView
+                        android:id="@+id/collection_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/search_height"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/locationbar_fav_btn"
+                        android:text="@string/collection_line"
+                        android:layout_gravity="center"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textColor="@color/blue"
+                />
+                <TextView
+                        android:id="@+id/favtor_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/search_height"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/favtor"
+                        android:text="@string/falvetor"
+                        android:layout_gravity="center"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textColor="@color/blue"
+                />
+                <TextView
+                        android:id="@+id/cancle_remind_btn"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/search_height"
+                        android:layout_weight="1"
+                        android:drawableTop="@drawable/set_remind"
+                        android:text="@string/cancle_remind"
+                        android:layout_gravity="center"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:textColor="@color/blue"
+                />
             </LinearLayout>
-        </HorizontalScrollView>
-
-    </LinearLayout>
-
-    <android.support.v7.widget.CardView
-            android:layout_alignParentBottom="true"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="5dp"
-            android:layout_margin="5dp"
-            app:cardUseCompatPadding="true"
-            app:cardPreventCornerOverlap="false">
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:orientation="horizontal">
-            <TextView
-                    android:id="@+id/collection_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/search_height"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/locationbar_fav_btn"
-                    android:text="@string/collection_line"
-                    android:layout_gravity="center"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/blue"
-            />
-            <TextView
-                    android:id="@+id/favtor_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/search_height"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/favtor"
-                    android:text="@string/falvetor"
-                    android:layout_gravity="center"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/blue"
-            />
-            <TextView
-                    android:id="@+id/cancle_remind_btn"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/search_height"
-                    android:layout_weight="1"
-                    android:drawableTop="@drawable/set_remind"
-                    android:text="@string/cancle_remind"
-                    android:layout_gravity="center"
-                    android:textSize="12sp"
-                    android:gravity="center"
-                    android:textColor="@color/blue"
-            />
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
-</RelativeLayout>
+        </android.support.v7.widget.CardView>
+    </RelativeLayout>
+</LinearLayout>

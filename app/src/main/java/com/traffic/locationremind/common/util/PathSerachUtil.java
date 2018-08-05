@@ -338,6 +338,33 @@ public class PathSerachUtil {
 		return nerstStationInfo;
 	}
 
+	private static final int MINDIS = 600;
+	public static StationInfo getNerastNextStation(BDLocation location,Map<Integer,LineInfo> mLineInfoList){
+		double min = Double.MAX_VALUE;
+		double longitude = 0;
+		double latitude = 0;
+		double dis = 0;
+		StationInfo nerstStationInfo = null;
+		if (location != null && mLineInfoList != null) {
+			for (Map.Entry<Integer, LineInfo> entry : mLineInfoList.entrySet()) {
+				for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
+					longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
+					latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
+					dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(), location.getLatitude());
+					if (min > dis) {
+						min = dis;
+						nerstStationInfo = stationInfo;
+					}
+				}
+			}
+		}
+		Log.d("zxc","getNerastNextStation min = "+min);
+		if(MINDIS < min){
+			return null;
+		}
+		return nerstStationInfo;
+	}
+
 	public static List<Map.Entry<List<Integer>,List<StationInfo>>> getReminderLines(StationInfo start,final StationInfo end,
 																					int maxLineid,BDLocation location,Map<Integer,LineInfo> mLineInfoList, Map<Integer, Map<Integer,Integer>> allLineCane){
 		List<Map.Entry<List<Integer>,List<StationInfo>>>  lastLinesLast = new ArrayList<Map.Entry<List<Integer>,List<StationInfo>>>();

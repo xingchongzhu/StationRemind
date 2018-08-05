@@ -39,6 +39,8 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private View rootView;
     private DataManager mDataManager;
     private List<LineInfo> list = new ArrayList<>();
+    private String linenail = "";
+    MainActivity activity;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         sceneMap = (GridView) rootView.findViewById(R.id.sceneMap);
         currentLineInfoText = (TextView) rootView.findViewById(R.id.text);
         lineMap = (GridView) rootView.findViewById(R.id.lineMap);
-
+        linenail = getResources().getString(R.string.line_tail);
         mDataManager = ((MainActivity)getActivity()).getDataManager();
 
         colorLineAdapter = new ColorLineAdapter(this.getActivity());
@@ -66,7 +68,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
         sceneMapAdapter = new AllLineAdapter(this.getActivity());
         sceneMap.setAdapter(sceneMapAdapter);
-
+        activity = (MainActivity) getActivity();
         lineMap.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -104,13 +106,13 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         if(index >= list.size()){
             return;
         }
-        String string = String.format(getResources().getString(R.string.line_tail),list.get(index).lineid+"")+" "+list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+
-                list.get(index).getLineinfo();
+        String string = String.format(linenail,list.get(index).lineid+"")+" "
+                +list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+ list.get(index).getLineinfo();
         currentLineInfoText.setText(string);
         currentLineInfoText.setBackgroundColor(list.get(index).colorid);
         sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));
 
-        int height = (int)getActivity().getResources().getDimension(R.dimen.count_line_node_rect_height)*list.get(index).getStationInfoList().size()/5+1;
+        int height = (int)activity.getResources().getDimension(R.dimen.count_line_node_rect_height)*list.get(index).getStationInfoList().size()/5+1;
         ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
         linearParams.height = height;
         sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件

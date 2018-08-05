@@ -116,7 +116,6 @@ public class RemindSetViewManager implements RemindSetViewListener {
             mSelectlineMap.setStationList(lastLines.getValue());
             mSelectlineMap.setLineInfoList(dataManager.getLineInfoList());
         }
-
     }
 
     @Override

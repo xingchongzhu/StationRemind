@@ -83,5 +83,6 @@
     <string name="direction">方向</string>
     <string name="change_station_hint">请在%s站换乘%s号线</string>
     <string name="line_background_hint">到站提醒</string>
+    <string name="set_remind_hint">请设置提醒路线</string>
 
 </resources>

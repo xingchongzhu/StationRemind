@@ -67,6 +67,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private ViewGroup serachLayoutRoot;
     private ImageButton searchBackButton;
     private TextView citySelect;
+    private ViewGroup set_remind_layout;
     private SearchEditView editButton;
     private PageNavigationView pageBottomTabLayout;
 
@@ -105,6 +106,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         mNavigationController.setupWithViewPager(viewPager);
 
+        set_remind_layout = (ViewGroup)findViewById(R.id.set_remind_layout);
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
         serachLayoutRoot = (ViewGroup) findViewById(R.id.serach_layout_manager_root);
@@ -159,7 +161,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
     }
 
-    private void showSerach(View view) {
+    public void showSerach(View view) {
         // 显示动画
         view.setVisibility(View.VISIBLE);
         TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
@@ -330,13 +332,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (getRemindState()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                if (mRemindSetViewManager.getRemindWindowState()) {
-                    hideSetRemindView();
-                    return true;
-                }
-                if (serachLayoutRoot.getVisibility() == View.VISIBLE) {
-                    hideSerachView();
-                } else {
+                if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);
                     notificationMoveTaskToBack();
                 }
@@ -344,9 +340,19 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             }
             if (keyCode == KeyEvent.KEYCODE_HOME) {
                 notificationMoveTaskToBack();
+                return true;
             }
         }
-
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mRemindSetViewManager.getRemindWindowState()) {
+                hideSetRemindView();
+                return true;
+            }
+            if (serachLayoutRoot.getVisibility() == View.VISIBLE) {
+                hideSerachView();
+                return true;
+            }
+        }
         return super.onKeyDown(keyCode, event);
     }
 
