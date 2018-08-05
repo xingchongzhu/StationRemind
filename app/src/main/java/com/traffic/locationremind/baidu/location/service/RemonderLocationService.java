@@ -64,13 +64,13 @@ public class RemonderLocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if(intent != null){
+        /*if(intent != null){
             Log.d(TAG,"onStartCommand intent.getAction() = "+intent.getAction());
             if(intent.getAction() != null && intent.getAction().equals(CLOSE_REMINDER_SERVICE)){
                 setCancleReminder();
                 stopSelf();
             }
-        }
+        }*/
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -253,7 +253,7 @@ public class RemonderLocationService extends Service {
         Log.d(TAG,"isremark = "+ismark);
         if(ismark){
             NotificationObject mNotificationObject = new NotificationObject("1号地铁","老街","机场东","华强北","2分钟");
-            mNotificationUtil.showNotification(NotificationUtil.notificationId,mNotificationObject);
+            mNotificationUtil.showNotification(getApplication(),NotificationUtil.notificationId,mNotificationObject);
         }
     }
 

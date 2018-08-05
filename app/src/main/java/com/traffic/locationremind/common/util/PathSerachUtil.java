@@ -1,14 +1,3 @@
-/**
- * Copyright (C) 2015~2050 by foolstudio. All rights reserved.
- * 
- * ��Դ�ļ��д��벻����������������ҵ��;�����߱�������Ȩ��
- * 
- * ���ߣ�������
- * 
- * �������䣺foolstudio@qq.com
- * 
-*/
-
 package com.traffic.locationremind.common.util;
 
 import android.content.Context;

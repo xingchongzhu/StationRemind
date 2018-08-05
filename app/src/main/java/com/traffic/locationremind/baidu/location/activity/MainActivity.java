@@ -23,6 +23,7 @@ import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
+import com.traffic.locationremind.baidu.location.fragment.LineMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
@@ -50,7 +51,7 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
-        ReadExcelDataUtil.DbWriteFinishListener , GoToFragmentListener,LoadDataListener {
+        ReadExcelDataUtil.DbWriteFinishListener, GoToFragmentListener, LoadDataListener {
 
     private final static String TAG = "MainActivity";
 
@@ -85,27 +86,27 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         setStatusBar(Color.WHITE);
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
-        mRemindSetViewManager = new  RemindSetViewManager();
+        mRemindSetViewManager = new RemindSetViewManager();
         mRemindSetViewManager.setGoToFragmentListener(this);
-        mRemindSetViewManager.initView(this,mDataManager);
+        mRemindSetViewManager.initView(this, mDataManager);
 
         ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
 
         mNavigationController = pageBottomTabLayout.material()
-                .addItem(R.drawable.all_icon,getString(R.string.full_subway_title))
-                .addItem(R.drawable.line_icon,getString(R.string.line_title))
-                .addItem(R.drawable.remind_icon,getString(R.string.remind_title))
+                .addItem(R.drawable.all_icon, getString(R.string.full_subway_title))
+                .addItem(R.drawable.line_icon, getString(R.string.line_title))
+                .addItem(R.drawable.remind_icon, getString(R.string.remind_title))
                 .build();
 
         root = (ViewGroup) findViewById(R.id.root);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        mViewPagerAdapter = new ViewPagerAdapter(this,getSupportFragmentManager(),mNavigationController);
+        mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), mNavigationController);
         viewPager.setAdapter(mViewPagerAdapter);
 
         mNavigationController.setupWithViewPager(viewPager);
 
         citySelect = (TextView) findViewById(R.id.city_select);
-        editButton = (SearchEditView)findViewById(R.id.edit_button);
+        editButton = (SearchEditView) findViewById(R.id.edit_button);
         serachLayoutRoot = (ViewGroup) findViewById(R.id.serach_layout_manager_root);
         searchBackButton = (ImageButton) findViewById(R.id.search_back);
         searchView = (SearchView) findViewById(R.id.search_root);
@@ -113,8 +114,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         editButton.setOnClickListener(this);
 
         mSearchManager = new SearchManager();
-        mSearchManager.initViews(this,searchView);
-        mSearchManager.initData(this,mDataManager);
+        mSearchManager.initViews(this, searchView);
+        mSearchManager.initData(this, mDataManager);
         mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
         if (ReadExcelDataUtil.getInstance().hasWrite) {
             initData();
@@ -131,17 +132,22 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        Intent intent = getIntent();
+        if(intent.getAction() != null && intent.getAction().equals(RemonderLocationService.CLOSE_REMINDER_SERVICE)){
+            RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+            remindFragment.cancleRemind();
+        }
     }
 
-    private void initData(){
-        if(ReadExcelDataUtil.getInstance().hasWrite){
+    private void initData() {
+        if (ReadExcelDataUtil.getInstance().hasWrite) {
             mDataManager.loadData(this);
         }
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.edit_button:
                 showSerachView();
                 break;
@@ -153,7 +159,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
     }
 
-    private void showSerach(View view){
+    private void showSerach(View view) {
         // 显示动画
         view.setVisibility(View.VISIBLE);
         TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
@@ -166,19 +172,19 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     @Override
-    public void openRemindFragment(List<StationInfo> list){
+    public void openRemindFragment(List<StationInfo> list) {
         mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
-        RemindFragment remindFragment = (RemindFragment)mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         remindFragment.setData(list);
         hideSerachView();
         hideSetRemindView();
     }
 
-    public void setLocationChangerListener(LocationChangerListener locationChangerListener){
+    public void setLocationChangerListener(LocationChangerListener locationChangerListener) {
         locationChangerListenerList.add(locationChangerListener);
     }
 
-    private void hideSerach(View view){
+    private void hideSerach(View view) {
         // 隐藏动画
         view.setVisibility(View.GONE);
         TranslateAnimation mHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF,
@@ -209,7 +215,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
         //隐藏标题栏
         ActionBar actionBar = getSupportActionBar();
-        if(actionBar != null)
+        if (actionBar != null)
             actionBar.hide();
 
     }
@@ -225,28 +231,30 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         return ColorUtils.calculateLuminance(color) >= 0.5;
     }
 
-    public void showSerachView(){
+    public void showSerachView() {
         hideSerach(editButton);
         pageBottomTabLayout.setVisibility(View.GONE);
         showSerach(serachLayoutRoot);
     }
 
-    public void hideSerachView(){
+    public void hideSerachView() {
         hideSerach(serachLayoutRoot);
         showSerach(editButton);
         pageBottomTabLayout.setVisibility(View.VISIBLE);
     }
 
-    public void hideSetRemindView(){
-        if(mRemindSetViewManager.getRemindWindowState()){
+    public void hideSetRemindView() {
+        if (mRemindSetViewManager.getRemindWindowState()) {
             mRemindSetViewManager.closeRemindWindow();
         }
     }
 
     @Override
     public void loadFinish() {
-        Log.d(TAG,"loadFinish");
+        Log.d(TAG, "loadFinish");
         mSearchManager.reloadData(this);
+        LineMapFragment remindFragment = (LineMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.LINEMAPFRAGMENTINDEX);
+        remindFragment.upadaData();
     }
 
     @Override
@@ -257,7 +265,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     @Override
     public void dbWriteFinishNotif() {
         initData();
-        Log.d(TAG,"dbWriteFinishNotif ReadExcelDataUtil.getInstance().hasWrite = "+ReadExcelDataUtil.getInstance().hasWrite);
+        Log.d(TAG, "dbWriteFinishNotif ReadExcelDataUtil.getInstance().hasWrite = " + ReadExcelDataUtil.getInstance().hasWrite);
     }
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -280,11 +288,11 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 if (mRemonderLocationService != null) {
                     mRemonderLocationService.startLocationService();
                 }
-
                 mRemonderLocationService.setLocationChangerListener(new LocationChangerListener() {
                     @Override
                     public void loactionStation(BDLocation location) {
-                        for(LocationChangerListener locationChangerListener:locationChangerListenerList){
+                        Log.d(TAG,"setLocationChangerListener");
+                        for (LocationChangerListener locationChangerListener : locationChangerListenerList) {
                             locationChangerListener.loactionStation(location);
                         }
                     }
@@ -294,7 +302,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
     };
 
-    public BDLocation getBDLocation(){
+    public BDLocation getBDLocation() {
         BDLocation location = null;
         if (mRemonderLocationService != null) {
             location = mRemonderLocationService.getCurrentLocation();
@@ -302,33 +310,33 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         return location;
     }
 
-    public void addActivityListener(ActivityListener activityListener){
+    public void addActivityListener(ActivityListener activityListener) {
         activityListenerList.add(activityListener);
     }
 
-    public void notificationOnKeyDown(int keyCode, KeyEvent event){
-        for (ActivityListener activityListener:activityListenerList){
-            activityListener.onKeyDown(keyCode,event);
+    public void notificationOnKeyDown(int keyCode, KeyEvent event) {
+        for (ActivityListener activityListener : activityListenerList) {
+            activityListener.onKeyDown(keyCode, event);
         }
     }
 
-    public void notificationMoveTaskToBack(){
-        for (ActivityListener activityListener:activityListenerList){
+    public void notificationMoveTaskToBack() {
+        for (ActivityListener activityListener : activityListenerList) {
             activityListener.moveTaskToBack();
         }
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(getRemindState()){
+        if (getRemindState()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
-                if(mRemindSetViewManager.getRemindWindowState()){
+                if (mRemindSetViewManager.getRemindWindowState()) {
                     hideSetRemindView();
                     return true;
                 }
-                if(serachLayoutRoot.getVisibility() == View.VISIBLE){
+                if (serachLayoutRoot.getVisibility() == View.VISIBLE) {
                     hideSerachView();
-                }else{
+                } else {
                     moveTaskToBack(true);
                     notificationMoveTaskToBack();
                 }
@@ -342,8 +350,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         return super.onKeyDown(keyCode, event);
     }
 
-    public boolean getRemindState(){
-        RemindFragment remindFragment = (RemindFragment)mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+    public boolean getRemindState() {
+        RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         return remindFragment.getRemindState();
     }
 
@@ -359,10 +367,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         if (mRemonderLocationService != null) {
             BDLocation location = getBDLocation();
             if (location != null) {
-               // Log.d(TAG, "locationCurrentStation location.getCityCode() = " + location.getCityCode() + " lot = " + location.getLatitude() + " lat = " + location.getLongitude());
+                // Log.d(TAG, "locationCurrentStation location.getCityCode() = " + location.getCityCode() + " lot = " + location.getLatitude() + " lat = " + location.getLongitude());
 
                 currentCityNo = mDataManager.getCityInfoList().get(location.getCityCode());
-               // Log.d(TAG, "locationCurrentStation currentCityInfo CityName = " + currentCityNo.getCityName());
+                // Log.d(TAG, "locationCurrentStation currentCityInfo CityName = " + currentCityNo.getCityName());
                 if (currentCityNo != null) {
                     String shpno = CommonFuction.getSharedPreferencesValue(MainActivity.this, CommonFuction.CITYNO);
                     Map<Integer, LineInfo> tempList = mDataManager.getLineInfoList();
@@ -390,4 +398,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         return nerstStationInfo;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(connection);
+    }
 }

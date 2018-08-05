@@ -14,9 +14,10 @@
     <dimen name="notif_text_pad">5dp</dimen>
     <dimen name="magin_left">12dp</dimen>
     <dimen name="bottom_navigation_height">56dp</dimen>
+    <dimen name="search_height_btn">35dp</dimen>
     <dimen name="search_height">45dp</dimen>
     <dimen name="search_all_height">90dp</dimen>
-    <dimen name="search_top">55dp</dimen>
+    <dimen name="search_top">50dp</dimen>
     <dimen name="serach_view_height">50dp</dimen>
     <dimen name="btn_height">40dp</dimen>
     <dimen name="btn_width">50dp</dimen>
@@ -29,4 +30,22 @@
     <dimen name="line_node_height">300dp</dimen>
     <dimen name="current_bitmap_siez">30dp</dimen>
     <dimen name="transfer_bitmap_size">15dp</dimen>
+
+    <dimen name="single_node_padding_top">5dp</dimen>
+    <dimen name="single_node_line_width">8dp</dimen>
+    <dimen name="single_node_bitmap_size">8dp</dimen>
+    <dimen name="single_node_padding_bottom">8dp</dimen>
+    <dimen name="single_node_height">35dp</dimen>
+    <dimen name="all_line_node_width">80dp</dimen>
+
+    <dimen name="color_line_node_width">80dp</dimen>
+    <dimen name="color_line_width">20dp</dimen>
+    <dimen name="color_line_height">10dp</dimen>
+    <dimen name="color_line_margin_bottom">125dp</dimen>
+
+    <dimen name="line_node_rect_height">40dp</dimen>
+    <dimen name="line_node_bitmap_size">16dp</dimen>
+    <dimen name="count_line_node_rect_height">85dp</dimen>
+    <dimen name="node_height">2dp</dimen>
+    <dimen name="current_bitmap_node_height">20dp</dimen>
 </resources>

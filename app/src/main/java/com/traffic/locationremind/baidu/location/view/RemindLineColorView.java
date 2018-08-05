@@ -59,51 +59,54 @@ public class RemindLineColorView extends View {
     protected void onDraw(Canvas canvas) {
         // TODO Auto-generated method stub
         super.onDraw(canvas);
-        canvas.drawColor(Color.WHITE);
-        int height = 0;
-        mPaint.setTextSize(textSize);
-        mPaint.setStrokeWidth(3);
-        Rect rect = new Rect();
-        int n = 0;
-        for(Map.Entry<Integer, LineInfo> entry:lineInfoMap.entrySet()){
+        if (lineInfoMap != null) {
 
-            mPaint.setColor(entry.getValue().colorid);
 
-            if(n%2 == 0){
-                height+= padding;
-                rect.left = padding;
-                rect.top = height;
-                rect.right = rect.left+rectSize;
-                rect.bottom = rect.top+rectSize;
-                canvas.drawRect(rect,mPaint);
-            }else{
-                rect.left = getWidth()/2;
-                if(rect.width()+2*padding > getWidth()/2){
-                    rect.left = rect.width()+2*padding;
+            canvas.drawColor(Color.WHITE);
+            int height = 0;
+            mPaint.setTextSize(textSize);
+            mPaint.setStrokeWidth(3);
+            Rect rect = new Rect();
+            int n = 0;
+            for (Map.Entry<Integer, LineInfo> entry : lineInfoMap.entrySet()) {
+
+                mPaint.setColor(entry.getValue().colorid);
+
+                if (n % 2 == 0) {
+                    height += padding;
+                    rect.left = padding;
+                    rect.top = height;
+                    rect.right = rect.left + rectSize;
+                    rect.bottom = rect.top + rectSize;
+                    canvas.drawRect(rect, mPaint);
+                } else {
+                    rect.left = getWidth() / 2;
+                    if (rect.width() + 2 * padding > getWidth() / 2) {
+                        rect.left = rect.width() + 2 * padding;
+                    }
+                    rect.top = height;
+                    rect.right = rect.left + rectSize;
+                    rect.bottom = rect.top + rectSize;
+                    canvas.drawRect(rect, mPaint);
+                    height += rectSize;
                 }
-                rect.top = height;
-                rect.right = rect.left+rectSize;
-                rect.bottom = rect.top+rectSize;
-                canvas.drawRect(rect,mPaint);
-                height+=rectSize;
+                mPaint.setColor(getContext().getResources().getColor(R.color.black));
+                String text = String.format(getResources().getString(R.string.line_tail, entry.getKey() + "") + "(" + entry.getValue().getLinename() + ")");
+                mPaint.getTextBounds(text, 0, text.length(), mBound);
+                int textHeight = mBound.height();
+                canvas.drawText(text, rect.right + padding / 2, rect.top + rectSize / 2 + textHeight / 3, mPaint);
+                n++;
             }
-            mPaint.setColor(getContext().getResources().getColor(R.color.black));
-            String text = String.format(getResources().getString(R.string.line_tail,entry.getKey()+"")+"("+entry.getValue().getLinename()+")");
-            mPaint.getTextBounds(text, 0, text.length(), mBound);
-            int textHeight = mBound.height();
-            canvas.drawText(text,rect.right+padding/2,rect.top+rectSize/2+textHeight/3, mPaint);
-            n++;
-        }
-        if(n%2 == 0)
-            height+= padding;
-        else
-            height+= 2*padding;
-        if(height != getHeight()){
-            ViewGroup.LayoutParams params = this.getLayoutParams();
-            params.height = height;
-            setLayoutParams(params);
-            invalidate();
+            if (n % 2 == 0)
+                height += padding;
+            else
+                height += 2 * padding;
+            if (height != getHeight()) {
+                ViewGroup.LayoutParams params = this.getLayoutParams();
+                params.height = height;
+                setLayoutParams(params);
+                invalidate();
+            }
         }
     }
-
 }

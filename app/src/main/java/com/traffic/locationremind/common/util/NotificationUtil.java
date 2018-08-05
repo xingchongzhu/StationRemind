@@ -37,23 +37,23 @@ import java.util.Map;
 public class NotificationUtil {
 
 	public final static int notificationId = 1;
-	public final static int changeNotificationId = 1;
-	public final static int arriveNotificationId = 2;
-	private Context mContext;
+	public final static int changeNotificationId = 2;
+	public final static int arriveNotificationId = 3;
+	//private Context mContext;
 	// NotificationManager ： 是状态栏通知的管理类，负责发通知、清楚通知等。
 	private NotificationManager manager;
 	// 定义Map来保存Notification对象
 	private Map<Integer, Notification> map = null;
 
 	public NotificationUtil(Context context) {
-		this.mContext = context;
+		//this.mContext = context;
 		// NotificationManager 是一个系统Service，必须通过 getSystemService()方法来获取。
-		manager = (NotificationManager) mContext
+		manager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		map = new HashMap<Integer, Notification>();
 	}
 
-	public void showNotification(int notificationId, NotificationObject mNotificationObject) {
+	public void showNotification(Context context,int notificationId, NotificationObject mNotificationObject) {
 		//notification();
 
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
@@ -71,16 +71,18 @@ public class NotificationUtil {
 					mChannel = new NotificationChannel(id, name, importance);
 					mChannel.setDescription(description);
 					mChannel.enableLights(true); //是否在桌面icon右上角展示小红点
+					mChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);//设置在锁屏界面上显示这条通知
+					mChannel.setSound(null, null);
 					manager.createNotificationChannel(mChannel);
 				}
 			}
 
 			// 创建通知对象
 			//Notification notification = new Notification();
-			NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext);
+			NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
 			// 设置通知栏滚动显示文字
 			//notification.tickerText = mContext.getResources().getString(R.string.arrived_reminder);
-			notification.setTicker(mContext.getResources().getString(R.string.arrived_reminder));;
+			notification.setTicker(context.getResources().getString(R.string.arrived_reminder));;
 			// 设置显示时间
 			//notification.when = System.currentTimeMillis();
 			notification.setWhen(System.currentTimeMillis());
@@ -89,41 +91,34 @@ public class NotificationUtil {
 			//notification.icon = R.drawable.cm_mainmap_notice_green;
 			notification.setSmallIcon(R.mipmap.notification_icon);
 			notification.setColor(Color.parseColor("#880000FF"));
+			notification.setContentText(context.getString(R.string.line_background_hint));
 			// 设置通知的特性: 通知被点击后，自动消失
 			notification.setAutoCancel(true);
 			//notification.flags = Notification.FLAG_AUTO_CANCEL;
 			// 设置点击通知栏操作
-			Intent in = new Intent(mContext, MainViewActivity.class);// 点击跳转到指定页面
-			PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, in, 0);
+			Intent in = new Intent(context, MainViewActivity.class);// 点击跳转到指定页面
+			PendingIntent pIntent = PendingIntent.getActivity(context, 0, in, 0);
 			notification.setContentIntent(pIntent);
 			//notification.contentIntent = pIntent;
 			// 设置通知的显示视图
-			RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.reminder_notify);
+			RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.reminder_notify);
 
-			int layoutId = remoteViews.getLayoutId();
-			ViewGroup notificationRoot = (ViewGroup) LayoutInflater.from(mContext).inflate(layoutId,null);
-			TextView lineName = (TextView)notificationRoot.findViewById(R.id.line);
-			TextView start = (TextView)notificationRoot.findViewById(R.id.start);
-			TextView end = (TextView)notificationRoot.findViewById(R.id.end);
-			TextView next = (TextView)notificationRoot.findViewById(R.id.next);
-			TextView time = (TextView)notificationRoot.findViewById(R.id.time);
-
-			lineName.setText(mNotificationObject.getLineName());
-			start.setText(mNotificationObject.getStartStation());
-			end.setText(mNotificationObject.getEndStation());
-			next.setText(mNotificationObject.getNextStation());
-			time.setText(mNotificationObject.getTime());
+			//remoteViews.setTextViewCompoundDrawablesRelative(R.id.line,mNotificationObject.getLineName());
+            remoteViews.setTextViewText(R.id.line,mNotificationObject.getLineName());
+            remoteViews.setTextViewText(R.id.start,mNotificationObject.getStartStation());
+            remoteViews.setTextViewText(R.id.end,mNotificationObject.getEndStation());
+            remoteViews.setTextViewText(R.id.next,mNotificationObject.getNextStation());
+            remoteViews.setTextViewText(R.id.time,mNotificationObject.getTime());
 
 			// 设置暂停按钮的点击事件
-			Intent close = new Intent(mContext,MainActivity.class);// 设置跳转到对应界面
+			Intent close = new Intent(context,MainActivity.class);// 设置跳转到对应界面
 			close.setAction(RemonderLocationService.CLOSE_REMINDER_SERVICE);
-			PendingIntent pauseIn = PendingIntent.getService(mContext, 0, in, 0);
+			PendingIntent pauseIn = PendingIntent.getService(context, 0, in, 0);
 			// 这里可以通过Bundle等传递参数
 			remoteViews.setOnClickPendingIntent(R.id.close, pauseIn);
 			/********** 简单分隔 **************************/
 			// 设置通知的显示视图
-			notification.setCustomBigContentView(remoteViews);
-			//notification.contentView = remoteViews;
+			notification.setCustomContentView(remoteViews);
 			// 发出通知
 			Notification notifi = notification.build();
 
@@ -134,7 +129,7 @@ public class NotificationUtil {
 		}
 	}
 
-	public void arrivedNotification(int notificationId) {
+	public void arrivedNotification(Context context,int notificationId) {
 		//notification();
 
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
@@ -152,17 +147,19 @@ public class NotificationUtil {
 				mChannel = new NotificationChannel(id, name, importance);
 				mChannel.setDescription(description);
 				mChannel.enableLights(true); //是否在桌面icon右上角展示小红点
+				mChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);//设置在锁屏界面上显示这条通知
 				manager.createNotificationChannel(mChannel);
 			}
 		}
 
 		// 创建通知对象
 		//Notification notification = new Notification();
-		NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext);
+		NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
 		// 设置通知栏滚动显示文字
 		//notification.tickerText = mContext.getResources().getString(R.string.arrived_reminder);
-        notification.setContentText(mContext.getResources().getString(R.string.hint_arrive_end_station));
-        notification.setContentTitle(mContext.getResources().getString(R.string.arrive_station_title));
+		notification.setVibrate(new long[]{500, 500, 500, 500, 500, 500});
+        notification.setContentText(context.getResources().getString(R.string.hint_arrive_end_station));
+        notification.setContentTitle(context.getResources().getString(R.string.arrive_station_title));
 		// 设置显示时间
 		//notification.when = System.currentTimeMillis();
 		notification.setWhen(System.currentTimeMillis());
@@ -173,12 +170,6 @@ public class NotificationUtil {
 		notification.setColor(Color.parseColor("#880000FF"));
 		// 设置通知的特性: 通知被点击后，自动消失
 		notification.setAutoCancel(true);
-		//notification.flags = Notification.FLAG_AUTO_CANCEL;
-		/*// 设置点击通知栏操作
-		Intent in = new Intent(mContext, MainViewActivity.class);// 点击跳转到指定页面
-		PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, in, 0);
-		notification.setContentIntent(pIntent);*/
-		//notification.contentIntent = pIntent;
 		// 发出通知
 		Notification notifi = notification.build();
 
@@ -189,7 +180,7 @@ public class NotificationUtil {
 		//}
 	}
 
-	public void changeNotification(int notificationId,String changeHint) {
+	public void changeNotification(Context context,int notificationId,String changeHint) {
 		//notification();
 
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
@@ -207,17 +198,19 @@ public class NotificationUtil {
 					mChannel = new NotificationChannel(id, name, importance);
 					mChannel.setDescription(description);
 					mChannel.enableLights(true); //是否在桌面icon右上角展示小红点
+					mChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);//设置在锁屏界面上显示这条通知
 					manager.createNotificationChannel(mChannel);
 				}
 			}
 
 			// 创建通知对象
 			//Notification notification = new Notification();
-			NotificationCompat.Builder notification = new NotificationCompat.Builder(mContext);
+			NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
 			// 设置通知栏滚动显示文字
 			//notification.tickerText = mContext.getResources().getString(R.string.arrived_reminder);
             notification.setContentText(changeHint);
-            notification.setContentTitle(mContext.getResources().getString(R.string.changet_hint_tile));
+		    notification.setVibrate(new long[]{500, 500, 500, 500, 500, 500});
+            notification.setContentTitle(context.getResources().getString(R.string.changet_hint_tile));
 			notification.setChannelId(id);
 			// 设置通知显示的图标
 			//notification.icon = R.drawable.cm_mainmap_notice_green;
@@ -227,8 +220,8 @@ public class NotificationUtil {
 			notification.setAutoCancel(true);
 			//notification.flags = Notification.FLAG_AUTO_CANCEL;
 			// 设置点击通知栏操作
-			Intent in = new Intent(mContext, MainViewActivity.class);// 点击跳转到指定页面
-			PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, in, 0);
+			Intent in = new Intent(context, MainActivity.class);// 点击跳转到指定页面
+			PendingIntent pIntent = PendingIntent.getActivity(context, 0, in, 0);
 			notification.setContentIntent(pIntent);
 			//notification.contentIntent = pIntent;
 			// 发出通知
@@ -253,23 +246,15 @@ public class NotificationUtil {
 		map.remove(notificationId);
 	}
 
-	public void updateProgress(int notificationId, NotificationObject mNotificationObject) {
+	public void updateProgress(Context context,int notificationId, NotificationObject mNotificationObject) {
 		Notification notify = map.get(notificationId);
 		if (null != notify) {
 			// 修改进度条
-			int layoutId = notify.contentView.getLayoutId();
-			ViewGroup notificationRoot = (ViewGroup) LayoutInflater.from(mContext).inflate(layoutId,null);
-			TextView lineName = (TextView)notificationRoot.findViewById(R.id.line);
-			TextView start = (TextView)notificationRoot.findViewById(R.id.start);
-			TextView end = (TextView)notificationRoot.findViewById(R.id.end);
-			TextView next = (TextView)notificationRoot.findViewById(R.id.next);
-			TextView timeTextView = (TextView)notificationRoot.findViewById(R.id.time);
-
-			lineName.setText(mNotificationObject.getLineName());
-			start.setText(mNotificationObject.getStartStation());
-			end.setText(mNotificationObject.getEndStation());
-			next.setText(mNotificationObject.getNextStation());
-			timeTextView.setText(mNotificationObject.getTime());
+            notify.contentView.setTextViewText(R.id.line,mNotificationObject.getLineName());
+            notify.contentView.setTextViewText(R.id.start,mNotificationObject.getStartStation());
+            notify.contentView.setTextViewText(R.id.end,mNotificationObject.getEndStation());
+            notify.contentView.setTextViewText(R.id.next,mNotificationObject.getNextStation());
+            notify.contentView.setTextViewText(R.id.time,mNotificationObject.getTime());
 			manager.notify(notificationId, notify);
 		}
 	}

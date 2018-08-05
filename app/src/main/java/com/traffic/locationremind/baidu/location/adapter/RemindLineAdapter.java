@@ -36,27 +36,6 @@ public class RemindLineAdapter extends BaseAdapter {
 
     public void setData(Map.Entry<List<Integer>,List<StationInfo>> data){
         this.data = data;
-        /*List<Integer> lineidList = data.getKey();
-        List<StationInfo> stationInfoList = data.getValue();*/
-        /*for(int i = 0 ;i<lineidList.size();i++){
-            dataList.add(lineidList.get(i));
-            List<StationInfo> list = new ArrayList<>();
-            StationInfo lastStation = null;
-            for(StationInfo stationInfo:stationInfoList){
-                if(lineidList.get(i) == stationInfo.lineid){
-                    list.add(stationInfo);
-                }else{
-                    break;
-                    //lastStation = stationInfo;
-                }
-
-            }
-            *//*if(i < lineidList.size() -1){
-                list.add(lastStation);
-            }*//*
-            data1.put(lineidList.get(i),list);
-        }*/
-
         notifyDataSetChanged();
     }
 

@@ -82,5 +82,6 @@
     <string name="hint_arrive_end_station">你已抵达终点站</string>
     <string name="direction">方向</string>
     <string name="change_station_hint">请在%s站换乘%s号线</string>
+    <string name="line_background_hint">到站提醒</string>
 
 </resources>

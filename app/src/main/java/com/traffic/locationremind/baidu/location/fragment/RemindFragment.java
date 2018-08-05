@@ -202,8 +202,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
 
     @Override
     public void loactionStation(BDLocation location) {
-
         MainActivity activity = (MainActivity)getActivity();
+
         if (activity == null || !activity.getPersimmions()) {
             return;
         } else {
@@ -242,6 +242,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
 
                     n = 0;
                     size = needChangeStationList.size();
+                    Log.d(TAG,"loactionStation currentStationNum = "+currentStationNum);
+                    currentStationNum++;
                     if(isRemind) {
                         for (StationInfo stationInfo : needChangeStationList) {
                             if (stationInfo.getCname().equals(nerstStationInfo.getCname())) {
@@ -260,12 +262,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
                             }
                             n++;
                         }
-                        //if(this.isPause) {
-                            updataNotification(createNotificationObject(currentStation, nextStation));
-                        //}
+                        Log.d(TAG,"loactionStation updataNotification ");
+                        updataNotification(createNotificationObject(currentStation, nextStation));
                     }
-                    currentStationNum++;
-                    Log.d(TAG,"loactionStation currentStationNum = "+currentStationNum);
+
+
                 }
             }
         }
@@ -305,6 +306,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         this.isPause = true;
     }
 
+    public void cancleRemind(){
+        isRemind = false;
+        cancleNotification();
+    }
     public boolean getRemindState(){
         return isRemind;
     }
@@ -333,19 +338,19 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     }
 
     public void setNotification(NotificationObject mNotificationObject) {
-        mNotificationUtil.showNotification(NotificationUtil.notificationId,mNotificationObject);
+        mNotificationUtil.showNotification(getActivity(),NotificationUtil.notificationId,mNotificationObject);
     }
 
     public void updataNotification(NotificationObject mNotificationObject) {
-        mNotificationUtil.updateProgress(NotificationUtil.notificationId,mNotificationObject);
+        mNotificationUtil.updateProgress(getActivity(),NotificationUtil.notificationId,mNotificationObject);
     }
 
     public void arriveNotification() {
-        mNotificationUtil.arrivedNotification(NotificationUtil.arriveNotificationId);
+        mNotificationUtil.arrivedNotification(getActivity(),NotificationUtil.arriveNotificationId);
     }
 
     public void changeNotification(String str) {
-        mNotificationUtil.changeNotification(NotificationUtil.changeNotificationId,str);
+        mNotificationUtil.changeNotification(getActivity(),NotificationUtil.changeNotificationId,str);
     }
 
 }
