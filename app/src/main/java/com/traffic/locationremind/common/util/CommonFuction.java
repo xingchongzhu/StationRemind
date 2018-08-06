@@ -14,6 +14,7 @@ import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,24 @@ public class CommonFuction {
 	public final static int MAXRECENTSERACHHISTORY = 10;
 
 	public final static double INVALE_DATA = 4.9E-324D;
+
+	// 获得状态栏高度
+	public static int getStatusBarHeight(Context context) {
+		Class<?> c = null;
+		Object obj = null;
+		Field field = null;
+		int x = 0;
+		try {
+			c = Class.forName("com.android.internal.R$dimen");
+			obj = c.newInstance();
+			field = c.getField("status_bar_height");
+			x = Integer.parseInt(field.get(obj).toString());
+			return context.getResources().getDimensionPixelSize(x);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			return 75;
+		}
+	}
 
 	public static void writeSharedPreferences(Context context,String key,String value){
 		SharedPreferences sp = context.getSharedPreferences(SHNAME, Context.MODE_PRIVATE);

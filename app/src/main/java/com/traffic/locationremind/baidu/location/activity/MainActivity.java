@@ -11,6 +11,7 @@ import android.support.annotation.ColorInt;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.*;
 import android.view.animation.Animation;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private List<ActivityListener> activityListenerList = new ArrayList<>();
 
     private CityInfo currentCityNo = null;
+    private Toolbar mToolbarSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,11 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mDataManager = DataManager.getInstance(this);
         mDataManager.addLoadDataListener(this);
         setStatusBar(Color.WHITE);
+
+        mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
+        citySelect = (TextView) findViewById(R.id.city_select);
+        editButton = (SearchEditView) findViewById(R.id.edit_button);
+
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
         mRemindSetViewManager = new RemindSetViewManager();
@@ -107,8 +114,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mNavigationController.setupWithViewPager(viewPager);
 
         set_remind_layout = (ViewGroup)findViewById(R.id.set_remind_layout);
-        citySelect = (TextView) findViewById(R.id.city_select);
-        editButton = (SearchEditView) findViewById(R.id.edit_button);
+
         serachLayoutRoot = (ViewGroup) findViewById(R.id.serach_layout_manager_root);
         searchBackButton = (ImageButton) findViewById(R.id.search_back);
         searchView = (SearchView) findViewById(R.id.search_root);

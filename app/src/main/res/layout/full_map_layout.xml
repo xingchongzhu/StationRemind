@@ -2,18 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical" >
+    android:background="@color/white" >
     
-    <TextView
-            android:id="@+id/speed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="全局图片" />
-    <TextView
-        android:layout_alignParentBottom="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="全局图片777" />
+    <com.traffic.locationremind.baidu.location.view.FullMapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="matrix" />
 
 </RelativeLayout>

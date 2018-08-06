@@ -110,7 +110,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         recentSerachGrid = (GridView) findViewById(R.id.recent_grid);
 
         change = (ImageView) findViewById(R.id.change);
-        serach = (ImageView) findViewById(R.id.serach);
+        //serach = (ImageView) findViewById(R.id.serach);
 
         result = (ListView) findViewById(R.id.result);
         startInput.addTextChangedListener(new StartEditChangedListener());
@@ -144,7 +144,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         endDelete.setOnClickListener(this);
 
         change.setOnClickListener(this);
-        serach.setOnClickListener(this);
+        //serach.setOnClickListener(this);
     }
 
     boolean isComplete = false;
@@ -321,9 +321,9 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 startInput.setText(str1);
                 endInput.setText(str);
                 break;
-            case R.id.serach:
+            /*case R.id.serach:
                 notifyStartSearching("");
-                break;
+                break;*/
         }
     }
 

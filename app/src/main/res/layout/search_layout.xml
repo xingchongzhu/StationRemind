@@ -3,66 +3,82 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:background="@color/white"
-              android:paddingTop="10dp"
+              android:paddingTop="5dp"
               android:paddingLeft="10dp"
               android:paddingRight="10dp"
               android:orientation="vertical">
 
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        <ImageButton
-                android:id="@+id/search_back"
-                android:layout_width="@dimen/bick_btn_width"
-                android:layout_height="@dimen/bick_btn_width"
-                android:background="@drawable/button_back_select"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentLeft="true"
-        />
-        <TextView
-                android:id="@+id/city_select"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="25dp"
-                android:layout_marginTop="5dp"
-                android:textColor="@color/black"
-                android:layout_centerInParent="true"
-                android:text="深圳"
-                android:drawableRight="@drawable/ic_select_city_down"
-                android:textStyle="normal"/>
-    </RelativeLayout>
+    <include
+            android:id="@+id/serach_view_button"
+            layout="@layout/serach_toolbar"/>
     <FrameLayout
-            android:layout_marginTop="10dp"
             android:layout_width="match_parent"
+            android:layout_marginBottom="5dp"
             android:layout_height="wrap_content">
+        <FrameLayout
 
-        <com.traffic.locationremind.baidu.location.view.SearchEditView
-                android:id="@+id/search_start_input"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/search_height"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/search_edittext_shape_top"
-                android:layout_marginRight="@dimen/btn_width"
-                android:drawableLeft="@drawable/start_green_route"
-                android:drawablePadding="5dp"
-                android:hint="起点站"
-                android:text="@string/current_location"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:textColor="@color/blue"
-                android:textSize="16sp"/>
+                android:layout_height="wrap_content">
 
-        <ImageView
-                android:id="@+id/search_start_delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="@dimen/delete_margin"
-                android:src="@drawable/iv_delete_bg"
-                android:visibility="gone"/>
+            <com.traffic.locationremind.baidu.location.view.SearchEditView
+                    android:id="@+id/search_start_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/search_height"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/search_edittext_shape_top"
+                    android:drawableLeft="@drawable/start_green_route"
+                    android:drawablePadding="5dp"
+                    android:hint="起点站"
+                    android:text="@string/current_location"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textColor="@color/blue"
+                    android:textSize="16sp"/>
 
+            <ImageView
+                    android:id="@+id/search_start_delete"
+                    android:layout_width="@dimen/search_delete"
+                    android:layout_height="@dimen/search_delete"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/iv_delete_bg"
+                    android:visibility="visible"/>
+
+        </FrameLayout>
+
+
+        <FrameLayout
+                android:layout_marginTop="@dimen/search_height"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            <com.traffic.locationremind.baidu.location.view.SearchEditView
+                    android:id="@+id/search_end_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/search_height"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/search_edittext_shape_bottom"
+                    android:drawableLeft="@drawable/end_red_route"
+                    android:drawablePadding="5dp"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:hint="终点站"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textColor="@color/blue"
+                    android:textSize="16sp"/>
+
+            <ImageView
+                    android:id="@+id/search_end_delete"
+                    android:layout_width="@dimen/search_delete"
+                    android:layout_height="@dimen/search_delete"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/iv_delete_bg"
+                    android:visibility="visible"/>
+        </FrameLayout>
         <ImageView
                 android:id="@+id/change"
                 android:layout_width="@dimen/btn_width"
@@ -71,44 +87,6 @@
                 android:src="@drawable/change"/>
     </FrameLayout>
 
-    <FrameLayout
-            android:layout_marginTop="1dp"
-            android:layout_marginBottom="5dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        <com.traffic.locationremind.baidu.location.view.SearchEditView
-                android:id="@+id/search_end_input"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/search_height"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/search_edittext_shape_bottom"
-                android:drawableLeft="@drawable/end_red_route"
-                android:layout_marginRight="@dimen/btn_width"
-                android:drawablePadding="5dp"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="终点站"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:textColor="@color/blue"
-                android:textSize="16sp"/>
-
-        <ImageView
-                android:id="@+id/search_end_delete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="@dimen/delete_margin"
-                android:src="@drawable/iv_delete_bg"
-                android:visibility="gone"/>
-        <ImageView
-                android:id="@+id/serach"
-                android:layout_width="@dimen/btn_width"
-                android:layout_height="@dimen/btn_width"
-                android:layout_gravity="right|center_vertical"
-                android:src="@drawable/serach_button_select"/>
-    </FrameLayout>
     <ListView
             android:id="@+id/main_lv_search_results"
             android:layout_width="match_parent"
