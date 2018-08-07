@@ -121,7 +121,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (lvTips != null)
                         lvTips.setVisibility(GONE);
-                    notifyStartSearching(startInput.getText().toString());
+                    endInputNotifyStartSearching(startInput.getText().toString());
                 }
                 return true;
             }
@@ -136,7 +136,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     if (lvTips != null)
                         lvTips.setVisibility(GONE);
-                    notifyStartSearching(endInput.getText().toString());
+                    endInputNotifyStartSearching(endInput.getText().toString());
                 }
                 return true;
             }
@@ -171,7 +171,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 mListener.notificationRecentSerachChange(getContext());
             }
         }
-
+        notifyStartSearching(null);
     }
 
     public void setRecentSelectStation(String text) {
@@ -199,7 +199,17 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
      */
     private void notifyStartSearching(String text) {
         if (mListener != null) {
-            //String str = startInput.hasFocus() ? startInput.getText().toString() : endInput.getText().toString();
+            mListener.onSearch(getContext(), startInput.getText().toString() , endInput.getText().toString());
+        }
+    }
+
+    /**
+     * 通知监听者 进行搜索操作
+     *
+     * @param text
+     */
+    private void endInputNotifyStartSearching(String text) {
+        if (mListener != null) {
             mListener.onSearch(getContext(), startInput.getText().toString() , endInput.getText().toString());
         }
         hideSoftInput();
@@ -208,6 +218,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     public void setStartCurrentLocation(){
         if(startInput != null)
             startInput.setText(getResources().getString(R.string.current_location));
+        startInput.setSelection(startInput.getText().toString().length());
     }
 
     private void hideSoftInput() {
@@ -234,6 +245,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
             if (isComplete) {
                 isComplete = false;
+                notifyStartSearching(null);
                 return;
             }
             if (!"".equals(charSequence.toString())) {
@@ -242,6 +254,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 if (mListener != null) {
                     mListener.onRefreshAutoComplete(getContext(), charSequence + "");
                 }
+                notifyStartSearching(null);
             } else {
                 startDelete.setVisibility(GONE);
                 if (lvTips != null) {
@@ -265,6 +278,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
             if (isComplete) {
                 isComplete = false;
+                notifyStartSearching(null);
                 return;
             }
             if (!"".equals(charSequence.toString())) {
@@ -273,6 +287,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 if (mListener != null) {
                     mListener.onRefreshAutoComplete(getContext(), charSequence + "");
                 }
+                notifyStartSearching(null);
             } else {
                 endDelete.setVisibility(GONE);
                 if (lvTips != null) {
@@ -320,6 +335,8 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
                 String str1 = endInput.getText().toString();
                 startInput.setText(str1);
                 endInput.setText(str);
+                startInput.setSelection(startInput.getText().toString().length());
+                endInput.setSelection(endInput.getText().toString().length());
                 break;
             /*case R.id.serach:
                 notifyStartSearching("");

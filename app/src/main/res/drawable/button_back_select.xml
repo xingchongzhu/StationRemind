@@ -5,14 +5,14 @@
         android:state_enabled="true"
         android:state_pressed="true"
         android:color="@color/gray"
-        android:drawable="@drawable/setting_back" />
+        android:drawable="@drawable/xh_ic_arrow_left" />
 <item
         android:state_enabled="false"
-        android:drawable="@drawable/setting_back">
-    <color android:color="@color/white" />
+        android:drawable="@drawable/xh_ic_arrow_left">
+    <color android:color="@color/blue" />
 </item>
-<item android:drawable="@drawable/setting_back">
-    <color android:color="@color/white" />
+<item android:drawable="@drawable/xh_ic_arrow_left">
+    <color android:color="@color/blue" />
 </item>
 
 </selector>

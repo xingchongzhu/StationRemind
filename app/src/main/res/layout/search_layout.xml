@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:background="@color/white"
+              android:background="@color/lightgray"
               android:paddingTop="5dp"
               android:paddingLeft="10dp"
               android:paddingRight="10dp"
@@ -44,7 +44,7 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_marginRight="10dp"
                     android:src="@drawable/iv_delete_bg"
-                    android:visibility="visible"/>
+                    android:visibility="gone"/>
 
         </FrameLayout>
 
@@ -77,18 +77,20 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_marginRight="10dp"
                     android:src="@drawable/iv_delete_bg"
-                    android:visibility="visible"/>
+                    android:visibility="gone"/>
         </FrameLayout>
         <ImageView
                 android:id="@+id/change"
                 android:layout_width="@dimen/btn_width"
                 android:layout_height="@dimen/btn_width"
                 android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="30dp"
                 android:src="@drawable/change"/>
     </FrameLayout>
 
     <ListView
             android:id="@+id/main_lv_search_results"
+            android:layout_marginBottom="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
@@ -96,23 +98,29 @@
             android:background="@color/white">
     </ListView>
     <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:text="@string/search_history"
+            android:padding="5dp"
             android:textSize="18dp"
             android:textColor="@color/blue"
+            android:layout_marginBottom="1dp"
+            android:background="@color/lightwhite"
             android:layout_height="wrap_content"/>
 
     <GridView
             android:id="@+id/recent_grid"
             android:layout_width="match_parent"
+            android:layout_marginBottom="1dp"
+            android:padding="5dp"
             android:layout_height="wrap_content"
             android:horizontalSpacing="5dp"
+            android:background="@color/lightwhite"
             android:verticalSpacing="2dp"
             android:numColumns="5"
             android:gravity="center_horizontal">
     </GridView>
     <ListView
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:id="@+id/result"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

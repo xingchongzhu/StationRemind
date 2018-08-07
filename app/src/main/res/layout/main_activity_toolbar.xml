@@ -5,7 +5,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/lightwhite"
         android:popupTheme="@style/AppTheme">
 
     <LinearLayout
@@ -18,14 +18,14 @@
                 android:id="@+id/city_select"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="18dp"
+                android:textSize="20dp"
                 android:layout_margin="5dp"
-                android:textColor="@color/black"
+                android:textColor="#6A5ACD"
                 android:layout_gravity="center"
                 android:gravity="top"
                 android:text="深圳"
                 android:drawableRight="@drawable/city_select"
-                android:textStyle="normal"/>
+                android:textStyle="bold"/>
         <com.traffic.locationremind.baidu.location.view.SearchEditView
                 android:id="@+id/edit_button"
                 android:layout_width="match_parent"
@@ -40,7 +40,7 @@
                 android:imeOptions="actionSearch"
                 android:inputType="text"
                 android:textColor="@color/blue"
-                android:textSize="16sp"/>
+                android:textSize="12sp"/>
 
     </LinearLayout>
 

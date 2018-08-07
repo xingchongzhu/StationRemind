@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.TypedValue;
+import com.traffic.location.remind.R;
 
 
 public class Utils {
@@ -29,9 +30,9 @@ public class Utils {
 	 */
 	public static int getColorPrimary(Context context){
 		Resources res = context.getResources();
-		int attrRes =res.getIdentifier("colorPrimary","attr",context.getPackageName());
+		int attrRes =res.getIdentifier("Royal_blue","attr",context.getPackageName());
 		if(attrRes == 0){
-			return 0xFF009688;
+			return context.getResources().getColor(R.color.colorPrimary);
 		}
 		return ContextCompat.getColor(context,getResourceId(context,attrRes));
 	}

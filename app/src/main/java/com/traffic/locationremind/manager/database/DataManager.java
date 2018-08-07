@@ -36,6 +36,7 @@ public class DataManager{
 	private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//用于初始化路线矩阵
 	private Map<Integer,Integer> lineColor = new HashMap<>();//路线对应颜色
 	private Object mLock = new Object();
+	private Map<String, StationInfo> allstations = new HashMap<>();
 
 	private int maxLineid = 0;
 
@@ -130,6 +131,7 @@ public class DataManager{
 			}
 			maxLineid+= 1;//找出路线最大编号加一
 			mLineInfoList = list;
+			setAllstations(mLineInfoList);
 			return list;
 		}
 
@@ -146,6 +148,20 @@ public class DataManager{
 
 	}
 
+	public Map<String, StationInfo> getAllstations() {
+		return allstations;
+	}
+
+	private void setAllstations(Map<Integer, LineInfo> allLines) {
+		allstations.clear();
+		if (allLines != null) {
+			for (Map.Entry<Integer, LineInfo> entry : allLines.entrySet()) {
+				for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
+					allstations.put(stationInfo.getCname(), stationInfo);
+				}
+			}
+		}
+	}
 	/**
 	 * Set this as the current Launcher activity object for the loader.
 	 */

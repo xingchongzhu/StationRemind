@@ -36,7 +36,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
     private SelectlineMap mSelectlineMap;
 
     private GoToFragmentListener mGoToFragmentListener;
-
+    Activity activity;
     private DataManager dataManager;
     public RemindSetViewManager(){
 
@@ -46,7 +46,8 @@ public class RemindSetViewManager implements RemindSetViewListener {
         this.mGoToFragmentListener = mGoToFragmentListener;
     }
 
-    public void initView(Activity activity,DataManager dataManager) {
+    public void initView(final Activity activity,DataManager dataManager) {
+        this.activity = activity;
         this.dataManager = dataManager;
         set_remind_layout = (ViewGroup)activity.findViewById(R.id.set_remind_layout);
         //listView = (ListView) activity.findViewById(R.id.list_view);
@@ -73,6 +74,33 @@ public class RemindSetViewManager implements RemindSetViewListener {
             public void onClick(View v) {
                 if(mGoToFragmentListener != null){
                     mGoToFragmentListener.openRemindFragment(mSelectlineMap.getDataList());
+                }
+            }
+        });
+
+        collectionBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String lineStr = CommonFuction.convertStationToString(mSelectlineMap.getDataList());
+                String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+                if(allFavoriteLine.contains(lineStr)){
+                    String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
+                    StringBuffer newLine = new StringBuffer();
+                    int size = string.length;
+                    for(int i = 0;i < size;i++){
+                        if(!lineStr.equals(string[i])) {
+                            newLine.append(string[i] + CommonFuction.TRANSFER_SPLIT);
+                        }
+                    }
+                    CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
+                    collectionBtn.setCompoundDrawables(null,activity.getResources().getDrawable(R.drawable.locationbar_fav_btn),null,null);
+                }else{
+                    String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+                    StringBuffer newLine = new StringBuffer();
+                    newLine.append(allFavoriteLines+lineStr+CommonFuction.TRANSFER_SPLIT);
+                    CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
+                    collectionBtn.setCompoundDrawables(null,activity.getResources().getDrawable(R.drawable.saveas_fav_btn),null,null);
+
                 }
             }
         });
@@ -115,6 +143,11 @@ public class RemindSetViewManager implements RemindSetViewListener {
             set_remind_layout.setVisibility(View.VISIBLE);
             mSelectlineMap.setStationList(lastLines.getValue());
             mSelectlineMap.setLineInfoList(dataManager.getLineInfoList());
+            String lineStr = CommonFuction.convertStationToString(lastLines.getValue());
+            String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+            if(allFavoriteLine.contains(lineStr)){
+                collectionBtn.setCompoundDrawables(null,activity.getResources().getDrawable(R.drawable.saveas_fav_btn),null,null);
+            }
         }
     }
 

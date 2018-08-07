@@ -6,50 +6,48 @@
                 android:orientation="vertical"
                 tools:context="com.traffic.locationremind.baidu.location.activity.MainActivity">
 
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
             android:id="@+id/bar"
-            android:layout_margin="1dp"
             android:layout_width="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_height="50dp"
-            android:paddingLeft="10dp"
-            android:orientation="horizontal">
-        <ImageView
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:popupTheme="@style/AppTheme">
 
+
+        <ImageButton
                 android:id="@+id/back_btn"
-                android:background="@drawable/button_back_select"
-                android:layout_gravity="center"
                 android:layout_width="@dimen/bick_btn_width"
-                android:layout_height="@dimen/bick_btn_width"/>
+                android:layout_height="@dimen/bick_btn_width"
+                android:background="@drawable/button_back_select"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentLeft="true"
+        />
         <TextView
                 android:id="@+id/change_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:paddingLeft="10dp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                android:text="ddd"
-                android:textSize="20sp"    />
-    </LinearLayout>
+                android:textSize="20dp"
+                android:textColor="#6A5ACD"
+                android:layout_centerInParent="true"
+                android:textStyle="normal"/>
 
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:paddingTop="10dp"
             android:layout_height="match_parent"
             android:layout_below="@+id/bar"
             android:layout_marginBottom="@dimen/search_height"
             android:background="@color/white"
             android:orientation="vertical">
-
         <View android:layout_width="match_parent"
               android:layout_height="1px"
-              android:background="@color/gray"
+              android:background="#104E8B"
         />
 
         <LinearLayout
                 android:layout_margin="1dp"
+                android:paddingTop="8dp"
                 android:layout_width="match_parent"
                 android:paddingLeft="@dimen/remind_line_map_padding_left"
                 android:layout_height="wrap_content"
@@ -64,15 +62,15 @@
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/start_green_route"
                         android:text="@string/start_station"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
+                        android:textColor="#EE7621"
+                        android:textStyle="normal"
                         android:textSize="18sp"
                 />
                 <TextView android:id="@+id/start"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:textColor="@color/black"
-                          android:textStyle="bold"
+                          android:textColor="#6495ED"
+                          android:textStyle="normal"
                           android:textSize="18sp"
                 />
             </LinearLayout>
@@ -87,16 +85,16 @@
                         android:layout_height="wrap_content"
                         android:drawableLeft="@drawable/end_red_route"
                         android:text="@string/end_station"
-                        android:textColor="@color/black"
+                        android:textColor="#EE7621"
                         android:textSize="18sp"
-                        android:textStyle="bold"
+                        android:textStyle="normal"
                 />
                 <TextView android:id="@+id/end"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
-                          android:textColor="@color/black"
+                          android:textColor="#6495ED"
                           android:textSize="18sp"
-                          android:textStyle="bold"
+                          android:textStyle="normal"
                 />
             </LinearLayout>
 
@@ -138,7 +136,7 @@
                 android:drawableTop="@drawable/locationbar_fav_btn"
                 android:text="@string/collection_line"
                 android:layout_gravity="center"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:gravity="center"
                 android:textColor="@color/blue"
         />
@@ -150,7 +148,7 @@
                 android:drawableTop="@drawable/set_remind"
                 android:text="@string/set_remind"
                 android:layout_gravity="center"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:gravity="center"
                 android:textColor="@color/blue"
         />

@@ -9,7 +9,7 @@
     <color name="green">#008B00</color>
     <color name="yellow">#FFCC33</color>
     <color name="blue">#099FF0</color>
-    <color name="red">#CD0000</color>
+    <color name="red">#EE5C42</color>
     <color name="blue_violet">#8A2BE2</color>
     <color name="Royal_blue">#3A5FCD</color>
     <color name="light_gray">#F0F0F0</color>
@@ -20,7 +20,9 @@
     <color name="notif_text_color">#000000</color>
 
     <color name="myred">#eb4f38</color>
-    <color name="darkgray">#cccc</color>
+    <color name="darkgray">#F8F8FF</color>
+    <color name="lightgray">#F7F7F7</color>
+    <color name="lightwhite">#FFFFFF</color>
     <color name="color_white">#ffffff</color>
     <color name="btn_press_color">#5677fc</color>
     <color name="btn_pressed_color">#3ca0ec</color>

@@ -10,7 +10,7 @@
         android:padding="5dp"
         android:layout_height="wrap_content"
         android:textSize="15dp"
-        android:textColor="@color/black"
+        android:textColor="@color/salmon"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </LinearLayout>

@@ -99,7 +99,6 @@ public class SearchManager implements SearchView.SearchViewListener {
                 if (mRemindSetViewListener != null) {
                     mRemindSetViewListener.openSetWindow(mCardAdapter.getItem(position));
                 }
-
             }
         });
 
@@ -155,16 +154,16 @@ public class SearchManager implements SearchView.SearchViewListener {
      * 获取db 数据
      */
     private void getDbData() {
-        Map<Integer, LineInfo> allLines = mDataManager.getLineInfoList();
-        Log.d(TAG, "getDbData" + " allLines = " + allLines);
-        allstations.clear();
-        if (allLines != null) {
+        allstations = mDataManager.getAllstations();
+       // Log.d(TAG, "getDbData" + " allLines = " + allLines);
+        //allstations.clear();
+        /*if (allLines != null) {
             for (Map.Entry<Integer, LineInfo> entry : allLines.entrySet()) {
                 for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
                     allstations.put(stationInfo.getCname(), stationInfo);
                 }
             }
-        }
+        }*/
     }
 
     /**
@@ -209,10 +208,12 @@ public class SearchManager implements SearchView.SearchViewListener {
     @Override
     public void onSearch(Context context, String start, String end) {
         //更新result数据
-        //getAutoCompleteData(context,text);
-        lvResults.setVisibility(View.GONE);
+        if(TextUtils.isEmpty(start) || TextUtils.isEmpty(end))
+            return;
+
+        String current = context.getResources().getString(R.string.current_location);
         StationInfo startStation = null, endStation = null;
-        if (TextUtils.isEmpty(start) || start.equals(context.getResources().getString(R.string.current_location))) {
+        if (start.equals(current)) {
             StationInfo stationInfo = activity.getLocationCurrentStation();
             if (stationInfo != null) {
                 startStation = stationInfo;
@@ -221,14 +222,13 @@ public class SearchManager implements SearchView.SearchViewListener {
             startStation = allstations.get(start);
         }
 
-        if (TextUtils.isEmpty(end) || end.equals(context.getResources().getString(R.string.current_location))) {
+        if(end.equals(current)) {
             StationInfo stationInfo = activity.getLocationCurrentStation();
             if (stationInfo != null) {
                 endStation = stationInfo;
             }
         } else {
             endStation = allstations.get(end);
-            ;
         }
         if (startStation == null) {
             Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
@@ -238,10 +238,10 @@ public class SearchManager implements SearchView.SearchViewListener {
             Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (startStation.getCname().equals(endStation.getCname())) {
+        /*if (startStation.getCname().equals(endStation.getCname())) {
             Toast.makeText(context, "起始站和终点站不能相同", Toast.LENGTH_SHORT).show();
-        }
-        Log.d(TAG, "onSearch start = " + start + " end = " + end);
+        }*/
+        Log.d(TAG, "onSearch start = " + start + " end = " + end+" startStation.getCname() = "+startStation.getCname()+" endStation.getCname() = "+endStation.getCname());
         List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
                 mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
         if (mCardAdapter == null) {
@@ -250,7 +250,7 @@ public class SearchManager implements SearchView.SearchViewListener {
         } else {
             mCardAdapter.setData(lastLinesLast);
         }
-
+        //lvResults.setVisibility(View.GONE);
         //PathSerachUtil.printAllRecomindLine(lastLinesLast);
     }
 

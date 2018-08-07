@@ -12,9 +12,11 @@ import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
+import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,7 @@ public class CommonFuction {
 	public static final String CURRENTSTATIONNAME = "currentstationname";//站名
 	public static final String STARTSTATIONNAME = "startstationname";//起始站
 	public static final String ENDSTATIONNAME = "endstationname";//目标站
+	public static final String FAVOURITE = "favourite";//目标站
 
 	public static final String RECENTSERACHHISTORY = "recent_serach_history";//目标站
 
@@ -36,6 +39,8 @@ public class CommonFuction {
 	public static final String SHNAME = "subwab_info";
 	public static final String CITYNO = "cityno";
 	public static final String TRANSFER_SPLIT = ",";
+	public static final String FAVOURITE_STATION_SPLIT = "/";
+	public static final String FAVOURITE_Line = "#";
 	public final static String HEAD = "head";
 	public final static String TAIL = "tail";
 
@@ -59,6 +64,33 @@ public class CommonFuction {
 			e1.printStackTrace();
 			return 75;
 		}
+	}
+
+
+	public static String convertStationToString(List<StationInfo> list){
+		StringBuffer line = new StringBuffer();
+		for(StationInfo stationInfo:list){
+			String str = stationInfo.getCname()+FAVOURITE_Line+stationInfo.lineid+FAVOURITE_STATION_SPLIT;
+			line.append(str);
+		}
+		return line.toString();
+	}
+
+	public static List<StationInfo> convertStringToStation(Map<String, StationInfo> allStation,String line){
+		List<StationInfo> list = new ArrayList<>();
+		String strList[] = line.split(FAVOURITE_STATION_SPLIT);
+		int size = strList.length;
+		for(int i = 0;i < size;i++){
+			String str[] = strList[i].split(FAVOURITE_Line);
+			if(str.length > 0){
+				StationInfo stationInfo = allStation.get(str[0]);
+				if(stationInfo != null){
+					stationInfo.lineid = convertToInt(str[1],0);
+					list.add(stationInfo);
+				}
+			}
+		}
+		return list;
 	}
 
 	public static void writeSharedPreferences(Context context,String key,String value){
