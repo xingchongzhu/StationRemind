@@ -10,7 +10,9 @@ import com.traffic.locationremind.baidu.location.fragment.FullMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.LineMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
+import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
+import com.traffic.locationremind.manager.RemindSetViewManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +25,8 @@ public class ViewPagerAdapter extends FragmentPagerAdapter{
     NavigationController mNavigationController;
     private FragmentManager mFragmentManager;
     private List<Fragment> fragments = new ArrayList<>();
-    public ViewPagerAdapter(MainActivity activity,FragmentManager mFragmentManager,NavigationController mNavigationController){
+    public ViewPagerAdapter(MainActivity activity,FragmentManager mFragmentManager,NavigationController mNavigationController,
+                            RemindSetViewListener mRemindSetViewManager){
         super(mFragmentManager);
         this.mFragmentManager = mFragmentManager;
         this.mNavigationController = mNavigationController;
@@ -35,6 +38,7 @@ public class ViewPagerAdapter extends FragmentPagerAdapter{
         fragments.add(remindFragment);
         activity.setLocationChangerListener(remindFragment);
         activity.addActivityListener(remindFragment);
+        remindFragment.setRemindSetViewListener(mRemindSetViewManager);
     }
 
     public Fragment getFragment(int index){

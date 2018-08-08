@@ -11,6 +11,7 @@ import android.widget.*;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
@@ -97,7 +98,10 @@ public class SearchManager implements SearchView.SearchViewListener {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 if (mRemindSetViewListener != null) {
-                    mRemindSetViewListener.openSetWindow(mCardAdapter.getItem(position));
+                    LineObject lineObject = new LineObject();
+                    lineObject.lineidList = mCardAdapter.getItem(position).getKey();
+                    lineObject.stationList = mCardAdapter.getItem(position).getValue();
+                    mRemindSetViewListener.openSetWindow(lineObject);
                 }
             }
         });
@@ -250,8 +254,6 @@ public class SearchManager implements SearchView.SearchViewListener {
         } else {
             mCardAdapter.setData(lastLinesLast);
         }
-        //lvResults.setVisibility(View.GONE);
-        //PathSerachUtil.printAllRecomindLine(lastLinesLast);
     }
 
 }

@@ -3,6 +3,8 @@ package com.traffic.locationremind.manager;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +13,9 @@ import android.widget.TextView;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
+import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.view.SelectlineMap;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -36,6 +40,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
     private SelectlineMap mSelectlineMap;
 
     private GoToFragmentListener mGoToFragmentListener;
+    private PageNavigationView pageBottomTabLayout;
     Activity activity;
     private DataManager dataManager;
     public RemindSetViewManager(){
@@ -49,6 +54,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
     public void initView(final Activity activity,DataManager dataManager) {
         this.activity = activity;
         this.dataManager = dataManager;
+        pageBottomTabLayout = (PageNavigationView) activity.findViewById(R.id.tab);
         set_remind_layout = (ViewGroup)activity.findViewById(R.id.set_remind_layout);
         //listView = (ListView) activity.findViewById(R.id.list_view);
         changeNumber = (TextView) activity.findViewById(R.id.change_text);
@@ -83,6 +89,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
             public void onClick(View v) {
                 String lineStr = CommonFuction.convertStationToString(mSelectlineMap.getDataList());
                 String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+                Log.d(TAG,"lineStr = "+lineStr+" allFavoriteLine = "+allFavoriteLine);
                 if(allFavoriteLine.contains(lineStr)){
                     String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
                     StringBuffer newLine = new StringBuffer();
@@ -92,18 +99,21 @@ public class RemindSetViewManager implements RemindSetViewListener {
                             newLine.append(string[i] + CommonFuction.TRANSFER_SPLIT);
                         }
                     }
+                    setCompoundDrawables(activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
-                    collectionBtn.setCompoundDrawables(null,activity.getResources().getDrawable(R.drawable.locationbar_fav_btn),null,null);
+                    Log.d(TAG,"remove newLine = "+newLine);
                 }else{
                     String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
                     StringBuffer newLine = new StringBuffer();
                     newLine.append(allFavoriteLines+lineStr+CommonFuction.TRANSFER_SPLIT);
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
-                    collectionBtn.setCompoundDrawables(null,activity.getResources().getDrawable(R.drawable.saveas_fav_btn),null,null);
-
+                    setCompoundDrawables(activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+                    Log.d(TAG,"add newLine = "+newLine);
                 }
             }
         });
+
+
 
         set_remind_layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -114,6 +124,11 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
     }
 
+    public void setCompoundDrawables(Drawable drawable){
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), (int) (drawable.getMinimumHeight()));
+        collectionBtn.setCompoundDrawables(null,drawable,null,null);
+    }
+
     public boolean getRemindWindowState(){
         if(set_remind_layout.getVisibility() == View.VISIBLE)
             return true;
@@ -122,32 +137,36 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
     public void closeRemindWindow(){
         set_remind_layout.setVisibility(View.GONE);
+        pageBottomTabLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void openSetWindow(Map.Entry<List<Integer>,List<StationInfo>> lastLines){
+    public void openSetWindow(LineObject lastLines){
         if(lastLines != null){
             //mRemindLineAdapter.setData(lastLines);
-            start.setText(lastLines.getValue().get(0).getCname());
-            end.setText(lastLines.getValue().get(lastLines.getValue().size()-1).getCname());
-            int size = lastLines.getKey().size();
+            start.setText(lastLines.stationList.get(0).getCname());
+            end.setText(lastLines.stationList.get(lastLines.stationList.size()-1).getCname());
+            int size = lastLines.lineidList.size();
             StringBuffer str = new StringBuffer();
             for(int i = 0 ; i < size ; i++){
                 if(i < size -1){
-                    str.append(String.format(lineTial,lastLines.getKey().get(i))+"->");
+                    str.append(String.format(lineTial,lastLines.lineidList.get(i))+"->");
                 }else{
-                    str.append(String.format(lineTial,lastLines.getKey().get(i)));
+                    str.append(String.format(lineTial,lastLines.lineidList.get(i)));
                 }
             }
             changeNumber.setText(str.toString());
             set_remind_layout.setVisibility(View.VISIBLE);
-            mSelectlineMap.setStationList(lastLines.getValue());
+            mSelectlineMap.setStationList(lastLines.stationList);
             mSelectlineMap.setLineInfoList(dataManager.getLineInfoList());
-            String lineStr = CommonFuction.convertStationToString(lastLines.getValue());
+            String lineStr = CommonFuction.convertStationToString(lastLines.stationList);
             String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
             if(allFavoriteLine.contains(lineStr)){
-                collectionBtn.setCompoundDrawables(null,activity.getResources().getDrawable(R.drawable.saveas_fav_btn),null,null);
+                setCompoundDrawables(activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+            }else{
+                setCompoundDrawables(activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
             }
+            pageBottomTabLayout.setVisibility(View.GONE);
         }
     }
 

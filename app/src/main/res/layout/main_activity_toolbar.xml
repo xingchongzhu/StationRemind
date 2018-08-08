@@ -8,31 +8,34 @@
         android:background="@color/lightwhite"
         android:popupTheme="@style/AppTheme">
 
-    <LinearLayout
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_margin="5dp">
-
         <TextView
                 android:id="@+id/city_select"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="20dp"
-                android:layout_margin="5dp"
+                android:textSize="16dp"
                 android:textColor="#6A5ACD"
-                android:layout_gravity="center"
-                android:gravity="top"
+                android:layout_gravity="start"
                 android:text="深圳"
+                android:gravity="center"
                 android:drawableRight="@drawable/city_select"
                 android:textStyle="bold"/>
+
         <com.traffic.locationremind.baidu.location.view.SearchEditView
                 android:id="@+id/edit_button"
                 android:layout_width="match_parent"
+                android:layout_toRightOf="@id/city_select"
                 android:layout_height="@dimen/search_height_btn"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/search_edittext_shape"
+                android:layout_marginRight="40dp"
+                android:layout_marginLeft="5dp"
                 android:drawableLeft="@drawable/ic_search_grey"
+                android:layout_centerVertical="true"
                 android:drawablePadding="5dp"
                 android:hint="站台 路线 城市"
                 android:focusable="false"
@@ -42,7 +45,17 @@
                 android:textColor="@color/blue"
                 android:textSize="12sp"/>
 
-    </LinearLayout>
+
+        <ImageView
+                android:layout_alignParentRight="true"
+                android:id="@+id/colloction_btn"
+                android:layout_width="@dimen/search_height_btn"
+                android:layout_height="@dimen/search_height_btn"
+                android:layout_centerVertical="true"
+                android:padding="5dp"
+                android:background="@drawable/favtor"
+        />
+    </RelativeLayout>
 
 
 </android.support.v7.widget.Toolbar>

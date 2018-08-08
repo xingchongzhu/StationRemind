@@ -95,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:visibility="visible"
+            android:divider="@null"
             android:background="@color/white">
     </ListView>
     <TextView
@@ -114,6 +115,7 @@
             android:padding="5dp"
             android:layout_height="wrap_content"
             android:horizontalSpacing="5dp"
+            android:divider="@null"
             android:background="@color/lightwhite"
             android:verticalSpacing="2dp"
             android:numColumns="5"

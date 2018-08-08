@@ -27,7 +27,6 @@ import android.widget.TextView;
 
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
-import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
 
@@ -96,7 +95,7 @@ public class NotificationUtil {
 			notification.setAutoCancel(true);
 			//notification.flags = Notification.FLAG_AUTO_CANCEL;
 			// 设置点击通知栏操作
-			Intent in = new Intent(context, MainViewActivity.class);// 点击跳转到指定页面
+			Intent in = new Intent(context, MainActivity.class);// 点击跳转到指定页面
 			PendingIntent pIntent = PendingIntent.getActivity(context, 0, in, 0);
 			notification.setContentIntent(pIntent);
 			//notification.contentIntent = pIntent;

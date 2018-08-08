@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.traffic.locationremind.baidu.location.view.ScrollLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scroll_down_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+        <TextView
+                android:id="@+id/text_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/colloction_catalog"
+                android:textColor="@color/white"
+                android:background="#8470FF"
+                android:textSize="16dp"
+                android:padding="10dp"
+                android:visibility="gone"
+                android:layout_gravity="center"
+                android:gravity="center"
+        />
+        <com.traffic.locationremind.baidu.location.view.ContentListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@null"
+                android:background="@color/white">
+        </com.traffic.locationremind.baidu.location.view.ContentListView>
+
+    </LinearLayout>
+
+</com.traffic.locationremind.baidu.location.view.ScrollLayout>
+
+
+

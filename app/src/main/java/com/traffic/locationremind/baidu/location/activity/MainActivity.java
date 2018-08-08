@@ -17,6 +17,7 @@ import android.view.*;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
@@ -79,6 +81,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     private CityInfo currentCityNo = null;
     private Toolbar mToolbarSet;
+    private ImageView colloction_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
+        colloction_btn = (ImageView) findViewById(R.id.colloction_btn);
+        colloction_btn.setOnClickListener(this);
 
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
@@ -108,7 +113,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         root = (ViewGroup) findViewById(R.id.root);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), mNavigationController);
+        mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), mNavigationController,mRemindSetViewManager);
         viewPager.setAdapter(mViewPagerAdapter);
 
         mNavigationController.setupWithViewPager(viewPager);
@@ -163,6 +168,16 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 hideSerachView();
                 break;
             case R.id.city_select:
+                break;
+            case R.id.colloction_btn:
+                List<LineObject> lineObjects = CommonFuction.getAllFavourite(this,mDataManager);
+                if(lineObjects.size() <= 0){
+                    Toast.makeText(this,getResources().getString(R.string.colloction_catalog_empty),Toast.LENGTH_SHORT).show();
+                }else{
+                    mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+                    RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+                    remindFragment.getScrollFavoriteManager().openScrollView(lineObjects);
+                }
                 break;
         }
     }
@@ -322,10 +337,15 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         activityListenerList.add(activityListener);
     }
 
-    public void notificationOnKeyDown(int keyCode, KeyEvent event) {
+
+    public boolean notificationOnKeyDown(int keyCode, KeyEvent event){
+        boolean result =false;
         for (ActivityListener activityListener : activityListenerList) {
-            activityListener.onKeyDown(keyCode, event);
+            if(activityListener.onKeyDown( keyCode,  event)){
+                result = true;
+            }
         }
+        return result;
     }
 
     public void notificationMoveTaskToBack() {
@@ -336,6 +356,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(notificationOnKeyDown(keyCode,event)){
+            return true;
+        }
         if (getRemindState()) {
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {

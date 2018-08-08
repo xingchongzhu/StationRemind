@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,6 +23,8 @@ import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
+import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
 import com.traffic.locationremind.baidu.location.view.LineNodeView;
@@ -29,6 +33,7 @@ import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.NotificationUtil;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.common.util.ToastUitl;
+import com.traffic.locationremind.manager.ScrollFavoriteManager;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -62,14 +67,18 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     private TextView collection_btn;
     private TextView favtor_btn;
     private TextView cancle_remind_btn;
+
     private RelativeLayout remind_root;
 
     private NotificationUtil mNotificationUtil;
     private StationInfo currentStation,nextStation;
+    private RemindSetViewListener mRemindSetViewListener;
 
     private boolean isRemind = false;
     private boolean isPause = false;
     private MainActivity activity;
+
+    private ScrollFavoriteManager mScrollFavoriteManager;
 
     //起点，当前站，换乘点，终点
     private List<StationInfo> needChangeStationList = new ArrayList<>();
@@ -103,8 +112,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         if(list == null || list.size() <= 0){
             return;
         }
-        remind_root.setVisibility(View.VISIBLE);
-        hint_text.setVisibility(View.GONE);
+        mScrollFavoriteManager.closeScrollView();
+        //remind_root.setVisibility(View.VISIBLE);
+        //hint_text.setVisibility(View.GONE);
         needChangeStationList.clear();
         linearlayout.removeAllViews();
         Map<Integer,LineInfo> lineInfoMap = new HashMap<>();
@@ -165,6 +175,15 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         current_info_text.setText(surplusNum+"    "+currenStr);
         line_color_view.setLineInfoMap(lineInfoMap);
         cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
+
+        String lineStr = CommonFuction.convertStationToString(list);
+        String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+        if(allFavoriteLine.contains(lineStr)){
+            setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+        }else{
+            setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
+        }
+        setCompoundDrawables(cancle_remind_btn,getResources().getDrawable(R.drawable.is_remind));
     }
 
     private void initView(View rootView){
@@ -172,7 +191,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         horizontalScrollView = (HorizontalScrollView) rootView.findViewById(R.id.horizontalScrollView);
 
         remind_root = (RelativeLayout)rootView.findViewById(R.id.remind_root);
-        hint_text = (TextView)rootView.findViewById(R.id.hint_text);
+        //hint_text = (TextView)rootView.findViewById(R.id.hint_text);
         start_and_end = (TextView)rootView.findViewById(R.id.start_and_end);
         line_change_introduce = (TextView)rootView.findViewById(R.id.line_change_introduce);
         line_color_view = (RemindLineColorView)rootView.findViewById(R.id.line_color_view);
@@ -187,19 +206,42 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         mNotificationUtil = new NotificationUtil(getActivity());
         activity = (MainActivity)getActivity();
 
-        hint_text.setOnClickListener(this);
+        //hint_text.setOnClickListener(this);
+        collection_btn.setOnClickListener(this);
+        favtor_btn.setOnClickListener(this);
+        cancle_remind_btn.setOnClickListener(this);
+
+        mScrollFavoriteManager = new ScrollFavoriteManager(getActivity(),rootView);
+        mScrollFavoriteManager.setRemindSetViewListener(mRemindSetViewListener);
+    }
+
+    public ScrollFavoriteManager getScrollFavoriteManager(){
+        return mScrollFavoriteManager;
+    }
+
+    public void setCompoundDrawables(TextView view,Drawable drawable){
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), (int) (drawable.getMinimumHeight()));
+        view.setCompoundDrawables(null,drawable,null,null);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.collection_btn:
+                saveFavourite();
                 break;
             case R.id.favtor_btn:
+                List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(),mDataManager);
+                if(lineObjects.size() <= 0){
+                    Toast.makeText(getActivity(),getResources().getString(R.string.colloction_catalog_empty),Toast.LENGTH_SHORT).show();
+                }else{
+                    mScrollFavoriteManager.openScrollView(lineObjects);
+                }
+
                 break;
-            case R.id.hint_text:
+            /*case R.id.hint_text:
                 activity.showSerachView();
-                break;
+                break;*/
             case R.id.cancle_remind_btn:
                 if(isRemind){
                     isRemind = false;
@@ -207,11 +249,42 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
                 }else{
                     isRemind = true;
                     cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
+                    setCompoundDrawables(cancle_remind_btn,getResources().getDrawable(R.drawable.is_remind));
                 }
                 break;
         }
     }
 
+    public void saveFavourite(){
+        String lineStr = CommonFuction.convertStationToString(list);
+        String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+        Log.d(TAG,"lineStr = "+lineStr+" allFavoriteLine = "+allFavoriteLine);
+        if(allFavoriteLine.contains(lineStr)){
+            String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
+            StringBuffer newLine = new StringBuffer();
+            int size = string.length;
+            for(int i = 0;i < size;i++){
+                if(!lineStr.equals(string[i])) {
+                    newLine.append(string[i] + CommonFuction.TRANSFER_SPLIT);
+                }
+            }
+            setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
+            CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
+            Log.d(TAG,"remove newLine = "+newLine);
+        }else{
+            String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+            StringBuffer newLine = new StringBuffer();
+            newLine.append(allFavoriteLines+lineStr+CommonFuction.TRANSFER_SPLIT);
+            CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
+            setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+            Log.d(TAG,"add newLine = "+newLine);
+        }
+    }
+
+    public void setRemindSetViewListener(RemindSetViewListener mRemindSetViewListener){
+        this.mRemindSetViewListener = mRemindSetViewListener;
+
+    }
 
     @Override
     public void loactionStation(BDLocation location) {
@@ -325,9 +398,12 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return true;
+            if(mScrollFavoriteManager.isOpen()){
+                mScrollFavoriteManager.closeScrollView();
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -343,6 +419,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     public void cancleNotification(){
         mNotificationUtil.cancel(NotificationUtil.notificationId);
         cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
+        setCompoundDrawables(cancle_remind_btn,getResources().getDrawable(R.drawable.set_remind));
     }
 
     public void setNotification(NotificationObject mNotificationObject) {

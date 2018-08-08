@@ -10,13 +10,16 @@ import android.text.TextUtils;
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +43,7 @@ public class CommonFuction {
 	public static final String CITYNO = "cityno";
 	public static final String TRANSFER_SPLIT = ",";
 	public static final String FAVOURITE_STATION_SPLIT = "/";
-	public static final String FAVOURITE_Line = "#";
+	public static final String FAVOURITE_LINE = "#";
 	public final static String HEAD = "head";
 	public final static String TAIL = "tail";
 
@@ -66,31 +69,56 @@ public class CommonFuction {
 		}
 	}
 
-
 	public static String convertStationToString(List<StationInfo> list){
 		StringBuffer line = new StringBuffer();
 		for(StationInfo stationInfo:list){
-			String str = stationInfo.getCname()+FAVOURITE_Line+stationInfo.lineid+FAVOURITE_STATION_SPLIT;
+			String str = stationInfo.getCname()+FAVOURITE_LINE+stationInfo.lineid+FAVOURITE_STATION_SPLIT;
 			line.append(str);
 		}
 		return line.toString();
 	}
 
-	public static List<StationInfo> convertStringToStation(Map<String, StationInfo> allStation,String line){
+	public static List<LineObject> getAllFavourite(Context context,DataManager mDataManager){
+		String allFavoriteLine = CommonFuction.getSharedPreferencesValue(context,CommonFuction.FAVOURITE);
+		String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
+		int size = string.length;
+		List<LineObject> lastLinesLast = new ArrayList<>();
+		for(int i = 0;i<size;i++){
+			LineObject lineObject = CommonFuction.convertStringToStation(mDataManager.getAllstations(),string[i]);
+			if(lineObject != null)
+				lastLinesLast.add(lineObject);
+		}
+		return lastLinesLast;
+	}
+
+	public static LineObject convertStringToStation(Map<String, StationInfo> allStation, String line){
+		LineObject LineObject = new LineObject();
 		List<StationInfo> list = new ArrayList<>();
+		List<Integer> listLine = new ArrayList<>();
 		String strList[] = line.split(FAVOURITE_STATION_SPLIT);
 		int size = strList.length;
+		int lineid = -1;
 		for(int i = 0;i < size;i++){
-			String str[] = strList[i].split(FAVOURITE_Line);
+			String str[] = strList[i].split(FAVOURITE_LINE);
 			if(str.length > 0){
 				StationInfo stationInfo = allStation.get(str[0]);
 				if(stationInfo != null){
-					stationInfo.lineid = convertToInt(str[1],0);
+					int tempid = convertToInt(str[1],0);
+					if(lineid != tempid){
+						listLine.add(tempid);
+					}
+					lineid = tempid;
+					stationInfo.lineid = tempid;
 					list.add(stationInfo);
 				}
 			}
 		}
-		return list;
+		LineObject.stationList = list;
+		LineObject.lineidList = listLine;
+		if(LineObject.stationList.size() <= 0){
+		    return null;
+        }
+		return LineObject;
 	}
 
 	public static void writeSharedPreferences(Context context,String key,String value){
