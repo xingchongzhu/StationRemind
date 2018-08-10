@@ -70,12 +70,25 @@ public class CommonFuction {
 	}
 
 	public static String convertStationToString(List<StationInfo> list){
+	    if(list == null){
+	        return "";
+        }
 		StringBuffer line = new StringBuffer();
 		for(StationInfo stationInfo:list){
 			String str = stationInfo.getCname()+FAVOURITE_LINE+stationInfo.lineid+FAVOURITE_STATION_SPLIT;
 			line.append(str);
 		}
 		return line.toString();
+	}
+
+	public static boolean isEmptyColloctionFolder(Context context){
+		String allFavoriteLine = CommonFuction.getSharedPreferencesValue(context,CommonFuction.FAVOURITE);
+		String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
+		if(string.length <= 0){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	public static List<LineObject> getAllFavourite(Context context,DataManager mDataManager){

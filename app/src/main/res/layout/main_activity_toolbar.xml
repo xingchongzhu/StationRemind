@@ -32,7 +32,6 @@
                 android:layout_height="@dimen/search_height_btn"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/search_edittext_shape"
-                android:layout_marginRight="40dp"
                 android:layout_marginLeft="5dp"
                 android:drawableLeft="@drawable/ic_search_grey"
                 android:layout_centerVertical="true"
@@ -46,7 +45,7 @@
                 android:textSize="12sp"/>
 
 
-        <ImageView
+       <!-- <ImageView
                 android:layout_alignParentRight="true"
                 android:id="@+id/colloction_btn"
                 android:layout_width="@dimen/search_height_btn"
@@ -54,7 +53,7 @@
                 android:layout_centerVertical="true"
                 android:padding="5dp"
                 android:background="@drawable/favtor"
-        />
+        />-->
     </RelativeLayout>
 
 

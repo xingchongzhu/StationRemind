@@ -26,4 +26,6 @@
     <color name="color_white">#ffffff</color>
     <color name="btn_press_color">#5677fc</color>
     <color name="btn_pressed_color">#3ca0ec</color>
+    <color name="text_color">#836FFF</color>
+    <color name="text1_color">#7171C6</color>
 </resources>

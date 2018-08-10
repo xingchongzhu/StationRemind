@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+<item
+        android:state_enabled="true"
+        android:state_pressed="true"
+        android:color="@color/blue"
+        android:drawable="@drawable/barcode_menu_item_remove" />
+<item
+        android:state_enabled="false"
+        android:drawable="@drawable/barcode_menu_item_remove">
+    <color android:color="@color/black" />
+</item>
+<item android:drawable="@drawable/barcode_menu_item_remove">
+    <color android:color="@color/black" />
+</item>
+
+</selector>

@@ -100,6 +100,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     }
 
     public void setData(List<StationInfo> list){
+        if(CommonFuction.isEmptyColloctionFolder(getActivity())){
+            favtor_btn.setTextColor(getResources().getColor(R.color.black));
+        }else{
+            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
+        }
         isRemind = true;
         this.list = list;
         for(StationInfo stationInfo:list){
@@ -175,12 +180,14 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         current_info_text.setText(surplusNum+"    "+currenStr);
         line_color_view.setLineInfoMap(lineInfoMap);
         cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
-
+        cancle_remind_btn.setEnabled(true);
         String lineStr = CommonFuction.convertStationToString(list);
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
         if(allFavoriteLine.contains(lineStr)){
+            collection_btn.setTextColor(getResources().getColor(R.color.blue));
             setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
         }else{
+            collection_btn.setTextColor(getResources().getColor(R.color.black));
             setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
         }
         setCompoundDrawables(cancle_remind_btn,getResources().getDrawable(R.drawable.is_remind));
@@ -209,10 +216,16 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         //hint_text.setOnClickListener(this);
         collection_btn.setOnClickListener(this);
         favtor_btn.setOnClickListener(this);
+        cancle_remind_btn.setEnabled(false);
         cancle_remind_btn.setOnClickListener(this);
 
         mScrollFavoriteManager = new ScrollFavoriteManager(getActivity(),rootView);
         mScrollFavoriteManager.setRemindSetViewListener(mRemindSetViewListener);
+        if(CommonFuction.isEmptyColloctionFolder(getActivity())){
+            favtor_btn.setTextColor(getResources().getColor(R.color.black));
+        }else{
+            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
+        }
     }
 
     public ScrollFavoriteManager getScrollFavoriteManager(){
@@ -228,7 +241,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.collection_btn:
-                saveFavourite();
+                if(list == null || list.size() <= 0){
+                    Toast.makeText(activity, getResources().getString(R.string.please_select_colloction_line), Toast.LENGTH_SHORT).show();
+                }else{
+                    saveFavourite();
+                }
                 break;
             case R.id.favtor_btn:
                 List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(),mDataManager);
@@ -245,9 +262,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
             case R.id.cancle_remind_btn:
                 if(isRemind){
                     isRemind = false;
+                    cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
                     cancleNotification();
                 }else{
                     isRemind = true;
+                    cancle_remind_btn.setTextColor(getResources().getColor(R.color.blue));
                     cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
                     setCompoundDrawables(cancle_remind_btn,getResources().getDrawable(R.drawable.is_remind));
                 }
@@ -260,6 +279,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
         Log.d(TAG,"lineStr = "+lineStr+" allFavoriteLine = "+allFavoriteLine);
         if(allFavoriteLine.contains(lineStr)){
+            collection_btn.setTextColor(getResources().getColor(R.color.black));
             String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
             StringBuffer newLine = new StringBuffer();
             int size = string.length;
@@ -272,12 +292,18 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
             CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
             Log.d(TAG,"remove newLine = "+newLine);
         }else{
+            collection_btn.setTextColor(getResources().getColor(R.color.blue));
             String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
             StringBuffer newLine = new StringBuffer();
             newLine.append(allFavoriteLines+lineStr+CommonFuction.TRANSFER_SPLIT);
             CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
             setCompoundDrawables(collection_btn,activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
             Log.d(TAG,"add newLine = "+newLine);
+        }
+        if(CommonFuction.isEmptyColloctionFolder(getActivity())){
+            favtor_btn.setTextColor(getResources().getColor(R.color.black));
+        }else{
+            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
         }
     }
 

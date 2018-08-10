@@ -94,8 +94,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
-        colloction_btn = (ImageView) findViewById(R.id.colloction_btn);
-        colloction_btn.setOnClickListener(this);
+       // colloction_btn = (ImageView) findViewById(R.id.colloction_btn);
+        //colloction_btn.setOnClickListener(this);
 
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
@@ -169,7 +169,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 break;
             case R.id.city_select:
                 break;
-            case R.id.colloction_btn:
+            /*case R.id.colloction_btn:
                 List<LineObject> lineObjects = CommonFuction.getAllFavourite(this,mDataManager);
                 if(lineObjects.size() <= 0){
                     Toast.makeText(this,getResources().getString(R.string.colloction_catalog_empty),Toast.LENGTH_SHORT).show();
@@ -178,7 +178,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                     RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
                     remindFragment.getScrollFavoriteManager().openScrollView(lineObjects);
                 }
-                break;
+                break;*/
         }
     }
 

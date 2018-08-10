@@ -1,21 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto"
-
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:background="@color/white"
               android:orientation="vertical">
-<!--    <TextView
-            android:id="@+id/hint_text"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/brown"
-            android:text="@string/set_remind_hint"
-            android:gravity="center"
-            android:padding="5dp"
-            android:visibility="gone"
-            android:textSize="25sp"/>-->
     <RelativeLayout
             android:id="@+id/remind_root"
             android:visibility="visible"
@@ -30,8 +19,9 @@
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:background="@color/light_gray"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/radius_btn"
                     android:orientation="vertical">
 
                 <TextView
@@ -41,6 +31,7 @@
                         android:textColor="@color/brown"
                         android:text="@string/select_remind_line"
                         android:padding="5dp"
+                        android:paddingBottom="0dp"
                         android:textSize="16sp"/>
                 <TextView
                         android:id="@+id/line_change_introduce"
@@ -56,8 +47,9 @@
                     android:id="@+id/cardView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="5dp"
-                    android:layout_margin="5dp"
+                    app:cardCornerRadius="2dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
                     app:cardUseCompatPadding="true"
                     app:cardPreventCornerOverlap="false">
                 <LinearLayout
@@ -72,7 +64,7 @@
                             android:layout_height="wrap_content"/>
 
                     <View android:layout_width="match_parent"
-                          android:background="@color/gray"
+                          android:background="#EDEDED"
                           android:layout_height="1dp">
                     </View>
                     <TextView
@@ -113,8 +105,9 @@
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="5dp"
-                android:layout_margin="5dp"
+                app:cardCornerRadius="2dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 app:cardUseCompatPadding="true"
                 app:cardPreventCornerOverlap="false">
             <LinearLayout
@@ -132,7 +125,7 @@
                         android:layout_gravity="center"
                         android:textSize="12sp"
                         android:gravity="center"
-                        android:textColor="@color/blue"
+                        android:textColor="@color/black"
                 />
                 <TextView
                         android:id="@+id/favtor_btn"
@@ -144,7 +137,7 @@
                         android:layout_gravity="center"
                         android:textSize="12sp"
                         android:gravity="center"
-                        android:textColor="@color/blue"
+                        android:textColor="@color/black"
                 />
                 <TextView
                         android:id="@+id/cancle_remind_btn"
@@ -152,11 +145,11 @@
                         android:layout_height="@dimen/search_height"
                         android:layout_weight="1"
                         android:drawableTop="@drawable/set_remind"
-                        android:text="@string/cancle_remind"
+                        android:text="@string/set_remind"
                         android:layout_gravity="center"
                         android:textSize="12sp"
                         android:gravity="center"
-                        android:textColor="@color/blue"
+                        android:textColor="@color/black"
                 />
             </LinearLayout>
         </android.support.v7.widget.CardView>
