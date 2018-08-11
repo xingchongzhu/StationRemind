@@ -3,16 +3,21 @@ package com.traffic.locationremind.baidu.location.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.view.SelectlineMap;
+import com.traffic.locationremind.baidu.location.view.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.view.SingleNodeView;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,26 +34,28 @@ public class AllLineAdapter extends BaseAdapter {
     private final static String TAG = "AllLineAdapter";
     private Context mContext;
     private int size = 0;
-
     private LineInfo data;
-    public AllLineAdapter(Context context) {
+    private DataManager mDataManager;
+
+    public AllLineAdapter(Context context, DataManager mDataManager) {
         this.mContext = context;
-        this.size = (int)mContext.getResources().getDimension(R.dimen.current_bitmap_siez);
+        this.mDataManager = mDataManager;
+        this.size = (int) mContext.getResources().getDimension(R.dimen.current_bitmap_siez);
     }
 
-    public void setData(LineInfo data){
+    public void setData(LineInfo data) {
         this.data = data;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return data == null?0:data.getStationInfoList().size();
+        return data == null ? 0 : data.getStationInfoList().size();
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public StationInfo getItem(int position) {
+        return data ==null?null:data.getStationInfoList().get(position);
     }
 
     @Override
@@ -67,19 +74,12 @@ public class AllLineAdapter extends BaseAdapter {
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
-        if(data != null){
+        if (data != null) {
             viewholder.textView.setText(data.getStationInfoList().get(position).getCname());
-           /* if(data.getStationInfoList().get(position).canTransfer()){
-                Bitmap bitmap1 = CommonFuction.getbitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.cm_main_map_pin_location), size/5*3,size/5*3);
-                viewholder.singleNodeView.setBitMap(bitmap1);
-            }else{
-                viewholder.singleNodeView.setBitMap(null);
-            }*/
-
-            if(data.getStationInfoList().get(position).canTransfer()){
-                Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.cm_route_map_pin_dottransfer), size/5*3,size/5*3);
+            if (data.getStationInfoList().get(position).canTransfer()) {
+                Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.cm_route_map_pin_dottransfer), size / 5 * 3, size / 5 * 3);
                 viewholder.singleNodeView.setTransFerBitmap(bitmap);
-            }else{
+            } else {
                 viewholder.singleNodeView.setTransFerBitmap(null);
             }
             viewholder.singleNodeView.setColor(data.colorid);

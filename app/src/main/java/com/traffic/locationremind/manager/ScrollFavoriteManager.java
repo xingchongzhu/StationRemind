@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.adapter.FavouriteAdapter;
+import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.utils.ScreenUtil;
@@ -24,8 +25,10 @@ public class ScrollFavoriteManager {
     private TextView textTitle;
     //private RelativeLayout remind_root;
     private TextView hint_text;
+    private TextView collection_btn;
     private FavouriteAdapter mFavouriteAdapter;
-    RemindSetViewListener mRemindSetViewListener;
+    private RemindSetViewListener mRemindSetViewListener;
+    private RemindFragment fragment;
 
     private ScrollLayout.OnScrollChangedListener mOnScrollChangedListener = new ScrollLayout.OnScrollChangedListener() {
         @Override
@@ -46,6 +49,7 @@ public class ScrollFavoriteManager {
             if (currentStatus.equals(ScrollLayout.Status.EXIT)) {
                 btn_layout.setVisibility(View.VISIBLE);
                 textTitle.setVisibility(View.GONE);
+                fragment.updateColloctionView();
             }
         }
 
@@ -54,30 +58,30 @@ public class ScrollFavoriteManager {
         }
     };
 
-    public ScrollFavoriteManager(Activity activity, View view){
-        initView( activity, view);
+    public ScrollFavoriteManager(RemindFragment fragment, View view){
+        initView( fragment, view);
     }
 
     public void setRemindSetViewListener(RemindSetViewListener mRemindSetViewListener){
         this.mRemindSetViewListener = mRemindSetViewListener;
     }
 
-    private void initView(Activity activity,View view) {
+    private void initView(RemindFragment fragment,View view) {
+        this.fragment = fragment;
         RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(R.id.remind_root);
         mScrollLayout = (ScrollLayout) view.findViewById(R.id.scroll_down_layout);
         textTitle = (TextView)view.findViewById(R.id.text_title);
         btn_layout = (CardView)view.findViewById(R.id.btn_layout);
-        //remind_root = (RelativeLayout)view.findViewById(R.id.remind_root);
-        //hint_text = (TextView)view.findViewById(R.id.hint_text);
+        collection_btn = (TextView)view.findViewById(R.id.collection_btn);
         ListView listView = (ListView) view.findViewById(R.id.list_view);
 
-        mFavouriteAdapter = new FavouriteAdapter(activity,new ArrayList<LineObject>(),R.layout.serach_result_item_layout);
+        mFavouriteAdapter = new FavouriteAdapter(fragment,new ArrayList<LineObject>(),R.layout.serach_result_item_layout);
         listView.setAdapter(mFavouriteAdapter);
 
         /**设置 setting*/
         mScrollLayout.setMinOffset(0);
-        mScrollLayout.setMaxOffset((int) (ScreenUtil.getScreenHeight(activity) * 0.5));
-        mScrollLayout.setExitOffset(ScreenUtil.dip2px(activity, 50));
+        mScrollLayout.setMaxOffset((int) (ScreenUtil.getScreenHeight(fragment.getActivity()) * 0.5));
+        mScrollLayout.setExitOffset(ScreenUtil.dip2px(fragment.getActivity(), 50));
         mScrollLayout.setIsSupportExit(true);
         mScrollLayout.setAllowHorizontalScroll(true);
         mScrollLayout.setOnScrollChangedListener(mOnScrollChangedListener);

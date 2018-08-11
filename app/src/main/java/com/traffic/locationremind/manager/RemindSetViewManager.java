@@ -105,7 +105,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
                 }else{
                     String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
                     StringBuffer newLine = new StringBuffer();
-                    newLine.append(allFavoriteLines+lineStr+CommonFuction.TRANSFER_SPLIT);
+                    newLine.append(allFavoriteLines+CommonFuction.TRANSFER_SPLIT+lineStr);
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
                     setCompoundDrawables(activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
                     Log.d(TAG,"add newLine = "+newLine);

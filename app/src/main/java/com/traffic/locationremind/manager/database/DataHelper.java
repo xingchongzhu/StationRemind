@@ -166,6 +166,7 @@ public class DataHelper {
             stationInfo.setNextStation(cursor.getString(8));
             stationInfo.setStationInfo(cursor.getString(9));
             stationInfo.setTransfer(cursor.getString(10));
+            stationInfo.setCityNo(cursor.getString(11));
             stationInfoList.add(stationInfo);
 
         }

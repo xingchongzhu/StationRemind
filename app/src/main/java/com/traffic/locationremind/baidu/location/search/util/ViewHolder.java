@@ -69,6 +69,24 @@ public class ViewHolder {
     }
 
     /**
+     * set text
+     */
+    public ViewHolder setVisable(int viewId, int visable){
+        View tv = getView(viewId);
+        tv.setVisibility(visable);
+        return this;
+    }
+
+    /**
+     * set text
+     */
+    public ViewHolder setOnClickListener(int viewId, View.OnClickListener listener){
+        View tv = getView(viewId);
+        tv.setOnClickListener(listener);
+        return this;
+    }
+
+    /**
      *  set image res
      */
     public ViewHolder setImageResource(int viewId,int resId){

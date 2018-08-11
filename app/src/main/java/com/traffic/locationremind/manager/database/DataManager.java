@@ -42,6 +42,9 @@ public class DataManager{
 
 	private static DataManager mDataManager;
 
+	public CityInfo getCurrentCityNo(){
+		return currentCityNo;
+	}
 	public DataManager(Context context){
 		this.mDataHelper = DataHelper.getInstance(context);
 		//new MyAsyncTask().execute(context);

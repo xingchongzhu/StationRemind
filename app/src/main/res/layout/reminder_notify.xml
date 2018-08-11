@@ -51,15 +51,6 @@
                     android:textSize="@dimen/notif_size"/>
 
                 <TextView
-                    android:id="@+id/start"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/notif_text_color"
-                    android:padding="@dimen/notif_text_pad"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textSize="@dimen/notif_size"/>
-
-                <TextView
                     android:id="@+id/end"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -74,11 +65,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
+                <TextView
+                        android:id="@+id/start"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/notif_text_color"
+                        android:padding="@dimen/notif_text_pad"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:textSize="@dimen/notif_size"/>
                 <TextView
                     android:id="@+id/next"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:textColor="@color/notif_text_color"
                     android:padding="@dimen/notif_text_pad"
                     android:textAppearance="?android:attr/textAppearanceLarge"

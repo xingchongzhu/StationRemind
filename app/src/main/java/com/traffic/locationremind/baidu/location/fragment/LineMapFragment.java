@@ -13,7 +13,9 @@ import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
 import com.traffic.locationremind.baidu.location.adapter.ColorLineAdapter;
+import com.traffic.locationremind.baidu.location.view.SettingReminderDialog;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
+import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
@@ -41,6 +43,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private List<LineInfo> list = new ArrayList<>();
     private String linenail = "";
     MainActivity activity;
+    private SettingReminderDialog mSettingReminderDialog;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -66,8 +69,15 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         colorLineAdapter = new ColorLineAdapter(this.getActivity());
         lineMap.setAdapter(colorLineAdapter);
 
-        sceneMapAdapter = new AllLineAdapter(this.getActivity());
+        sceneMapAdapter = new AllLineAdapter(this.getActivity(),mDataManager);
         sceneMap.setAdapter(sceneMapAdapter);
+
+        sceneMap.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                showDialog(sceneMapAdapter.getItem(position));
+            }
+        });
         activity = (MainActivity) getActivity();
         lineMap.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -77,6 +87,46 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         });
     }
 
+    private void showDialog(final StationInfo stationInfo) {
+        Log.d(TAG,"showDialog stationInfo.getCname() = "+stationInfo.getCname()+" stationInfo.getCityNo() = stationInfo.getCityNo()"+stationInfo.getCityNo());
+        List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname(), stationInfo.getCityNo());
+        String existInfostr = "";
+        if (existInfoList != null) {
+            final int existInfoList_size = existInfoList.size();// Moved  existInfoList.size() call out of the loop to local variable existInfoList_size
+            for (int n = 0; n < existInfoList_size; n++) {
+                existInfostr += existInfoList.get(n).getExitname() + " " + existInfoList.get(n).getAddr() + "\n";
+            }
+        }
+        if (mSettingReminderDialog != null) {
+            mSettingReminderDialog.dismiss();
+            mSettingReminderDialog = null;
+        }else{
+
+        }
+        mSettingReminderDialog = new SettingReminderDialog(getActivity(),
+                R.style.Dialog, new SettingReminderDialog.NoticeDialogListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    switch (view.getId()) {
+                        case R.id.start:
+                            mSettingReminderDialog.dismiss();
+
+                            break;
+                        case R.id.end:
+
+                            break;
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, stationInfo.getTransfer(), existInfostr,
+                "" + stationInfo.getLineid(), mDataManager.getCurrentCityNo().getCityName(), stationInfo.getCname());
+        mSettingReminderDialog.setContentView(R.layout.setting_reminder_dialog);
+        mSettingReminderDialog.show();
+    }
     public void upadaData(){
         if(mDataManager.getLineInfoList() != null){
             list.clear();
