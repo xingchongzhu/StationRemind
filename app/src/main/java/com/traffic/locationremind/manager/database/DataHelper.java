@@ -6,10 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.traffic.locationremind.manager.bean.CityInfo;
-import com.traffic.locationremind.manager.bean.ExitInfo;
-import com.traffic.locationremind.manager.bean.LineInfo;
-import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.bean.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -250,6 +247,19 @@ public class DataHelper {
         values.put(CityInfo.CITYNAME, cityInfo.getCityName());
         long rowid = db.insert(SqliteHelper.TB_CITY_INFO, null, values);
         Log.d(TAG, "insetCityInfo rowid = " + rowid);
+        if (rowid > 0)
+            return true;
+        return false;
+    }
+
+    public boolean insetAddExtraInfo(AddInfo addInfo) {
+        ContentValues values = new ContentValues();
+
+        values.put(AddInfo.LAT, addInfo.getLat());
+        values.put(AddInfo.LOT, addInfo.getLot());
+        values.put(AddInfo.NAME, addInfo.getName());
+        long rowid = db.insert(SqliteHelper.TB_ADD_EXTRA_INFO, null, values);
+        Log.d(TAG, "insetAddExtraInfo rowid = " + rowid);
         if (rowid > 0)
             return true;
         return false;

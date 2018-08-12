@@ -30,7 +30,7 @@
     <string name="save_btn">保存</string>
     <string name="start">设为起点</string>
     <string name="end">设为终点</string>
-    <string name="transfer_hint">站台入口:</string>
+    <string name="transfer_hint">换乘线路:</string>
     <string name="station_exit">站台出口:</string>
     <string name="start_location">开始定位</string>
     <string name="stop_location">停止定位</string>

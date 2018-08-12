@@ -179,6 +179,45 @@
                         android:layout_gravity="center"
                         android:gravity="center"
                 />
+                <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/radius_btn"
+                        android:padding="5dp"
+                        android:orientation="horizontal">
+                    <EditText
+                            android:paddingRight="20dp"
+                            android:id="@+id/lat"
+                            android:layout_alignParentLeft="true"
+                            android:layout_width="wrap_content"
+                            android:hint="lat"
+                            android:textSize="12dp"
+                            android:layout_height="wrap_content"/>
+                    <EditText
+                            android:id="@+id/lot"
+                            android:hint="lot"
+                            android:layout_toRightOf="@id/lat"
+                            android:paddingRight="20dp"
+                            android:textSize="12dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"/>
+                    <EditText
+                            android:id="@+id/name"
+                            android:hint="name"
+                            android:paddingRight="20dp"
+                            android:layout_width="wrap_content"
+                            android:layout_toRightOf="@id/lot"
+                            android:textSize="12dp"
+                            android:layout_height="wrap_content"/>
+                    <ImageButton
+                            android:paddingRight="20dp"
+                            android:id="@+id/save"
+                            android:layout_width="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:background="@drawable/add_acount"
+                            android:layout_height="wrap_content"/>
+                </RelativeLayout>
                 <com.traffic.locationremind.baidu.location.view.ContentListView
                         android:id="@+id/list_view"
                         android:layout_width="match_parent"

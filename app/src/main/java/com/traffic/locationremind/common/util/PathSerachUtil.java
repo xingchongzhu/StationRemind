@@ -365,6 +365,16 @@ public class PathSerachUtil {
 		return nerstStationInfo;
 	}
 
+	public static boolean arriveNextStatison(BDLocation location,StationInfo stationInfo){
+		double longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
+		double latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
+		double dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(), location.getLatitude());
+		if(MINDIS > dis){
+			return true;
+		}
+		return false;
+	}
+
 	public static List<Map.Entry<List<Integer>,List<StationInfo>>> getReminderLines(StationInfo start,final StationInfo end,
 																					int maxLineid,BDLocation location,Map<Integer,LineInfo> mLineInfoList, Map<Integer, Map<Integer,Integer>> allLineCane){
 		List<Map.Entry<List<Integer>,List<StationInfo>>>  lastLinesLast = new ArrayList<Map.Entry<List<Integer>,List<StationInfo>>>();

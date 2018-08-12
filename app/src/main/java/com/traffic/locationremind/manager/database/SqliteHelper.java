@@ -6,10 +6,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.traffic.locationremind.manager.bean.CityInfo;
-import com.traffic.locationremind.manager.bean.ExitInfo;
-import com.traffic.locationremind.manager.bean.LineInfo;
-import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.bean.*;
 
 
 public class SqliteHelper extends SQLiteOpenHelper {
@@ -18,6 +15,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
     public static final String TB_STATION = "station";
     public static final String TB_EXIT_INFO = "exitinfo";
     public static final String TB_CITY_INFO = "city";
+    public static final String TB_ADD_EXTRA_INFO = "addinfo";
 
     public SqliteHelper(Context context, String name, CursorFactory factory,
                         int version) {
@@ -62,6 +60,11 @@ public class SqliteHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_CITY_INFO + "("
                 + CityInfo.CITYNO + " varchar,"
                 + CityInfo.CITYNAME + " varchar"
+                + ")");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_ADD_EXTRA_INFO + "("
+                + AddInfo.LAT+ " varchar,"
+                + AddInfo.LOT + " varchar,"
+                + AddInfo.NAME + " varchar"
                 + ")");
 
         Log.e("Database", "onCreate create table " + TB_LINE + " " + TB_STATION + " " + TB_STATION);

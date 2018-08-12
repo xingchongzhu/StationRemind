@@ -1,26 +1,36 @@
 package com.traffic.locationremind.manager.bean;
 
 
-public class CityInfo {
-    public static String  CITYNO = "cityno";
-    public static String CITYNAME = "cityname";
+public class AddInfo {
+    public static String  LAT = "lat";
+    public static String LOT = "lot";
+    public static String NAME = "name";
 
-    private String cityNo;//城市编码
-    private String cityName;//城市名
+    private String lat;//经度
+    private String lot;//纬度
+    private String name;//纬度
 
-    public void setCityNo(String cityno){
-        this.cityNo = cityno;
+    public String getLat() {
+        return this.lat;
     }
 
-    public String getCityNo(){
-        return cityNo;
+    public void setLat(String lat) {
+        this.lat = lat;
     }
 
-    public void setCityName(String cityName){
-        this.cityName = cityName;
+    public String getLot() {
+        return lot;
     }
 
-    public String getCityName(){
-        return cityName;
+    public void setLot(String lot) {
+        this.lot = lot;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
