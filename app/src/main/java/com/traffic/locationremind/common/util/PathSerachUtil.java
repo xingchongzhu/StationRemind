@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.item.Node;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
@@ -189,45 +190,114 @@ public class PathSerachUtil {
 		//取出一条路线
 		for(List<Integer> list:transferLine){
 			//Log.d(TAG,(n)+" list = "+list);
-			StationInfo startStation = null,  endStation = null;
+			StationInfo startStation = null;//,  endStation = null;
 			final int size = list.size();
 			//Log.d(TAG,"---------------------start----------------------------list = "+list);
 			List<StationInfo> oneLineMap = new ArrayList<StationInfo>();
 			//分段查找所有站
+			Node root = null,currentNode = null;
 			for(int i = 0 ; i < size ; i++){
 				final int lined = list.get(i);
 				//Log.d(TAG,lined+"号线");
 				LineInfo lineInfo = getLineInfoByLineid(mLineInfoList,lined);
 				if(size == 1){//不用换乘
 					startStation = start;
-					endStation = end;
+					//endStation = end;
 					startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
+					root = new Node(startStation);//根节点
+					Node nextNode = new Node(end);
+					root.addChildNode(nextNode);
+					currentNode = root;
 				}else if(i == 0) {//需要换乘，从开始起点走
 					startStation = start;
 					if(startStation != null)//起点站
 						startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
+					root = new Node(startStation);//根节点
 					if(size > i+1){
 						List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
-						endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
+						if(stationInfoList != null && stationInfoList.size() > 0){
+							for(StationInfo stationInfo:stationInfoList){
+								addChild(root, stationInfoList);
+							}
+						}
+						//endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
 					}else{
-						endStation = end;
+						//endStation = end;
+						List<StationInfo> stationInfoList = new ArrayList<>();
+						stationInfoList.add(end);
+						addChild(root,stationInfoList);
 					}
+					currentNode = root;
 				}else{
-					startStation = endStation;
-					if(startStation != null)
-						startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), startStation.getCname());//再找相同站台
-					if(size > i+1){
-						List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
-						endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
-					}else{
-						endStation = end;
+					if(currentNode != null){
+						List<Node> stationInfos = root.getChildNodes();
+
+						if(size > i+1){
+							List<StationInfo> stationInfoList = getTwoLineCommonStation(mLineInfoList,lined,list.get(i+1));//找到当前线路和下一条线路交汇站台
+							if(stationInfoList != null && stationInfoList.size() > 0) {
+								addChild(root, stationInfoList);
+							}
+							//endStation = gitNearestStation(stationInfoList,startStation);//找到与该站台最近的一个站作为结束站
+						}else{
+							List<StationInfo> stationInfoList = new ArrayList<>();
+							stationInfoList.add(end);
+							addChild(root,stationInfoList);
+							//endStation = end;
+							//Node nextNode = new Node(node.getNodeEntity());
+							//node.addChildNode(nextNode);
+						}
+
 					}
 				}
-				PathSerachUtil.findLinedStation(lineInfo,startStation,endStation,oneLineMap);
+
+
+				//PathSerachUtil.findLinedStation(lineInfo,startStation,endStation,oneLineMap);
 			}
+			List<List<StationInfo>> listtt = new ArrayList<>();
+			Log.d("zxc","------------start------------ list = "+list);
+			printNodeTree(root,listtt);
+			StringBuffer st= new StringBuffer();
+			for(List<StationInfo> l:listtt){
+
+				for(StationInfo stationInfo :l){
+					st.append(stationInfo.lineid+" "+stationInfo.getCname()+" ->");
+				}
+				Log.d("zxc","line = "+st.toString());
+				st.delete(0,st.length());
+			}
+			Log.d("zxc","------------end------------ ");
 			currentAllStationList.put(list,oneLineMap);
 		}
 		return currentAllStationList;
+	}
+
+	public static void printNodeTree(Node<StationInfo> node,List<List<StationInfo>> listtt){
+		List<StationInfo> list = new ArrayList<>();
+        //Log.d("zxc","---------------statr---------------");
+		for (Node<StationInfo> childNode: node.getChildNodes()) {
+            list.add(childNode.getNodeEntity());
+			//Log.d("zxc",childNode.getNodeEntity().lineid+"   "+childNode.getNodeEntity().getCname());
+			if (childNode.getChildNodes()!=null){
+				printNodeTree(childNode,listtt);
+			}else{
+				//Log.d("zxc","---------------end---------------");
+                listtt.add(list);
+            }
+		}
+	}
+
+	public static  void addChild(Node node,List<StationInfo> stationInfoList){
+		if(node.getChildNodes() == null){
+			for(StationInfo stationInfo:stationInfoList){
+				Node nextNode = new Node(stationInfo);
+				node.addChildNode(nextNode);
+			}
+		}else{
+			List<Node> stationInfos = node.getChildNodes();
+			for(Node node1:stationInfos){
+				addChild(node1,stationInfoList);
+			}
+		}
 	}
 
 	public static StationInfo gitNearestStation(List<StationInfo> stationInfoList,StationInfo stationInfo){
