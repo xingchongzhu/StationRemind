@@ -41,8 +41,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
     private GoToFragmentListener mGoToFragmentListener;
     private PageNavigationView pageBottomTabLayout;
-    Activity activity;
+    private Activity activity;
     private DataManager dataManager;
+    private ViewGroup serachLayoutRoot;
     public RemindSetViewManager(){
 
     }
@@ -67,7 +68,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
         mSelectlineMap = (SelectlineMap) activity.findViewById(R.id.item_tv_2);
 
         lineTial = activity.getResources().getString(R.string.line_tail);
-
+        serachLayoutRoot = (ViewGroup) activity.findViewById(R.id.serach_layout_manager_root);
         back_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,8 +114,6 @@ public class RemindSetViewManager implements RemindSetViewListener {
             }
         });
 
-
-
         set_remind_layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -137,7 +136,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
     public void closeRemindWindow(){
         set_remind_layout.setVisibility(View.GONE);
-        pageBottomTabLayout.setVisibility(View.VISIBLE);
+        if(serachLayoutRoot.getVisibility() != View.VISIBLE) {
+            pageBottomTabLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

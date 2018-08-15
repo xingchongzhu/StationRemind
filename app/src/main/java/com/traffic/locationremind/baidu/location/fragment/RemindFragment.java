@@ -164,7 +164,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
                 }else{
                     lineDirection.put(preStationInfo.lineid,mDataManager.getLineInfoList().get(preStationInfo.lineid).getForwad());
                 }
-
             }
             //终点
             if(i == list.size() - 1){
@@ -186,7 +185,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
 
         String surplusNum = String.format(getResources().getString(R.string.surples_station),list.size()+"");
         String currenStr = getResources().getString(R.string.current_station)+list.get(0).getCname();
-        current_info_text.setText(surplusNum+"    "+currenStr);
+        String line = String.format(getResources().getString(R.string.line_tail),list.get(0).lineid+"") ;
+        String direction = lineDirection.get(list.get(0).lineid)+getResources().getString(R.string.direction);
+        current_info_text.setText(surplusNum + "   " + currenStr+"   "+line+"   "+direction);
         line_color_view.setLineInfoMap(lineInfoMap);
         if(isRemind)
             cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));

@@ -356,22 +356,6 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(notificationOnKeyDown(keyCode,event)){
-            return true;
-        }
-        if (getRemindState()) {
-            if (keyCode == KeyEvent.KEYCODE_BACK) {
-                if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
-                    moveTaskToBack(true);
-                    notificationMoveTaskToBack();
-                }
-                return true;
-            }
-            if (keyCode == KeyEvent.KEYCODE_HOME) {
-                notificationMoveTaskToBack();
-                return true;
-            }
-        }
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (mRemindSetViewManager.getRemindWindowState()) {
                 hideSetRemindView();
@@ -382,6 +366,23 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 return true;
             }
         }
+        if(notificationOnKeyDown(keyCode,event)){
+            return true;
+        }
+        if (getRemindState()) {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
+                    moveTaskToBack(true);
+                    notificationMoveTaskToBack();
+                    return true;
+                }
+            }
+            if (keyCode == KeyEvent.KEYCODE_HOME) {
+                notificationMoveTaskToBack();
+                return true;
+            }
+        }
+
         return super.onKeyDown(keyCode, event);
     }
 
