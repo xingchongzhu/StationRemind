@@ -19,7 +19,7 @@
     <application
         android:name="com.traffic.locationremind.baidu.location.activity.LocationApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
 
         android:supportsRtl="true"
