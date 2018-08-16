@@ -3,11 +3,13 @@ package com.traffic.locationremind.manager.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.traffic.locationremind.manager.bean.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,13 +17,10 @@ import java.util.Map;
 
 public class DataHelper {
 
-    private static String DB_NAME = "metroinfo.db";
     private String TAG = "DataHelper";
 
-    private static int DB_VERSION = 1;
-
     private SQLiteDatabase db;
-    private SqliteHelper dbHelper;
+    private DBHelper dbHelper;
     private static DataHelper mDataHelper;
 
     public static DataHelper getInstance(Context context) {
@@ -32,7 +31,8 @@ public class DataHelper {
     }
 
     public DataHelper(Context context) {
-        dbHelper = new SqliteHelper(context, DB_NAME, null, DB_VERSION);
+        dbHelper = new DBHelper(context);
+        dbHelper.imporDatabase();
         db = dbHelper.getWritableDatabase();
     }
 

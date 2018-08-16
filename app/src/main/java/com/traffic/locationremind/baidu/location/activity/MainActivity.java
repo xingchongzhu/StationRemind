@@ -36,12 +36,9 @@ import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
-import com.traffic.locationremind.common.util.ToastUitl;
+import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.RemindSetViewManager;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
-import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.common.util.PathSerachUtil;
-import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -54,7 +51,7 @@ import java.util.Map;
 
 
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
-        ReadExcelDataUtil.DbWriteFinishListener, GoToFragmentListener, LoadDataListener {
+        CopyDBDataUtil.DbWriteFinishListener, GoToFragmentListener, LoadDataListener {
 
     private final static String TAG = "MainActivity";
 
@@ -103,8 +100,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mRemindSetViewManager.setGoToFragmentListener(this);
         mRemindSetViewManager.initView(this, mDataManager);
 
-        ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
-
+        //ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
+        //CopyDBDataUtil.getInstance().addDbWriteFinishListener(this);
         mNavigationController = pageBottomTabLayout.material()
                 .addItem(R.drawable.all_icon, getString(R.string.full_subway_title))
                 .addItem(R.drawable.line_icon, getString(R.string.line_title))
@@ -130,9 +127,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mSearchManager.initViews(this, searchView);
         mSearchManager.initData(this, mDataManager);
         mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
-        if (ReadExcelDataUtil.getInstance().hasWrite) {
+        /*if (ReadExcelDataUtil.getInstance().hasWrite) {
             initData();
-        }
+        }*/
+        //if (CopyDBDataUtil.getInstance().hasWrite) {
+            initData();
+        //}
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
@@ -153,7 +153,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     private void initData() {
-        if (ReadExcelDataUtil.getInstance().hasWrite) {
+        /*if (ReadExcelDataUtil.getInstance().hasWrite) {
+            mDataManager.loadData(this);
+        }*/
+        if (CopyDBDataUtil.getInstance().hasWrite) {
             mDataManager.loadData(this);
         }
     }
@@ -288,7 +291,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     @Override
     public void dbWriteFinishNotif() {
         initData();
-        Log.d(TAG, "dbWriteFinishNotif ReadExcelDataUtil.getInstance().hasWrite = " + ReadExcelDataUtil.getInstance().hasWrite);
+        Log.d(TAG, "dbWriteFinishNotif ReadExcelDataUtil.getInstance().hasWrite = " + CopyDBDataUtil.getInstance().hasWrite);
     }
 
     private ServiceConnection connection = new ServiceConnection() {

@@ -356,11 +356,25 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     public BDLocation getBDLocation(){
         return mBDLocation;
     }
+    int adjustlocation = 0;
+    private final static int LOCATIONTIMEOUTNUM = 30;
     @Override
     public void loactionStation(BDLocation location) {
         MainActivity activity = (MainActivity)getActivity();
         mBDLocation = location;
         StationInfo nerstStationInfo = nextStation;
+        if(mDataManager != null) {
+            StationInfo nerstStationInfo1 = PathSerachUtil.getNerastNextStation(location, mDataManager.getLineInfoList());
+            if (nerstStationInfo1 != null && !nextStation.getCname().equals(nerstStationInfo1.getCname())) {
+                adjustlocation++;
+                if (adjustlocation > LOCATIONTIMEOUTNUM) {
+                    nerstStationInfo = nerstStationInfo1;
+                    adjustlocation = 0;
+                }
+            } else {
+                adjustlocation = 0;
+            }
+        }
         if(mScrollFavoriteManager != null)
             mScrollFavoriteManager.setLocation(location);
         if (activity == null || !activity.getPersimmions()) {

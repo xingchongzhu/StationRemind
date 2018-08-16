@@ -56,5 +56,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation files('libs/poi.jar')
     implementation files('libs/BaiduLBS_Android.jar')
+    implementation files('libs/pinyin4android1.0.jar')
+    implementation files('libs/pinyin4j-2.5.0.jar')
 }
 

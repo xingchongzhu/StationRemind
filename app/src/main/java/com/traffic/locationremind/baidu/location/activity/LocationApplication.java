@@ -11,6 +11,7 @@ import android.os.Vibrator;
 import com.baidu.mapapi.SDKInitializer;
 import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.common.util.CopyDBDataUtil;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.manager.database.SqliteHelper;
@@ -27,25 +28,26 @@ import java.util.List;
 public class LocationApplication extends Application {
     public LocationService locationService;
     public Vibrator mVibrator;
-    private DataHelper mDataHelper;
-    private ReadExcelDataUtil mReadExcelDataUtil;
+    //private DataHelper mDataHelper;
+    //private ReadExcelDataUtil mReadExcelDataUtil;
+    private CopyDBDataUtil mCopyDBDataUtil;
     @Override
     public void onCreate() {
         super.onCreate();
         /***
          * 初始化定位sdk，建议在Application中创建
          */
-        mDataHelper = DataHelper.getInstance(this);
+        //mDataHelper = DataHelper.getInstance(this);
         locationService = new LocationService(getApplicationContext());
         mVibrator = (Vibrator) getApplicationContext().getSystemService(Service.VIBRATOR_SERVICE);
         //SDKInitializer.initialize(getApplicationContext());
         String processName = getProcessName(this);
         if (processName!= null) {
             if(processName.equals("com.traffic.location.remind")){
-                //if(mDataHelper.getCount(SqliteHelper.TB_LINE) <= 0) {
-                mReadExcelDataUtil = ReadExcelDataUtil.getInstance();
-                mReadExcelDataUtil.execute(this);
-                //}
+                //mReadExcelDataUtil = ReadExcelDataUtil.getInstance();
+               // mReadExcelDataUtil.execute(this);
+                //mCopyDBDataUtil = CopyDBDataUtil.getInstance();
+                //mCopyDBDataUtil.execute(this);
             }
         }
 
@@ -70,7 +72,7 @@ public class LocationApplication extends Application {
         return null;
     }
 
-    public DataHelper getDataHelper(){
+   /* public DataHelper getDataHelper(){
         return mDataHelper;
     }
 
@@ -80,5 +82,5 @@ public class LocationApplication extends Application {
             Intent stopIntent = new Intent(this, RemonderLocationService.class);
             stopService(stopIntent);
         }
-    }
+    }*/
 }

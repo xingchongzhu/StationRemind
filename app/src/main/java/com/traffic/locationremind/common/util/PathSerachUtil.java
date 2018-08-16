@@ -18,7 +18,7 @@ import java.util.*;
 
 public class PathSerachUtil {
     private static final int MAXLINENUMBER = 20;
-    private static final int MAXRECOMENDLINENUMBER = 5;
+    private static final int MAXRECOMENDLINENUMBER = 8;
     static String TAG = "PathSerachUtil";
     static boolean debug = false;
 
@@ -183,6 +183,22 @@ public class PathSerachUtil {
             }
         }
         lastLines.clear();
+        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
+            /*
+             * 返回负数表示：p1 小于p2，
+             * 返回0 表示：p1和p2相等，
+             * 返回正数表示：p1大于p2
+             */
+            public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
+                               Map.Entry<List<Integer>, List<StationInfo>> o2) {
+                if (o1.getValue().size() < o2.getValue().size()) {
+                    return -1;
+                } else if (o1.getValue().size() == o2.getValue().size()) {
+                    return 0;
+                }
+                return 1;
+            }
+        });
         return lastLinesLast;
     }
 

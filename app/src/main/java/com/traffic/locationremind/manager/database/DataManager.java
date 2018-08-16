@@ -47,7 +47,6 @@ public class DataManager{
 	}
 	public DataManager(Context context){
 		this.mDataHelper = DataHelper.getInstance(context);
-		//new MyAsyncTask().execute(context);
 	}
 
 	public void loadData(Context context){
@@ -116,9 +115,11 @@ public class DataManager{
 		protected Map<Integer,LineInfo> doInBackground(Context... params) {
 			cityInfoList = mDataHelper.getAllCityInfo();
 			//获取传进来的参数
-			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CommonFuction.CITYNO);
+			String shpno = "340";//CommonFuction.getSharedPreferencesValue((Context) params[0], CommonFuction.CITYNO);
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
+			}else{
+				currentCityNo = cityInfoList.get("340");
 			}
 			if (currentCityNo == null) {
 				currentCityNo = CommonFuction.getFirstOrNull(cityInfoList);
