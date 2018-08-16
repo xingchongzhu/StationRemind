@@ -15,6 +15,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
 	private static String DB_NAME = "metroinfo.db";
 	private static String ASSETS_NAME = "metroinfo.db";
+	public static final String TB_RECENT_CITY = "recentcity";
 
 
 	private SQLiteDatabase myDataBase = null;
@@ -27,6 +28,17 @@ public class DBHelper extends SQLiteOpenHelper {
 					int version) {
 		super(context, name, null, version);
 		this.myContext = context;
+	}
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		//Log.d("info", "create table");
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		if(newVersion > oldVersion){
+			imporDatabase();
+		}
 	}
 
 	public DBHelper(Context context, String name, int version) {
@@ -95,16 +107,6 @@ public class DBHelper extends SQLiteOpenHelper {
 		super.close();
 	}
 
-	@Override
-	public void onCreate(SQLiteDatabase db) {
 
-	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if(newVersion > oldVersion){
-			imporDatabase();
-		}
-	}
 
 }

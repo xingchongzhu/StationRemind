@@ -64,13 +64,6 @@ public class RemonderLocationService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        /*if(intent != null){
-            Log.d(TAG,"onStartCommand intent.getAction() = "+intent.getAction());
-            if(intent.getAction() != null && intent.getAction().equals(CLOSE_REMINDER_SERVICE)){
-                setCancleReminder();
-                stopSelf();
-            }
-        }*/
         return super.onStartCommand(intent, flags, startId);
     }
 

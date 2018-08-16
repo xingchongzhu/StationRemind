@@ -1,5 +1,6 @@
 package com.traffic.locationremind.baidu.location.fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -128,7 +129,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         mSettingReminderDialog.show();
     }
     public void upadaData(){
-        if(mDataManager.getLineInfoList() != null){
+        if(mDataManager != null && mDataManager.getLineInfoList() != null){
             list.clear();
             for(Map.Entry<Integer,LineInfo> entry:mDataManager.getLineInfoList().entrySet()){
                 list.add(entry.getValue());
@@ -154,6 +155,10 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
     private void setCurrentLine(int index){
         if(index >= list.size()){
+            currentLineInfoText.setBackgroundColor(Color.WHITE);
+            currentLineInfoText.setTextColor(Color.WHITE);
+            currentLineInfoText.setText("");
+            sceneMapAdapter.setData(null);
             return;
         }
         String string = String.format(linenail,list.get(index).lineid+"")+" "

@@ -121,6 +121,25 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         createLine(list);
     }
 
+    public void upadaData(){
+        list = null;
+        if(linearlayout != null)
+            linearlayout.removeAllViews();
+        if(needChangeStationList != null)
+            needChangeStationList.clear();
+        if(mScrollFavoriteManager != null)
+            mScrollFavoriteManager.closeScrollView();
+        cancleRemind();
+        if(cancle_remind_btn != null)
+            cancle_remind_btn.setEnabled(false);
+        currentStation = null;
+        nextStation = null;
+        if(start_and_end != null)
+            start_and_end.setText(getResources().getString(R.string.select_remind_line));
+        if(line_change_introduce != null) {
+            line_change_introduce.setText("");
+        }
+    }
     public void createLine(List<StationInfo> list){
         if(list == null || list.size() <= 0){
             return;
@@ -434,61 +453,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
                     }
                 }
             }
-            /*StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location,mDataManager.getLineInfoList());
-            if(currentStationView != null){
-                currentStationView.setBitMap(null);
-            }
-            if(nerstStationInfo != null){
-                LineNodeView lineNodeView = textViewList.get(nerstStationInfo.getCname());
-                if(lineNodeView != null){
-                    int size = (int)getResources().getDimension(R.dimen.current_bitmap_siez);
-                    Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_location), size,size);
-                    lineNodeView.setBitMap(bitmap);
-                    currentStationView = lineNodeView;
-                    int n = 0;
-                    for(StationInfo stationInfo:list){
-                        if(stationInfo.getCname().equals(lineNodeView.getStationInfo().getCname())){
-                            break;
-                        }
-                        n++;
-                    }
-                    horizontalScrollView.scrollTo( lineNodeWidth*n,horizontalScrollView.getScrollY());
-                    String surplusNum = String.format(getResources().getString(R.string.surples_station),(list.size()-n)+"");
-                    String currenStr = getResources().getString(R.string.current_station)+lineNodeView.getStationInfo().getCname();
-                    current_info_text.setText(surplusNum+"    "+currenStr);
-
-                    currentStation = lineNodeView.getStationInfo();
-                    if(n+1 < list.size()-1){
-                        nextStation = list.get(n+1);
-                    }
-
-                    n = 0;
-                    size = needChangeStationList.size();
-                    Log.d(TAG,"loactionStation getCname = "+nerstStationInfo.getCname());
-                    if(isRemind) {
-                        for (StationInfo stationInfo : needChangeStationList) {
-                            if (stationInfo.getCname().equals(nerstStationInfo.getCname())) {
-                                if (size - 1 == n) {//终点站
-                                    isRemind = false;
-                                    cancleNotification();
-                                    arriveNotification();
-                                    break;
-                                } else {//换乘点
-                                    needChangeStationList.remove(stationInfo);
-                                    String str = String.format(getResources().getString(R.string.change_station_hint),stationInfo.getCname(),stationInfo.lineid+"")+
-                                            "   "+lineDirection.get(stationInfo.lineid)+getResources().getString(R.string.direction);
-                                    changeNotification(str);
-                                    break;
-                                }
-                            }
-                            n++;
-                        }
-                        Log.d(TAG,"loactionStation updataNotification ");
-                        updataNotification(createNotificationObject(currentStation, nextStation));
-                    }
-
-                }
-            }*/
         }
     }
 
@@ -556,10 +520,13 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
     }
 
     public void cancleNotification(){
-        mNotificationUtil.cancel(NotificationUtil.notificationId);
-        cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
-        cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
-        setCompoundDrawables(cancle_remind_btn,getResources().getDrawable(R.drawable.set_remind));
+        if(mNotificationUtil != null)
+            mNotificationUtil.cancel(NotificationUtil.notificationId);
+        if(cancle_remind_btn != null) {
+            cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
+            cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
+            setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+        }
     }
 
     public void setNotification(NotificationObject mNotificationObject) {

@@ -12,6 +12,7 @@ import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.*;
 import android.view.animation.Animation;
@@ -42,8 +43,10 @@ import com.traffic.locationremind.baidu.location.view.SearchEditView;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.manager.database.DataManager;
 import com.traffic.locationremind.manager.serach.SearchManager;
+import com.traffic.locationremind.pinying.LocationCityActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +56,8 @@ import java.util.Map;
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
         CopyDBDataUtil.DbWriteFinishListener, GoToFragmentListener, LoadDataListener {
 
+    public final static int SELECTCITYREQUEST = 2018;
+    public final static int SELECTCITYRESULTCODE = 2019;
     private final static String TAG = "MainActivity";
 
     private RemonderLocationService.UpdateBinder mUpdateBinder;
@@ -79,6 +84,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private CityInfo currentCityNo = null;
     private Toolbar mToolbarSet;
     private ImageView colloction_btn;
+    private String currentCity = "深圳";
+
+    public boolean hasLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +94,11 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         setContentView(R.layout.activity_behavior);
         mDataManager = DataManager.getInstance(this);
         mDataManager.addLoadDataListener(this);
-        setStatusBar(Color.WHITE);
 
         mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
+
        // colloction_btn = (ImageView) findViewById(R.id.colloction_btn);
         //colloction_btn.setOnClickListener(this);
 
@@ -122,6 +130,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         searchView = (SearchView) findViewById(R.id.search_root);
         searchBackButton.setOnClickListener(this);
         editButton.setOnClickListener(this);
+        citySelect.setOnClickListener(this);
 
         mSearchManager = new SearchManager();
         mSearchManager.initViews(this, searchView);
@@ -171,6 +180,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 hideSerachView();
                 break;
             case R.id.city_select:
+                Intent intent = new Intent(this, LocationCityActivity.class);
+                this.startActivityForResult(intent,SELECTCITYREQUEST);
+                overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
                 break;
             /*case R.id.colloction_btn:
                 List<LineObject> lineObjects = CommonFuction.getAllFavourite(this,mDataManager);
@@ -221,41 +233,6 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         view.startAnimation(mHiddenAction);//开始动画
     }
 
-    /**
-     * Android 6.0 以上设置状态栏颜色
-     */
-    protected void setStatusBar(@ColorInt int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            // 设置状态栏底色颜色
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            getWindow().setStatusBarColor(color);
-
-            // 如果亮色，设置状态栏文字为黑色
-            if (isLightColor(color)) {
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            } else {
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-            }
-        }
-        //隐藏标题栏
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
-            actionBar.hide();
-
-    }
-
-    /**
-     * 判断颜色是不是亮色
-     *
-     * @param color
-     * @return
-     * @from https://stackoverflow.com/questions/24260853/check-if-color-is-dark-or-light-in-android
-     */
-    private boolean isLightColor(@ColorInt int color) {
-        return ColorUtils.calculateLuminance(color) >= 0.5;
-    }
 
     public void showSerachView() {
         hideSerach(editButton);
@@ -279,7 +256,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     public void loadFinish() {
         Log.d(TAG, "loadFinish");
         mSearchManager.reloadData(this);
-        LineMapFragment remindFragment = (LineMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.LINEMAPFRAGMENTINDEX);
+        LineMapFragment lineMapFragment = (LineMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.LINEMAPFRAGMENTINDEX);
+        lineMapFragment.upadaData();
+
+        RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         remindFragment.upadaData();
     }
 
@@ -317,7 +297,13 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 mRemonderLocationService.setLocationChangerListener(new LocationChangerListener() {
                     @Override
                     public void loactionStation(BDLocation location) {
-                        Log.d(TAG,"setLocationChangerListener");
+                        if (location.getCity() != null && !hasLocation) {
+                            String tempCity = location.getCity().substring(0,location.getCity().length() - 1);
+                            if(cityIsExistLine(tempCity,mDataManager.getDataHelper(),mDataManager.getCityInfoList()) &&
+                                    mDataManager.getCityInfoList() != null && mDataManager.getCityInfoList().get(tempCity) != null) {
+                                setNewCity(tempCity);
+                            }
+                        }
                         for (LocationChangerListener locationChangerListener : locationChangerListenerList) {
                             locationChangerListener.loactionStation(location);
                         }
@@ -327,6 +313,43 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         }
     };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode ==SELECTCITYRESULTCODE){
+            if (data != null && !TextUtils.isEmpty(data.getAction())) {
+                String tempCity = data.getAction();
+
+                if(cityIsExistLine(tempCity,mDataManager.getDataHelper(),mDataManager.getCityInfoList()) && !currentCity.equals(tempCity)){
+                    setNewCity(tempCity);
+                }
+
+            }
+        }
+    }
+
+    public void setNewCity(String city){
+        Log.d(TAG,"setNewCity tempCity = "+city);
+        citySelect.setText(currentCity);
+        currentCity = city;
+        CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.CITYNAME,currentCity);
+        mDataManager.loadData(MainActivity.this);
+        hasLocation = true;
+    }
+
+    public boolean cityIsExistLine(String cityInfo,DataHelper mDataHelper, Map<String,CityInfo> allcity){
+        Log.d(TAG,"cityIsExistLine city name = "+cityInfo);
+        CityInfo city = allcity.get(cityInfo);
+        if(city == null){
+            return false;
+        }
+        Map<Integer,LineInfo> list= mDataHelper.getLineList(city.getCityNo(), LineInfo.LINEID, "ASC");
+        if(list == null || list.size() <= 0){
+            return false;
+        }
+        return true;
+    }
 
     public BDLocation getBDLocation() {
         BDLocation location = null;
@@ -408,13 +431,13 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             if (location != null) {
                 // Log.d(TAG, "locationCurrentStation location.getCityCode() = " + location.getCityCode() + " lot = " + location.getLatitude() + " lat = " + location.getLongitude());
 
-                currentCityNo = mDataManager.getCityInfoList().get(location.getCityCode());
+                /*currentCityNo = mDataManager.getCityInfoList().get(location.getCityCode());
                 // Log.d(TAG, "locationCurrentStation currentCityInfo CityName = " + currentCityNo.getCityName());
                 if (currentCityNo != null) {
-                    String shpno = CommonFuction.getSharedPreferencesValue(MainActivity.this, CommonFuction.CITYNO);
+                    String shpno = CommonFuction.getSharedPreferencesValue(MainActivity.this, CityInfo.CITYNAME);
                     Map<Integer, LineInfo> tempList = mDataManager.getLineInfoList();
                     if (!shpno.equals("" + currentCityNo)) {
-                        CommonFuction.writeSharedPreferences(MainActivity.this, CommonFuction.CITYNO, "" + currentCityNo);
+                        CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.CITYNAME, "" + currentCityNo);
                         tempList = mDataManager.getDataHelper().getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
                         if (tempList != null) {
                             for (Map.Entry<Integer, LineInfo> entry : tempList.entrySet()) {
@@ -423,13 +446,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                         }
                     }
                     //Log.d(TAG, "locationCurrentStation mLineInfoList = " + tempList.size());
-                    nerstStationInfo = PathSerachUtil.getNerastStation(location, tempList);
-                }
 
-                //Log.d(TAG,"locationCurrentStation currentStationInfo = "+nerstStationInfo);
+                }*/
+                nerstStationInfo = PathSerachUtil.getNerastStation(location, mDataManager.getLineInfoList());
+
                 if (nerstStationInfo != null) {
                     CommonFuction.writeSharedPreferences(MainActivity.this, CommonFuction.INITCURRENTLINEID, nerstStationInfo.getCname());
-                    //Log.d(TAG, "locationCurrentStation lineid = " + nerstStationInfo.lineid + " name = " + nerstStationInfo.getCname());
                 }
                 return nerstStationInfo;
             }
@@ -441,5 +463,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         unbindService(connection);
+        mDataManager.releaseResource();
+
     }
 }

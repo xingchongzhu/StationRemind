@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Vibrator;
 
 import com.baidu.mapapi.SDKInitializer;
+import com.squareup.leakcanary.LeakCanary;
 import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
 import com.traffic.locationremind.common.util.CopyDBDataUtil;
@@ -34,6 +35,12 @@ public class LocationApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
         /***
          * 初始化定位sdk，建议在Application中创建
          */

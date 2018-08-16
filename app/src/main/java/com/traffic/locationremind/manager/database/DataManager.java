@@ -42,6 +42,23 @@ public class DataManager{
 
 	private static DataManager mDataManager;
 
+	public void releaseResource(){
+		mDataHelper.Close();
+		mDataHelper = null;
+		if(allLineCane != null)
+			allLineCane.clear();
+		if(lineColor != null)
+			lineColor.clear();
+		if(allstations != null)
+			allstations.clear();
+		if(cityInfoList != null)
+			cityInfoList.clear();
+		if(mLineInfoList != null)
+			mLineInfoList.clear();
+		if(mLoadDataListener != null)
+			mLoadDataListener.clear();
+	}
+
 	public CityInfo getCurrentCityNo(){
 		return currentCityNo;
 	}
@@ -59,6 +76,10 @@ public class DataManager{
 		if(allLineCane != null){
 			allLineCane.clear();
 		}
+		if(mLineInfoList != null)
+			mLineInfoList.clear();
+		if(lineColor != null)
+			lineColor.clear();
 		new MyAsyncTask().execute(context);
 	}
 
@@ -115,15 +136,18 @@ public class DataManager{
 		protected Map<Integer,LineInfo> doInBackground(Context... params) {
 			cityInfoList = mDataHelper.getAllCityInfo();
 			//获取传进来的参数
-			String shpno = "340";//CommonFuction.getSharedPreferencesValue((Context) params[0], CommonFuction.CITYNO);
+			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
 			}else{
-				currentCityNo = cityInfoList.get("340");
+				currentCityNo = cityInfoList.get("深圳");
 			}
 			if (currentCityNo == null) {
 				currentCityNo = CommonFuction.getFirstOrNull(cityInfoList);
 			}
+            if (currentCityNo == null) {
+                return null;
+            }
 			Map<Integer,LineInfo> list= mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
 			for (Map.Entry<Integer,LineInfo> entry : list.entrySet()) {
 				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));

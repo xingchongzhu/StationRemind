@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.traffic.location.remind">
+          package="com.traffic.location.remind">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
@@ -17,40 +17,45 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS"></uses-permission>
 
     <application
-        android:name="com.traffic.locationremind.baidu.location.activity.LocationApplication"
-        android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
+            android:name="com.traffic.locationremind.baidu.location.activity.LocationApplication"
+            android:allowBackup="true"
+            android:icon="@mipmap/ic_launcher_round"
+            android:label="@string/app_name"
 
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+            android:supportsRtl="true"
+            android:theme="@style/AppTheme">
 
         <!-- 声明百度定位服务组件 -->
         <!--        <service android:name="com.baidu.location.f"
                     android:enabled="true"
                     android:process=":remote" />-->
         <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"
-            android:permission="android.permission.BAIDU_LOCATION_SERVICE">
+                 android:permission="android.permission.BAIDU_LOCATION_SERVICE">
         </service>
         <!-- AK鉴权 -->
         <!-- meta-data需要写在application中 -->
         <meta-data
-            android:name="com.baidu.lbsapi.API_KEY"
-            android:value="e1fk6y9QFLj5gcxVNSQe9ClYEsM542A3" /> <!-- http://lbsyun.baidu.com/apiconsole/key -->
+                android:name="com.baidu.lbsapi.API_KEY"
+                android:value="e1fk6y9QFLj5gcxVNSQe9ClYEsM542A3"/> <!-- http://lbsyun.baidu.com/apiconsole/key -->
 
         <activity android:name="com.traffic.locationremind.baidu.location.activity.MainViewActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait">
+                  android:launchMode="singleTask"
+                  android:screenOrientation="portrait">
+        </activity>
+        <activity android:name="com.traffic.locationremind.pinying.LocationCityActivity"
+                  android:launchMode="singleTask"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="com.traffic.locationremind.baidu.location.activity.MainActivity"
-            android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait">
+                  android:launchMode="singleTask"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 

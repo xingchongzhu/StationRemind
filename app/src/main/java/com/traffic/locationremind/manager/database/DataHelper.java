@@ -34,6 +34,7 @@ public class DataHelper {
         dbHelper = new DBHelper(context);
         dbHelper.imporDatabase();
         db = dbHelper.getWritableDatabase();
+        db.execSQL("CREATE TABLE IF NOT EXISTS "+DBHelper.TB_RECENT_CITY+" (id integer primary key autoincrement, name varchar(40), date INTEGER)");
     }
 
     public void Close() {
@@ -214,6 +215,7 @@ public class DataHelper {
             CityInfo cityInfo = new CityInfo();
             cityInfo.setCityNo(cursor.getString(0));
             cityInfo.setCityName(cursor.getString(1));
+            cityInfo.setPingying(cursor.getString(2));
             cityInfoList.add(cityInfo);
         }
 
@@ -231,7 +233,8 @@ public class DataHelper {
                 CityInfo cityInfo = new CityInfo();
                 cityInfo.setCityNo(cursor.getString(0));
                 cityInfo.setCityName(cursor.getString(1));
-                cityInfoList.put(cursor.getString(0),cityInfo);
+                cityInfo.setPingying(cursor.getString(2));
+                cityInfoList.put(cursor.getString(1),cityInfo);
             }
         }
 
@@ -280,6 +283,10 @@ public class DataHelper {
         return cityList;
     }
 
+    public SQLiteDatabase getSQLiteDatabase(){
+        return db;
+    }
+
     public Map<String,CityInfo> getAllCityInfo() {
 
         Map<String,CityInfo> cityList;
@@ -290,6 +297,21 @@ public class DataHelper {
         Log.e(TAG, "QueryCityByCityNo");
 
         cityList = convertCursorToCityInfoMap(cursor);
+        if (cursor != null)
+            cursor.close();
+        return cityList;
+    }
+
+    public List<CityInfo> getAllCityInfoList() {
+
+        List<CityInfo> cityList;
+        Cursor cursor = db.query(SqliteHelper.TB_CITY_INFO, null, null
+                , null, null, null,
+                null);
+
+        Log.e(TAG, "QueryCityByCityNo");
+
+        cityList = convertCursorToCityInfoList(cursor);
         if (cursor != null)
             cursor.close();
         return cityList;
