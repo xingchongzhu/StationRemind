@@ -210,9 +210,6 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 									case 5:
 										mLineInfo.setReverse(FooFileUtil.rightTrim(value));
 										break;
-									default:
-										mLineInfo.setCityNo(FooFileUtil.rightTrim(value));
-										break;
 								}
 								break;
 							case 1:
@@ -244,15 +241,15 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 									case 8:
 										mStationInfo.setAname(FooFileUtil.rightTrim(value));
 										break;
-									case 9:
+									/*case 9:
 										mStationInfo.setPreStation(FooFileUtil.rightTrim(value));
 										break;
 									case 10:
 										mStationInfo.setNextStation(FooFileUtil.rightTrim(value));
-										break;
-									default:
+										break;*/
+									/*default:
 										mStationInfo.setCityNo(FooFileUtil.rightTrim(value));
-										break;
+										break;*/
 								}
 								break;
 							case 2:
@@ -266,15 +263,15 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 									case 2:
 										mExitInfo.setAddr(FooFileUtil.rightTrim(value));
 										break;
-									default:
+									/*default:
 										mExitInfo.setCityNo(FooFileUtil.rightTrim(value));
-										break;
+										break;*/
 								}
 								break;
 							default:
 								switch (columnIndex) {//地铁站台出口信息表
 									case 0:
-										mCityInfo.setCityNo(FooFileUtil.rightTrim(value));
+										mCityInfo.setCityName(FooFileUtil.rightTrim(value));
 										break;
 									default :
 										mCityInfo.setCityName(FooFileUtil.rightTrim(value));

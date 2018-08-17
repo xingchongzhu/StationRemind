@@ -10,9 +10,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.FileUtil;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -134,7 +136,7 @@ public class DataManager{
 		//在doInBackground方法中进行异步任务的处理.
 		@Override
 		protected Map<Integer,LineInfo> doInBackground(Context... params) {
-			cityInfoList = mDataHelper.getAllCityInfo();
+		    cityInfoList = mDataHelper.getAllCityInfo();
 			//获取传进来的参数
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
 			if (!TextUtils.isEmpty(shpno)) {
@@ -142,13 +144,16 @@ public class DataManager{
 			}else{
 				currentCityNo = cityInfoList.get("深圳");
 			}
+
 			if (currentCityNo == null) {
 				currentCityNo = CommonFuction.getFirstOrNull(cityInfoList);
 			}
-            if (currentCityNo == null) {
+            if (currentCityNo == null || !FileUtil.dbIsExist((Context) params[0],currentCityNo)) {
                 return null;
             }
-			Map<Integer,LineInfo> list= mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
+
+            mDataHelper.setCityHelper((Context) params[0],currentCityNo.getPingying());
+			Map<Integer,LineInfo> list= mDataHelper.getLineList(LineInfo.LINEID, "ASC");
 			for (Map.Entry<Integer,LineInfo> entry : list.entrySet()) {
 				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
 				List<StationInfo> canTransferlist = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());

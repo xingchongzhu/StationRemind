@@ -11,15 +11,15 @@ public class ExitInfo {
     private String cname;//站名
     private String exitname;//出口名
     private String addr;//出口地址
-    public String cityNo;//城市编码
+    //public String cityNo;//城市编码
 
-    public void setCityNo(String cityno){
+   /* public void setCityNo(String cityno){
         this.cityNo = cityno;
     }
 
     public String getCityNo(){
         return cityNo;
-    }
+    }*/
 
     public int getId() {
         return id;

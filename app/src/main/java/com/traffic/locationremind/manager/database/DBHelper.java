@@ -16,9 +16,10 @@ public class DBHelper extends SQLiteOpenHelper {
 	private static String DB_NAME = "metroinfo.db";
 	private static String ASSETS_NAME = "metroinfo.db";
 	public static final String TB_RECENT_CITY = "recentcity";
+	public static String CITY_DB_NAME = "cities.db";
+	public static String SHENZHEN_DB_NAME = "shenzhen.db";
 
 
-	private SQLiteDatabase myDataBase = null;
 	private final Context myContext;
 
 	private static final int ASSETS_SUFFIX_BEGIN = 101;
@@ -50,7 +51,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	}
 
 	public DBHelper(Context context) {
-		this(context,  DB_NAME);
+		this(context,  CITY_DB_NAME);
 	}
 
 	public void imporDatabase() {
@@ -81,6 +82,34 @@ public class DBHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	public void imporCityDatabase(int id,String name) {
+		//存放数据库的目录
+		String dirPath = "/data/data/" + myContext.getPackageName() + "/databases";
+		File dir = new File(dirPath);
+		if(!dir.exists()) {
+			dir.mkdir();
+		}
+		//数据库文件
+		File file = new File(dir, name);
+		try {
+			if(!file.exists()) {
+				file.createNewFile();
+			}
+			//加载需要导入的数据库
+			InputStream is = myContext.getResources().openRawResource(id);
+			FileOutputStream fos = new FileOutputStream(file);
+			byte[] buffere=new byte[is.available()];
+			is.read(buffere);
+			fos.write(buffere);
+			is.close();
+			fos.close();
+		}catch(FileNotFoundException  e){
+			e.printStackTrace();
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@SuppressWarnings("unused")
 	private void copyBigDataBase() throws IOException {
 		InputStream myInput;
@@ -98,15 +127,6 @@ public class DBHelper extends SQLiteOpenHelper {
 		}
 		myOutput.close();
 	}
-
-	@Override
-	public synchronized void close() {
-		if (myDataBase != null) {
-			myDataBase.close();
-		}
-		super.close();
-	}
-
 
 
 }

@@ -13,8 +13,8 @@ public class StationInfo {
     public static String ANAME = "aname";
     public static String LOT = "lot";
     public static String LAT = "lat";
-    public static String PRESTATION = "preStation";
-    public static String NEXTSTATION = "nextStation";
+    /*public static String PRESTATION = "preStation";
+    public static String NEXTSTATION = "nextStation";*/
     public static String STATIONINFO = "stationinfo";
     public static String TRANSFER = "transfer";
 
@@ -27,20 +27,20 @@ public class StationInfo {
     public String stationinfo;//站台时间
     public String lot;//进度
     public String lat;//纬度
-    public String preStation;//下一站
-    public String nextStation;//上一站
+    /*public String preStation;//下一站
+    public String nextStation;//上一站*/
     public String transfer;
     public int colorId;
 
-    public String cityNo;//城市编码
-
+    //public String cityNo;//城市编码
+/*
     public void setCityNo(String cityno){
         this.cityNo = cityno;
     }
 
     public String getCityNo(){
         return cityNo;
-    }
+    }*/
 
     public int getId() {
         return id;
@@ -106,7 +106,7 @@ public class StationInfo {
         this.lat = lat;
     }
 
-    public void setPreStation(String preStation){
+    /*public void setPreStation(String preStation){
         this.preStation = preStation;
     }
 
@@ -121,7 +121,7 @@ public class StationInfo {
     public String getNextStation(){
         return nextStation;
     }
-
+*/
     public void setStationInfo(String stationinfo){
         this.stationinfo = stationinfo;
     }

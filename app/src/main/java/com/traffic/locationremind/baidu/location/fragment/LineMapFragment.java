@@ -89,8 +89,8 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     }
 
     private void showDialog(final StationInfo stationInfo) {
-        Log.d(TAG,"showDialog stationInfo.getCname() = "+stationInfo.getCname()+" stationInfo.getCityNo() = stationInfo.getCityNo()"+stationInfo.getCityNo());
-        List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname(), stationInfo.getCityNo());
+        Log.d(TAG,"showDialog stationInfo.getCname() = "+stationInfo.getCname());
+        List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname());
         String existInfostr = "";
         if (existInfoList != null) {
             final int existInfoList_size = existInfoList.size();// Moved  existInfoList.size() call out of the loop to local variable existInfoList_size

@@ -31,8 +31,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
                 + LineInfo.LINEINFO + " varchar,"
                 + LineInfo.RGBCOOLOR + " varchar,"
                 + LineInfo.FORWARD + " varchar,"
-                + LineInfo.REVERSE + " varchar,"
-                + CityInfo.CITYNO + " varchar"
+                + LineInfo.REVERSE + " varchar"
                 + ")");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_STATION + "("
@@ -43,23 +42,21 @@ public class SqliteHelper extends SQLiteOpenHelper {
                 + StationInfo.ANAME + " varchar,"
                 + StationInfo.LOT + " varchar,"
                 + StationInfo.LAT + " varchar,"
-                + StationInfo.PRESTATION + " varchar,"
-                + StationInfo.NEXTSTATION + " varchar,"
+                //+ StationInfo.PRESTATION + " varchar,"
+               // + StationInfo.NEXTSTATION + " varchar,"
                 + StationInfo.STATIONINFO + " varchar,"
-                + StationInfo.TRANSFER + " varchar,"
-                + CityInfo.CITYNO + " varchar"
+                + StationInfo.TRANSFER + " varchar"
                 + ")");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_EXIT_INFO + "("
                 + ExitInfo.CNAME + " varchar,"
                 + ExitInfo.EXITNAME + " varchar,"
-                + ExitInfo.ADDR + " varchar,"
-                + CityInfo.CITYNO + " varchar"
+                + ExitInfo.ADDR + " varchar"
                 + ")");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_CITY_INFO + "("
-                + CityInfo.CITYNO + " varchar,"
-                + CityInfo.CITYNAME + " varchar"
+                + CityInfo.CITYNAME + " varchar,"
+                + CityInfo.PINGYING + " varchar"
                 + ")");
         db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_ADD_EXTRA_INFO + "("
                 + AddInfo.LAT+ " varchar,"

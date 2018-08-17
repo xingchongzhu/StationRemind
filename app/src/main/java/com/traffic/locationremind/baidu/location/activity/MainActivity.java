@@ -1,6 +1,7 @@
 package com.traffic.locationremind.baidu.location.activity;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
@@ -136,6 +137,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mSearchManager.initViews(this, searchView);
         mSearchManager.initData(this, mDataManager);
         mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
+        currentCity = CommonFuction.getSharedPreferencesValue(this, CityInfo.CITYNAME);
         /*if (ReadExcelDataUtil.getInstance().hasWrite) {
             initData();
         }*/
@@ -299,7 +301,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                     public void loactionStation(BDLocation location) {
                         if (location.getCity() != null && !hasLocation) {
                             String tempCity = location.getCity().substring(0,location.getCity().length() - 1);
-                            if(cityIsExistLine(tempCity,mDataManager.getDataHelper(),mDataManager.getCityInfoList()) &&
+                            if(FileUtil.dbIsExist(MainActivity.this,mDataManager.getCityInfoList().get(tempCity)) &&
                                     mDataManager.getCityInfoList() != null && mDataManager.getCityInfoList().get(tempCity) != null) {
                                 setNewCity(tempCity);
                             }
@@ -310,7 +312,6 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                     }
                 });
             }
-
         }
     };
 
@@ -321,7 +322,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             if (data != null && !TextUtils.isEmpty(data.getAction())) {
                 String tempCity = data.getAction();
 
-                if(cityIsExistLine(tempCity,mDataManager.getDataHelper(),mDataManager.getCityInfoList()) && !currentCity.equals(tempCity)){
+                if(FileUtil.dbIsExist(this,mDataManager.getCityInfoList().get(tempCity)) && !currentCity.equals(tempCity)){
                     setNewCity(tempCity);
                 }
 
@@ -338,18 +339,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         hasLocation = true;
     }
 
-    public boolean cityIsExistLine(String cityInfo,DataHelper mDataHelper, Map<String,CityInfo> allcity){
-        Log.d(TAG,"cityIsExistLine city name = "+cityInfo);
-        CityInfo city = allcity.get(cityInfo);
-        if(city == null){
-            return false;
-        }
-        Map<Integer,LineInfo> list= mDataHelper.getLineList(city.getCityNo(), LineInfo.LINEID, "ASC");
-        if(list == null || list.size() <= 0){
-            return false;
-        }
-        return true;
-    }
+
 
     public BDLocation getBDLocation() {
         BDLocation location = null;

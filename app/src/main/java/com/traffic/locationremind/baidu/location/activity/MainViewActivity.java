@@ -268,7 +268,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             Map<Integer,LineInfo> tempList = mLineInfoList;
                             if (!shpno.equals("" + currentCityNo)) {
                                 CommonFuction.writeSharedPreferences(MainViewActivity.this, CommonFuction.CITYNO, "" + currentCityNo);
-                                tempList = mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
+                                tempList = mDataHelper.getLineList( LineInfo.LINEID, "ASC");
                                 if (tempList != null) {
                                     for (Map.Entry<Integer,LineInfo> entry : tempList.entrySet()) {
                                         entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
@@ -337,7 +337,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             if(currentCityNo == null){
                 return;
             }
-            mLineInfoList = mDataHelper.getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
+            mLineInfoList = mDataHelper.getLineList(LineInfo.LINEID, "ASC");
             Log.d(TAG, "currentCityNo = " + currentCityNo.getCityNo() + " mLineInfoList.size = " + mLineInfoList.size());
             int firstLineid = -1;
             for (Map.Entry<Integer,LineInfo> entry : mLineInfoList.entrySet()) {
@@ -574,7 +574,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
     }
 
     private void showDialog(final MarkObject markObject) {
-        List<ExitInfo> existInfoList = mDataHelper.QueryByExitInfoCname(markObject.mStationInfo.getCname(), currentCityNo.getCityNo());
+        List<ExitInfo> existInfoList = mDataHelper.QueryByExitInfoCname(markObject.mStationInfo.getCname());
         String existInfostr = "";
         if (existInfoList != null) {
             final int existInfoList_size = existInfoList.size();// Moved  existInfoList.size() call out of the loop to local variable existInfoList_size

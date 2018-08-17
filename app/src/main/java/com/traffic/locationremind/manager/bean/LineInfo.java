@@ -25,16 +25,6 @@ public class LineInfo {
     public String forward;
     public String reverse;
 
-    public String cityNo;//城市编码
-
-    public void setCityNo(String cityno){
-        this.cityNo = cityno;
-    }
-
-    public String getCityNo(){
-        return cityNo;
-    }
-
     private List<StationInfo> mStationInfoList;//地图站台信息
 
     public void setStationInfoList(List<StationInfo> mStationInfoList){

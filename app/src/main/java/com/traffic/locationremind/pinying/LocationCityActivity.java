@@ -65,7 +65,6 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	private EditText sh;
 	private TextView tv_noresult;
 
-
 	private String currentCity; // 用于保存定位到的城市
 	private int locateProcess = 1; // 记录当前定位的状态 正在定位-定位成功-定位失败
 	private boolean isNeedFresh;
@@ -123,7 +122,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 			}
 		});
 		letterListView = (MyLetterListView) findViewById(R.id.MyLetterListView01);
-		letterListView.setOnTouchingLetterChangedListener(new LetterListViewListener());
+		//letterListView.setOnTouchingLetterChangedListener(new LetterListViewListener());
 		alphaIndexer = new HashMap<String, Integer>();
 		handler = new Handler();
 		overlayThread = new OverlayThread();
@@ -170,7 +169,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	}
 
 	public void InsertCity(String name) {
-		SQLiteDatabase db = helper.getSQLiteDatabase();
+		SQLiteDatabase db = helper.getCitySQLiteDatabase();
 		Cursor cursor = db.rawQuery("select * from recentcity where name = '"
 				+ name + "'", null);
 		if (cursor.getCount() > 0) { //
@@ -223,7 +222,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	}
 
 	private void hisCityInit() {
-		SQLiteDatabase db = helper.getSQLiteDatabase();
+		SQLiteDatabase db = helper.getCitySQLiteDatabase();
 		Cursor cursor = db.rawQuery(
 				"select * from recentcity order by date desc limit 0, 3", null);
 		while (cursor.moveToNext()) {
@@ -241,7 +240,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 
 	@SuppressWarnings("unchecked")
 	private void getResultCityList(String keyword) {
-		SQLiteDatabase db = helper.getSQLiteDatabase();
+		SQLiteDatabase db = helper.getCitySQLiteDatabase();
 		Cursor cursor = db.rawQuery(
 					"select * from city where name like \"%" + keyword
 							+ "%\" or pinyin like \"%" + keyword + "%\"", null);
@@ -717,11 +716,6 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 				text = PingYinUtil.converterToFirstSpell(pinyin)
 						.substring(0, 1).toUpperCase();
 			}
-			overlay.setText(text);
-			overlay.setVisibility(View.VISIBLE);
-			handler.removeCallbacks(overlayThread);
-			// 延迟一秒后执行，让overlay为不可见
-			handler.postDelayed(overlayThread, 1000);
 		}
 	}
 }

@@ -315,10 +315,10 @@ public class CommonFuction {
 
 	public static String getSubwayShowText(Context context, DataHelper mDataHelper, LineInfo mLineInfo) {
 		String str = "";
-		List<CityInfo> cityList = mDataHelper.QueryCityByCityNo(mLineInfo.getCityNo());
+		/*List<CityInfo> cityList = mDataHelper.QueryCityByCityNo();
 		if (cityList != null && cityList.size() > 0) {
 			str += cityList.get(0).getCityName();
-		}
+		}*/
 		str += context.getResources().getString(R.string.subway) + mLineInfo.getLineid() +
 				context.getResources().getString(R.string.subway_tail) +
 				"(" + mLineInfo.getLinename() + ")" + "\n" + mLineInfo.getLineinfo();

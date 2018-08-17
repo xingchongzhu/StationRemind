@@ -295,7 +295,7 @@ public class RemonderLocationService extends Service {
         this.mStationInfoList = mStationInfoList;
         if(mStationInfoList != null && mStationInfoList.size() > 0){
             CommonFuction.writeSharedPreferences(this,CommonFuction.CURRENTLINEID,""+mStationInfoList.get(0).mStationInfo.getLineid());
-            CommonFuction.writeSharedPreferences(this,CommonFuction.CURRENTCITYNO,""+mStationInfoList.get(0).mStationInfo.getCityNo());
+            //CommonFuction.writeSharedPreferences(this,CommonFuction.CURRENTCITYNO,""+mStationInfoList.get(0).mStationInfo.getCityNo());
 
             final int mStationInfoList_size = mStationInfoList.size();// Moved  mStationInfoList.size() call out of the loop to local variable mStationInfoList_size
             for(int n = 0; n< mStationInfoList_size; n++){
