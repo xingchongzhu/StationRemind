@@ -204,7 +204,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
 
         String surplusNum = String.format(getResources().getString(R.string.surples_station),list.size()+"");
         String currenStr = getResources().getString(R.string.current_station)+list.get(0).getCname();
-        String line = String.format(getResources().getString(R.string.line_tail),list.get(0).lineid+"") ;
+        String line = CommonFuction.getLineNo(DataManager.getInstance(getActivity()).getLineInfoList().get(list.get(0).lineid).linename)[0];
+        //String.format(getResources().getString(R.string.line_tail),list.get(0).lineid+"") ;
         String direction = lineDirection.get(list.get(0).lineid)+getResources().getString(R.string.direction);
         current_info_text.setText(surplusNum + "   " + currenStr+"   "+line+"   "+direction);
         line_color_view.setLineInfoMap(lineInfoMap);
@@ -418,7 +419,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
                     horizontalScrollView.scrollTo(lineNodeWidth * n, horizontalScrollView.getScrollY());
                     String surplusNum = String.format(getResources().getString(R.string.surples_station), (list.size() - n) + "");
                     String currenStr = getResources().getString(R.string.current_station) + lineNodeView.getStationInfo().getCname();
-                    String line = String.format(getResources().getString(R.string.line_tail),lineNodeView.getStationInfo().lineid+"") ;
+                    String line =CommonFuction.getLineNo( DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid).linename)[0];
+                            //String.format(getResources().getString(R.string.line_tail),lineNodeView.getStationInfo().lineid+"") ;
                     String direction = lineDirection.get(lineNodeView.getStationInfo().lineid)+getResources().getString(R.string.direction);
                     current_info_text.setText(surplusNum + "   " + currenStr+"   "+line+"   "+direction);
 
@@ -466,7 +468,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         String nextStationName = "";
         String time = "2分钟";
         if(currentStation != null){
-            linename = String.format(getResources().getString(R.string.line_tail),currentStation.lineid+"");
+            linename = DataManager.getInstance(getActivity()).getLineInfoList().get(currentStation.lineid).linename;
+                    //String.format(getResources().getString(R.string.line_tail),currentStation.lineid+"");
             currentStationName = getResources().getString(R.string.current_station)+currentStation.getCname();
             direction = lineDirection.get(currentStation.lineid)+getResources().getString(R.string.direction);
         }

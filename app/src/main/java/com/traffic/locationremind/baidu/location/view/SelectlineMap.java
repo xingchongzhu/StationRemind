@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 import org.apache.poi.hssf.util.HSSFColor;
 
 import java.util.List;
@@ -35,11 +36,12 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
     private int paddingTop = 0;
     private int radio = 20;
     private int textPadding = 100;
-    private String lineTial = "";
+    ///private String lineTial = "";
     private int HEIGHTSCALE = 3;
     private int normalTextSize = 50;
     private int changetTextSize = 60;
     private int hintTextSize = 60;
+    DataManager dataManager;
 
     public void setStationList(List<StationInfo> list){
         this.list = list;
@@ -57,13 +59,14 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
     public SelectlineMap(Context context, AttributeSet attrs) {
         super(context, attrs);
         // 初始化画笔、Rect
+        dataManager = DataManager.getInstance(context);
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBounds = new Rect();
         PADDLEFT = (int)context.getResources().getDimension(R.dimen.remind_line_text_padding_left);
 
         LINEPADDLEFT = (int)context.getResources().getDimension(R.dimen.remind_line_map_padding_left);
         paddingTop = (int)context.getResources().getDimension(R.dimen.remind_line_map_padding_top);
-        lineTial = getResources().getString(R.string.line_tail);
+        //lineTial = getResources().getString(R.string.line_tail);
         // 本控件的点击事件
         setOnClickListener(this);
     }
@@ -105,8 +108,9 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
                     //textHeight = mBounds.height()*HEIGHTSCALE;
                     //起点中间断开提醒
                     height+=0.5*textHeight;
+
                     drawLine(canvas,LINEPADDLEFT,height,LINEPADDLEFT,height+textHeight,mLineInfoList.get(stationInfo.getLineid()).colorid);
-                    drawText(canvas,String.format(lineTial,stationInfo.lineid),PADDLEFT+textPadding, height+textHeight/2+mBounds.height()/2,getResources().getColor(R.color.blue),normalTextSize);
+                    drawText(canvas,dataManager.getLineInfoList().get(stationInfo.lineid).linename,PADDLEFT+textPadding, height+textHeight/2+mBounds.height()/2,getResources().getColor(R.color.blue),normalTextSize);
                     height+=0.7*textHeight;
                 }else{
                     height+=textHeight;
@@ -134,7 +138,7 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
                     mPaint.getTextBounds(text, 0, text.length(), mBounds);
                     //换乘线路提醒
                     drawLine(canvas,LINEPADDLEFT,height,LINEPADDLEFT,height+textHeight,mLineInfoList.get(stationInfo.getLineid()).colorid);
-                    drawText(canvas,String.format(lineTial,stationInfo.lineid),PADDLEFT+textPadding, height+textHeight/2+mBounds.height()/2,getResources().getColor(R.color.blue),normalTextSize);
+                    drawText(canvas,dataManager.getLineInfoList().get(stationInfo.lineid).linename,PADDLEFT+textPadding, height+textHeight/2+mBounds.height()/2,getResources().getColor(R.color.blue),normalTextSize);
                     height+= textHeight;
 
                     //换乘当前线路

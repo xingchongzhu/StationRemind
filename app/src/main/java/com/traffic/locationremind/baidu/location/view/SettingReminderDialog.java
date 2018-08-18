@@ -11,13 +11,15 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.manager.database.DataManager;
 
 
 public class SettingReminderDialog extends Dialog implements OnClickListener{
     Context context;
     private String transferInfo;
     private String exitInfo;
-    private String lineId;
+    private int lineId;
     private String station;
     private String city;
     private NoticeDialogListener listener;
@@ -35,7 +37,7 @@ public class SettingReminderDialog extends Dialog implements OnClickListener{
         this.exitInfo = exitInfo;
         this.station = station;
         this.city = city;
-        this.lineId = lineId;
+        this.lineId = CommonFuction.convertToInt(lineId,0);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,10 +62,9 @@ public class SettingReminderDialog extends Dialog implements OnClickListener{
         WindowManager.LayoutParams p = getWindow().getAttributes();
         p.width = d.getWidth();
         getWindow().setAttributes(p);
-
     }
     private String convertString() {
-        return city + context.getResources().getString(R.string.subway) + lineId + context.getResources().getString(R.string.subway_tail)
+        return CommonFuction.getLineNo(DataManager.getInstance(context).getLineInfoList().get(lineId).linename)[0]
                 +" " + station;
     }
     @Override

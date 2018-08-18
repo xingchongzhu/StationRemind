@@ -21,7 +21,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     private final int width = 150;
     private  int iconSize = 60;
     private final int paddingLine = 20;
-    private final int lineHeight = 40;
+    private final int lineHeight = 35;
     private final int norrowHeight = 5;
     private final int textSize = 60;
     private final int offset = 10;

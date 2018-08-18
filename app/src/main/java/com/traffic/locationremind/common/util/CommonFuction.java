@@ -319,10 +319,16 @@ public class CommonFuction {
 		if (cityList != null && cityList.size() > 0) {
 			str += cityList.get(0).getCityName();
 		}*/
-		str += context.getResources().getString(R.string.subway) + mLineInfo.getLineid() +
-				context.getResources().getString(R.string.subway_tail) +
+
+		str += context.getResources().getString(R.string.subway) +
+				DataManager.getInstance(context).getLineInfoList().get(mLineInfo.getLineid()).linename +
 				"(" + mLineInfo.getLinename() + ")" + "\n" + mLineInfo.getLineinfo();
 		return str;
+	}
+
+	public static String[] getLineNo(String str){
+		String tmp[] = {""};
+		return TextUtils.isEmpty(str)?tmp:str.split("/");
 	}
 
 	public static boolean isvalidLocation(BDLocation location){

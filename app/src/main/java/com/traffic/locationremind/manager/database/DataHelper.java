@@ -38,7 +38,7 @@ public class DataHelper {
         cityDbHelper = new DBHelper(context);
         cityDbHelper.imporCityDatabase(R.raw.cities,DBHelper.CITY_DB_NAME);
         cityDbHelper.imporCityDatabase(R.raw.shenzhen,DBHelper.SHENZHEN_DB_NAME);
-
+        cityDbHelper.imporCityDatabase(R.raw.beijing,DBHelper.BEIJING_DB_NAME);
         cityDb = cityDbHelper.getWritableDatabase();
         cityDb.execSQL("CREATE TABLE IF NOT EXISTS "+DBHelper.TB_RECENT_CITY+" (id integer primary key autoincrement, name varchar(40), date INTEGER)");
     }

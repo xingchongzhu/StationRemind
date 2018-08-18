@@ -6,6 +6,7 @@ import com.traffic.locationremind.baidu.location.search.util.CommonAdapter;
 import com.traffic.locationremind.baidu.location.search.util.ViewHolder;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.List;
 import java.util.Map;
@@ -17,15 +18,17 @@ import java.util.Map;
 public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<StationInfo>>> {
 
 
-    String lineTail = "";
+    //String lineTail = "";
     String lineChange = "";
     String staionsCNumber = "";
     String startStation = "";
     String endstation = "";
+    DataManager dataManager;
     public CardAdapter(Context context, List<Map.Entry<List<Integer>,List<StationInfo>>> data, int layoutId) {
         super(context, data, layoutId);
-        lineChange = context.getResources().getString(R.string.line_tail);
-        lineTail = context.getResources().getString(R.string.change_number);
+        dataManager = DataManager.getInstance(context);
+        //lineTail = context.getResources().getString(R.string.line_tail);
+        lineChange = context.getResources().getString(R.string.change_number);
         staionsCNumber = context.getResources().getString(R.string.station_number);
         startStation = context.getResources().getString(R.string.start_station);
         endstation =context.getResources().getString(R.string.end_station);
@@ -54,16 +57,18 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
         StringBuffer change = new StringBuffer();
         int n = 0;
         for(Integer i:data.getKey()){
-            if(n < data.getKey().size()-1)
-                change.append(String.format(lineChange,i+"")+"->");
-            else
-                change.append(String.format(lineChange,i+""));
+            if(n < data.getKey().size()-1) {
+                change.append( CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0]+ "->");
+            }
+            else {
+                change.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0]);
+            }
             n++;
         }
 
         String str = startStation+data.getValue().get(0).getCname()+"  "+endstation+data.getValue().get(data.getValue().size()-1).getCname();
 
-        holder.setText(R.id.change_numner, String.format(lineTail,data.getKey().size()+""))
+        holder.setText(R.id.change_numner, String.format(lineChange,data.getKey().size()+""))
                 .setText(R.id.change_lineid, change.toString())
                 .setText(R.id.station_number, String.format(staionsCNumber,data.getValue().size()+"")+"")
                 .setText(R.id.station_start_end, str);

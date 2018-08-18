@@ -10,6 +10,7 @@ import com.traffic.locationremind.baidu.location.search.util.CommonAdapter;
 import com.traffic.locationremind.baidu.location.search.util.ViewHolder;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.List;
 
@@ -19,10 +20,12 @@ import java.util.List;
 
 public class SearchAdapter extends CommonAdapter<StationInfo> {
 
-    String lineTail = "";
+    //String lineTail = "";
+    DataManager dataManager;
     public SearchAdapter(Context context, List<StationInfo> data, int layoutId) {
         super(context, data, layoutId);
-        lineTail = context.getResources().getString(R.string.line_tail);
+        dataManager = DataManager.getInstance(context);
+        //lineTail = context.getResources().getString(R.string.line_tail);
     }
 
     public void clearData() {
@@ -43,15 +46,15 @@ public class SearchAdapter extends CommonAdapter<StationInfo> {
     @Override
     public void convert(ViewHolder holder, int position) {
 
-        StringBuffer transfer = new StringBuffer(String.format(lineTail, "" + mData.get(position).lineid));
+        StringBuffer transfer = new StringBuffer( CommonFuction.getLineNo(dataManager.getLineInfoList().get(mData.get(position).lineid).linename)[0]);
         if (mData.get(position).canTransfer()) {
             transfer.delete(0, transfer.length());
             String lists[] = mData.get(position).getTransfer().split(CommonFuction.TRANSFER_SPLIT);
             for (int i = 0; i < lists.length; i++) {
                 if (i != lists.length - 1) {
-                    transfer.append(String.format(lineTail, lists[i]) + ",");
+                    transfer.append( CommonFuction.getLineNo(dataManager.getLineInfoList().get(mData.get(position).lineid).linename)[0] + ",");
                 } else {
-                    transfer.append(String.format(lineTail, lists[i]));
+                    transfer.append( CommonFuction.getLineNo(dataManager.getLineInfoList().get(mData.get(position).lineid).linename)[0]);
                 }
             }
         }

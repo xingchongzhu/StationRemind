@@ -69,8 +69,8 @@ public class ColorLineAdapter extends BaseAdapter {
             viewholder = (ViewHolder) convertView.getTag();
         }
         if(data != null && data.get(position) != null ){
-            //Log.d(TAG,"getView viewholder.textView ="+viewholder.textView+" name = "+data.get(position).linename);
-            viewholder.textView.setText(data.get(position).lineid+data.get(position).linename);
+            //Log.d(TAG,"getView viewholder.textView ="+viewholder.textView+" name = "+data.get(position).linename);data.get(position).lineid+
+            viewholder.textView.setText(data.get(position).linename);
             viewholder.singleNodeView.setColorId(data.get(position).colorid);
         }
         return convertView;

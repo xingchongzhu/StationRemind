@@ -36,7 +36,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
     private TextView end;
     private TextView collectionBtn;
     private TextView setRemindBtn;
-    private String lineTial = "";
+    //private String lineTial = "";
     private SelectlineMap mSelectlineMap;
 
     private GoToFragmentListener mGoToFragmentListener;
@@ -67,7 +67,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
         mSelectlineMap = (SelectlineMap) activity.findViewById(R.id.item_tv_2);
 
-        lineTial = activity.getResources().getString(R.string.line_tail);
+        //lineTial = activity.getResources().getString(R.string.line_tail);
         serachLayoutRoot = (ViewGroup) activity.findViewById(R.id.serach_layout_manager_root);
         back_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,9 +151,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
             StringBuffer str = new StringBuffer();
             for(int i = 0 ; i < size ; i++){
                 if(i < size -1){
-                    str.append(String.format(lineTial,lastLines.lineidList.get(i))+"->");
+                    str.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(lastLines.lineidList.get(i)).linename)[0]+"->");
                 }else{
-                    str.append(String.format(lineTial,lastLines.lineidList.get(i)));
+                    str.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(lastLines.lineidList.get(i)).linename)[0]);
                 }
             }
             changeNumber.setText(str.toString());

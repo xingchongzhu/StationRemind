@@ -17,7 +17,6 @@
     <string name="qa_callback_mail">反馈邮箱:loc-bugs@baidu.com</string>
     <string name="loading">玩命加载...</string>
     <string name="subway">地铁</string>
-    <string name="subway_tail">号线</string>
     <string name="select_city">切换城市</string>
     <string name="full_subway">全局图</string>
     <string name="scal_btn">放大</string>
@@ -41,7 +40,7 @@
     <string name="select_line_title">定位结果</string>
     <string name="location_line_select">最近站台:</string>
     <string name="select_line_info">选择线路</string>
-    <string name="line_tail">%s号线</string>
+    <!--<string name="line_tail">%s号线</string>-->
     <string name="change_number">换乘%s次</string>
     <string name="change_next_line">换乘%s号线</string>
     <string name="station_number">共%s站</string>

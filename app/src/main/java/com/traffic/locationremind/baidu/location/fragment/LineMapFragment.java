@@ -42,7 +42,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private View rootView;
     private DataManager mDataManager;
     private List<LineInfo> list = new ArrayList<>();
-    private String linenail = "";
+    //private String linenail = "";
     MainActivity activity;
     private SettingReminderDialog mSettingReminderDialog;
     @Nullable
@@ -64,12 +64,11 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         sceneMap = (GridView) rootView.findViewById(R.id.sceneMap);
         currentLineInfoText = (TextView) rootView.findViewById(R.id.text);
         lineMap = (GridView) rootView.findViewById(R.id.lineMap);
-        linenail = getResources().getString(R.string.line_tail);
+        //linenail = getResources().getString(R.string.line_tail);
         mDataManager = ((MainActivity)getActivity()).getDataManager();
 
         colorLineAdapter = new ColorLineAdapter(this.getActivity());
         lineMap.setAdapter(colorLineAdapter);
-
         sceneMapAdapter = new AllLineAdapter(this.getActivity(),mDataManager);
         sceneMap.setAdapter(sceneMapAdapter);
 
@@ -161,8 +160,10 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             sceneMapAdapter.setData(null);
             return;
         }
-        String string = String.format(linenail,list.get(index).lineid+"")+" "
-                +list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+ list.get(index).getLineinfo();
+       // String string = String.format(linenail,list.get(index).lineid+"")+" "
+        //        +list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+ list.get(index).getLineinfo();
+        String string = list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+ list.get(index).getLineinfo();
+
         currentLineInfoText.setText(string);
         currentLineInfoText.setBackgroundColor(list.get(index).colorid);
         sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));

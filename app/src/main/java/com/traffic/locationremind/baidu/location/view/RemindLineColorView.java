@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
+import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.LineInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +23,12 @@ public class RemindLineColorView extends View {
     public static final int ROWMAXCOUNT = 3;// 一行最多点
     private static final int padding = 50;
     private static final int rectSize = 50;
-    private static final int textSize = 60;
+    private static final int textSize = 50;
     private Rect mBound = new Rect();
     private Paint mPaint;
 
     Map<Integer, LineInfo> lineInfoMap;
+    DataManager dataManager;
 
 
     public RemindLineColorView(Context context, AttributeSet attrs, int defStyle) {
@@ -53,6 +56,7 @@ public class RemindLineColorView extends View {
 
     private void init(Context context) {
         mPaint = new Paint();
+        dataManager = DataManager.getInstance(context);
     }
 
     @Override
@@ -91,7 +95,8 @@ public class RemindLineColorView extends View {
                     height += rectSize;
                 }
                 mPaint.setColor(getContext().getResources().getColor(R.color.black));
-                String text = String.format(getResources().getString(R.string.line_tail, entry.getKey() + "") + "(" + entry.getValue().getLinename() + ")");
+
+                String text = entry.getValue().getLinename();
                 mPaint.getTextBounds(text, 0, text.length(), mBound);
                 int textHeight = mBound.height();
                 canvas.drawText(text, rect.right + padding / 2, rect.top + rectSize / 2 + textHeight / 3, mPaint);

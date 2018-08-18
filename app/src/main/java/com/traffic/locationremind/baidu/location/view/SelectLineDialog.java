@@ -19,6 +19,7 @@ import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,15 +55,15 @@ public class SelectLineDialog extends Dialog {
             if (station.canTransfer()) {
                 final String lines[] = transfer.split(CommonFuction.TRANSFER_SPLIT);
                 final int size = lines.length;
-                String lineTail = context.getResources().getString(R.string.line_tail);
+                //String lineTail = context.getResources().getString(R.string.line_tail);
                 for (int i = 0; i < size; i++) {
                     LineInfo lineInfo = tempList.get(CommonFuction.convertToInt(lines[i], 0));
                     if (lineInfo != null) {
                         List<StationInfo> tmpStationList = lineInfo.getStationInfoList();
                         for (StationInfo stationInfo : tmpStationList) {
                             if (stationInfo.getCname().equals(station.getCname())) {
-                                allLines += String.format(lineTail, "" + lineInfo.lineid) + "  ";
-                                selectList.add(String.format(lineTail, "" + lineInfo.lineid) + " ->" +
+                                allLines +=  CommonFuction.getLineNo(DataManager.getInstance(context).getLineInfoList().get(lineInfo.lineid).linename)[0]+ "  ";
+                                selectList.add(CommonFuction.getLineNo(DataManager.getInstance(context).getLineInfoList().get(lineInfo.lineid).linename)[0] + " ->" +
                                         lineInfo.linename + " :" + lineInfo.lineinfo);
                                 break;
                             }

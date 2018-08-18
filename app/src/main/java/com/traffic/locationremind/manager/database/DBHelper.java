@@ -18,6 +18,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static final String TB_RECENT_CITY = "recentcity";
 	public static String CITY_DB_NAME = "cities.db";
 	public static String SHENZHEN_DB_NAME = "shenzhen.db";
+	public static String BEIJING_DB_NAME = "beijing.db";
 
 
 	private final Context myContext;

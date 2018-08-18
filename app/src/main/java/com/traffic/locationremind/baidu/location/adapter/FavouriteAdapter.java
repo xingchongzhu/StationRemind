@@ -14,6 +14,7 @@ import com.traffic.locationremind.baidu.location.search.util.ViewHolder;
 import com.traffic.locationremind.baidu.location.view.SelectlineMap;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.Map;
 public class FavouriteAdapter extends CommonAdapter<LineObject> {
     String TAG = "FavouriteAdapter";
 
-    String lineTail = "";
+   // String lineTail = "";
     String lineChange = "";
     String staionsCNumber = "";
     String startStation = "";
@@ -33,8 +34,8 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
     public FavouriteAdapter(RemindFragment fragment, List<LineObject> data, int layoutId) {
         super(fragment.getActivity(), data, layoutId);
         this.fragment = fragment;
-        lineChange = fragment.getResources().getString(R.string.line_tail);
-        lineTail = fragment.getResources().getString(R.string.change_number);
+        lineChange = fragment.getResources().getString(R.string.change_number);
+        //lineTail = fragment.getResources().getString(R.string.change_number);
         staionsCNumber = fragment.getResources().getString(R.string.station_number);
         startStation = fragment.getResources().getString(R.string.start_station);
         endstation = fragment.getResources().getString(R.string.end_station);
@@ -62,10 +63,13 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
         StringBuffer change = new StringBuffer();
         int n = 0;
         for (Integer i : data.lineidList) {
-            if (n < data.lineidList.size() - 1)
-                change.append(String.format(lineChange, i + "") + "->");
-            else
-                change.append(String.format(lineChange, i + ""));
+            if (n < data.lineidList.size() - 1) {
+
+                change.append( CommonFuction.getLineNo(DataManager.getInstance(fragment.getActivity()).getLineInfoList().get(i).linename)[0]+ "->");
+            }
+            else {
+                change.append(CommonFuction.getLineNo(DataManager.getInstance(fragment.getActivity()).getLineInfoList().get(i).linename)[0]);
+            }
             n++;
         }
         if (data.stationList.size() <= 0) {
@@ -74,7 +78,7 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
 
         String str = startStation + data.stationList.get(0).getCname() + "  " + endstation + data.stationList.get(data.stationList.size() - 1).getCname();
 
-        holder.setText(R.id.change_numner, String.format(lineTail, data.lineidList.size() + ""))
+        holder.setText(R.id.change_numner, String.format(lineChange, data.lineidList.size() + ""))
                 .setText(R.id.change_lineid, change.toString())
                 .setText(R.id.station_number, String.format(staionsCNumber, data.stationList.size() + "") + "")
                 .setText(R.id.station_start_end, str)
