@@ -139,6 +139,12 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         if(line_change_introduce != null) {
             line_change_introduce.setText("");
         }
+        if(line_color_view != null) {
+            line_color_view.setLineInfoMap(null);
+        }
+        if(current_info_text != null){
+            current_info_text.setText("");
+        }
     }
     public void createLine(List<StationInfo> list){
         if(list == null || list.size() <= 0){
@@ -215,8 +221,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener 
         currentStation = list.get(0);
         nextStation = list.get(0);
         updateColloctionView();
-
-
     }
 
     public void updateColloctionView(){

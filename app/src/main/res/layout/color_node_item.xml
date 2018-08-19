@@ -14,9 +14,10 @@
             android:layout_width="match_parent"
             android:padding="5dp"
             android:layout_height="wrap_content"
-            android:textSize="12dp"
+            android:textSize="10dp"
             android:layout_gravity="center"
             android:gravity="center"
+            android:singleLine="true"
             android:textColor="@color/black"
             android:textAppearance="?android:attr/textAppearanceLarge"/>
 

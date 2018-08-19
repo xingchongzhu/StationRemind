@@ -136,9 +136,11 @@ public class DataManager{
 		//在doInBackground方法中进行异步任务的处理.
 		@Override
 		protected Map<Integer,LineInfo> doInBackground(Context... params) {
-		    cityInfoList = mDataHelper.getAllCityInfo();
+			//if(cityInfoList == null)
+		    	cityInfoList = mDataHelper.getAllCityInfo();
 			//获取传进来的参数
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
+			maxLineid = 0;
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
 			}else{
@@ -154,6 +156,7 @@ public class DataManager{
 
             mDataHelper.setCityHelper((Context) params[0],currentCityNo.getPingying());
 			Map<Integer,LineInfo> list= mDataHelper.getLineList(LineInfo.LINEID, "ASC");
+			Log.d("zxc","currentCityNo.getPingying() = "+currentCityNo.getPingying()+" list = "+list);
 			for (Map.Entry<Integer,LineInfo> entry : list.entrySet()) {
 				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
 				List<StationInfo> canTransferlist = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());

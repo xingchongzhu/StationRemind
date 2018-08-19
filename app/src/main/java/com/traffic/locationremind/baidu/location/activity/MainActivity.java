@@ -85,7 +85,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private CityInfo currentCityNo = null;
     private Toolbar mToolbarSet;
     private ImageView colloction_btn;
-    private String currentCity = "深圳";
+    private String currentCity = "北京";
 
     public boolean hasLocation = false;
 
@@ -321,25 +321,22 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         if(resultCode ==SELECTCITYRESULTCODE){
             if (data != null && !TextUtils.isEmpty(data.getAction())) {
                 String tempCity = data.getAction();
-
                 if(FileUtil.dbIsExist(this,mDataManager.getCityInfoList().get(tempCity)) && !currentCity.equals(tempCity)){
                     setNewCity(tempCity);
                 }
-
             }
         }
     }
 
     public void setNewCity(String city){
+        //city = "北京";
         Log.d(TAG,"setNewCity tempCity = "+city);
-        citySelect.setText(currentCity);
+        citySelect.setText(city);
         currentCity = city;
         CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.CITYNAME,currentCity);
         mDataManager.loadData(MainActivity.this);
         hasLocation = true;
     }
-
-
 
     public BDLocation getBDLocation() {
         BDLocation location = null;
