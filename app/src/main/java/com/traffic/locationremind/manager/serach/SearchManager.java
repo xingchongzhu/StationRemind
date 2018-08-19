@@ -206,6 +206,7 @@ public class SearchManager implements SearchView.SearchViewListener {
         getAutoCompleteData(context, text);
     }
 
+    StationInfo startStation = null, endStation = null;
     /**
      * 点击搜索键时edit text触发的回调
      */
@@ -216,7 +217,7 @@ public class SearchManager implements SearchView.SearchViewListener {
             return;
 
         String current = context.getResources().getString(R.string.current_location);
-        StationInfo startStation = null, endStation = null;
+
         if (start.equals(current)) {
             StationInfo stationInfo = activity.getLocationCurrentStation();
             if (stationInfo != null) {
@@ -246,14 +247,20 @@ public class SearchManager implements SearchView.SearchViewListener {
             Toast.makeText(context, "起始站和终点站不能相同", Toast.LENGTH_SHORT).show();
         }*/
         Log.d(TAG, "onSearch start = " + start + " end = " + end+" startStation.getCname() = "+startStation.getCname()+" endStation.getCname() = "+endStation.getCname());
-        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
-                mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
-        if (mCardAdapter == null) {
-            mCardAdapter = new CardAdapter(context, lastLinesLast, R.layout.serach_result_item_layout);
-            serachResults.setAdapter(mCardAdapter);
-        } else {
-            mCardAdapter.setData(lastLinesLast);
-        }
-    }
 
+        activity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
+                        mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
+                if (mCardAdapter == null) {
+                    mCardAdapter = new CardAdapter(activity, lastLinesLast, R.layout.serach_result_item_layout);
+                    serachResults.setAdapter(mCardAdapter);
+                } else {
+                    mCardAdapter.setData(lastLinesLast);
+                }
+            }
+        });
+    }
 }

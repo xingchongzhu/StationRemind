@@ -1,0 +1,110 @@
+/*CREATE TABLE exitinfo ( 
+    cname    TEXT,
+    exitname TEXT,
+    addr     TEXT 
+);
+
+CREATE TABLE line ( 
+    lineId   INTEGER         PRIMARY KEY
+                             NOT NULL
+                             DEFAULT '0',
+    linename TEXT( 100, 0 )  NOT NULL
+                             DEFAULT '''',
+    lineinfo TEXT,
+    rgbcolor TEXT( 100, 0 )  NOT NULL
+                             DEFAULT '''',
+    forward  TEXT,
+    reverse  TEXT 
+);
+CREATE TABLE station ( 
+    lineid      INT,
+    pm          INT,
+    cname       VARCHAR,
+    pname       VARCHAR,
+    aname       VARCHAR,
+    lot         VARCHAR,
+    lat         VARCHAR,
+    stationinfo VARCHAR,
+    transfer    VARCHAR 
+);
+
+insert into exitinfo(cname,exitname,addr) select stations.stationName,
+EXITS.exitName,POIS.poiName from EXITSPOIs join EXITS on  EXITSPOIs.exitId=EXITS.exitId
+join POIS on POIS.poiId=EXITSPOIs.poiId join stations on stations.stationId = EXITS.stationId
+
+
+CREATE TABLE stationtt ( 
+    lineid      INT,
+    pm          INT,
+    cname       VARCHAR,
+    pname       VARCHAR,
+    aname       VARCHAR,
+    lot         VARCHAR,
+    lat         VARCHAR,
+    stationinfo VARCHAR,
+    transfer    VARCHAR 
+);
+
+insert into stationtt(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+ select 0,1,stationName,PinYin,PinYinInitial,stationLong,stationLat,'',
+ 0 from STATIONS
+
+*/
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,4,cname,pname,aname,lot,lat,'6:16	/23:36|	6:18	/23:18','1,6' from station 
+where cname='杨箕';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,5,cname,pname,aname,lot,lat,'6:18	/23:38|	6:16	/23:16','1,7' from station 
+where cname='东山口';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,6,cname,pname,aname,lot,lat,'6:20/	23:40|	6:14	/23:14','0' from station 
+where cname='烈士陵园';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,7,cname,pname,aname,lot,lat,'6:22	/23:42	|6:12	/23:12','0' from station 
+where cname='农讲所';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,8,cname,pname,aname,lot,lat,'6:24	/23:44	|6:10	/23:10','1,2' from station 
+where cname='公园前';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,9,cname,pname,aname,lot,lat,'6:26	/23:46	|6:14	/23:08','0' from station 
+where cname='西门口';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,10,cname,pname,aname,lot,lat,'6:28/	23:48	|6:12	/23:06','0' from station 
+where cname='陈家祠';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,11,cname,pname,aname,lot,lat,'6:31	/23:51	|6:10	/23:04','24,16' from station 
+where cname='长寿路';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,12,cname,pname,aname,lot,lat,'6:33	/23:53	|6:08	/23:03','1,7' from station 
+where cname='黄沙';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,13,cname,pname,aname,lot,lat,'6:35	/23:55	|6:06	/23:00','0' from station 
+where cname='芳村';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,14,cname,pname,aname,lot,lat,'6:38	/23:58	|6:04	/22:58','0' from station 
+where cname='花地湾';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,15,cname,pname,aname,lot,lat,'6:40	/00:00	|6:02	/22:57','0' from station 
+where cname='坑口';
+
+insert into stations(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+select 1,16,cname,pname,aname,lot,lat,'——/	——	|6:00	/22:55','1,10' from station 
+where cname='西朗';
+
+
+
+
+
+
+
