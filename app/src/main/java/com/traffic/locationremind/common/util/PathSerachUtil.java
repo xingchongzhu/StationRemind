@@ -17,8 +17,8 @@ import com.traffic.locationremind.manager.bean.StationInfo;
 import java.util.*;
 
 public class PathSerachUtil {
-    private static final int MAXLINENUMBER = 20;
-    private static final int MAXRECOMENDLINENUMBER = 8;
+    private static final int MAXLINENUMBER = 30;
+    private static final int MAXRECOMENDLINENUMBER = 10;
     static String TAG = "PathSerachUtil";
     static boolean debug = false;
 
