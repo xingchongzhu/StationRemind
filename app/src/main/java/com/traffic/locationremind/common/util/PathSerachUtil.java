@@ -576,7 +576,7 @@ public class PathSerachUtil {
                 }
             }
         }
-        Log.d(TAG, "getLineAllLined lineid = " + list.get(0).lineid + " all lined = " + str);
+        //Log.d(TAG, "getLineAllLined lineid = " + list.get(0).lineid + " all lined = " + str);
         return listStr;
     }
 }
