@@ -14,7 +14,8 @@ import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
 import com.traffic.locationremind.baidu.location.adapter.ColorLineAdapter;
-import com.traffic.locationremind.baidu.location.view.SettingReminderDialog;
+import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
+import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -101,7 +102,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             mSettingReminderDialog.dismiss();
             mSettingReminderDialog = null;
         }else{
-
         }
         mSettingReminderDialog = new SettingReminderDialog(getActivity(),
                 R.style.Dialog, new SettingReminderDialog.NoticeDialogListener() {

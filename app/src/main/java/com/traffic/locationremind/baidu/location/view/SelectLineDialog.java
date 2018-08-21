@@ -5,17 +5,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.traffic.location.remind.R;
-import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
+import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;

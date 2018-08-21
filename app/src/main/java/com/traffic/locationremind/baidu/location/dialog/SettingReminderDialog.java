@@ -1,4 +1,4 @@
-package com.traffic.locationremind.baidu.location.view;
+package com.traffic.locationremind.baidu.location.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

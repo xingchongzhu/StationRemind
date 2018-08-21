@@ -67,5 +67,6 @@
     <string name="colloction_catalog_empty">收藏列表为空</string>
     <string name="please_select_colloction_line">请选择收藏路线</string>
     <string name="next_station">下一站:</string>
+    <string name="search_loading">查询...</string>
 
 </resources>

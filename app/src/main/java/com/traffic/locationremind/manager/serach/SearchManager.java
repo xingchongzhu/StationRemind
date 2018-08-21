@@ -1,6 +1,7 @@
 package com.traffic.locationremind.manager.serach;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -10,6 +11,8 @@ import android.widget.*;
 
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
+import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
@@ -39,7 +42,7 @@ public class SearchManager implements SearchView.SearchViewListener {
     private ListView serachResults;
     private GridView recentSerachGrid;
     private SearchView searchView;
-
+    private View loading;
     private RemindSetViewListener mRemindSetViewListener;
 
     GridViewAdapter mGridViewAdapter;
@@ -55,6 +58,7 @@ public class SearchManager implements SearchView.SearchViewListener {
     private Map<String, StationInfo> allstations = new HashMap<>();
     private DataManager mDataManager;
     private MainActivity activity;
+    private SearchLoadingDialog mSearchLoadingDialog;
 
     /**
      * 搜索过程中自动补全数据
@@ -72,6 +76,7 @@ public class SearchManager implements SearchView.SearchViewListener {
         lvResults = searchView.getLvTips();
         recentSerachGrid = searchView.getRecentSerachGrid();
         autoCompleteAdapter = new SearchAdapter(context, autoCompleteData, R.layout.item_bean_list);
+        loading = searchView.getLoading();
         //设置监听
         searchView.setSearchViewListener(this);
         //设置adapter
@@ -211,7 +216,10 @@ public class SearchManager implements SearchView.SearchViewListener {
      * 点击搜索键时edit text触发的回调
      */
     @Override
-    public void onSearch(Context context, String start, String end) {
+    public void onSearch(final Context context, String start, String end) {
+        if(mSearchLoadingDialog != null){
+            mSearchLoadingDialog.dismiss();
+        }
         //更新result数据
         if(TextUtils.isEmpty(start) || TextUtils.isEmpty(end))
             return;
@@ -243,24 +251,47 @@ public class SearchManager implements SearchView.SearchViewListener {
             Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
             return;
         }
-        /*if (startStation.getCname().equals(endStation.getCname())) {
-            Toast.makeText(context, "起始站和终点站不能相同", Toast.LENGTH_SHORT).show();
-        }*/
         Log.d(TAG, "onSearch start = " + start + " end = " + end+" startStation.getCname() = "+startStation.getCname()+" endStation.getCname() = "+endStation.getCname());
+        new MyAsyncTask().execute("");
+    }
+    class MyAsyncTask extends AsyncTask<String,Void,List<Map.Entry<List<Integer>, List<StationInfo>>>> {
 
-        activity.runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
-                        mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
-                if (mCardAdapter == null) {
-                    mCardAdapter = new CardAdapter(activity, lastLinesLast, R.layout.serach_result_item_layout);
-                    serachResults.setAdapter(mCardAdapter);
-                } else {
-                    mCardAdapter.setData(lastLinesLast);
-                }
+        //onPreExecute用于异步处理前的操作
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //此处将progressBar设置为可见.
+            if(mSearchLoadingDialog == null){
+                mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
+                mSearchLoadingDialog.setContentView(R.layout.search_loading);
             }
-        });
+            mSearchLoadingDialog.show();
+        }
+
+        //在doInBackground方法中进行异步任务的处理.
+        @Override
+        protected List<Map.Entry<List<Integer>, List<StationInfo>>> doInBackground(String... params) {
+            //获取传进来的参数
+            List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
+                    mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
+            return lastLinesLast;
+        }
+
+        //onPostExecute用于UI的更新.此方法的参数为doInBackground方法返回的值.
+        @Override
+        protected void onPostExecute(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast) {
+            super.onPostExecute(lastLinesLast);
+            //隐藏progressBar
+            if(mSearchLoadingDialog != null){
+                mSearchLoadingDialog.dismiss();
+            }
+            if (mCardAdapter == null) {
+                mCardAdapter = new CardAdapter(activity, lastLinesLast, R.layout.serach_result_item_layout);
+                serachResults.setAdapter(mCardAdapter);
+            } else {
+                mCardAdapter.setData(lastLinesLast);
+            }
+
+        }
     }
 }

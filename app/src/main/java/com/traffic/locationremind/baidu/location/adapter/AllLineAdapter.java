@@ -3,26 +3,16 @@ package com.traffic.locationremind.baidu.location.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
-import com.traffic.locationremind.baidu.location.object.MarkObject;
-import com.traffic.locationremind.baidu.location.view.SelectlineMap;
-import com.traffic.locationremind.baidu.location.view.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.view.SingleNodeView;
 import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @function listviewadapter

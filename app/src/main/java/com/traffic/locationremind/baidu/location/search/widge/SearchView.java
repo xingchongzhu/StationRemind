@@ -37,7 +37,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
      * 删除键
      */
     private ImageView startDelete, endDelete,change,serach;
-
+    private View loading;
     /**
      * 返回按钮
      */
@@ -99,6 +99,9 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         initViews();
     }
 
+    public View getLoading(){
+        return loading;
+    }
     private void initViews() {
         startInput = (SearchEditView) findViewById(R.id.search_start_input);
         startDelete = (ImageView) findViewById(R.id.search_start_delete);
@@ -111,7 +114,6 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
 
         change = (ImageView) findViewById(R.id.change);
         //serach = (ImageView) findViewById(R.id.serach);
-
         result = (ListView) findViewById(R.id.result);
         startInput.addTextChangedListener(new StartEditChangedListener());
         startInput.setOnClickListener(this);
