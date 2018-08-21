@@ -241,7 +241,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	@SuppressWarnings("unchecked")
 	private void getResultCityList(String keyword) {
 		SQLiteDatabase db = helper.getCitySQLiteDatabase();
-		Cursor cursor = db.rawQuery(
+		Cursor cursor = db.rawQuery(.q
 					"select * from city where name like \"%" + keyword
 							+ "%\" or pinyin like \"%" + keyword + "%\"", null);
 		CityInfo city;

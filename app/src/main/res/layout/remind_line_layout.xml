@@ -64,14 +64,14 @@
                         android:text="@string/start_station"
                         android:textColor="#EE7621"
                         android:textStyle="normal"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                 />
                 <TextView android:id="@+id/start"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textColor="#6495ED"
                           android:textStyle="normal"
-                          android:textSize="12sp"
+                          android:textSize="14sp"
                 />
             </LinearLayout>
 
@@ -86,14 +86,14 @@
                         android:drawableLeft="@drawable/end_red_route"
                         android:text="@string/end_station"
                         android:textColor="#EE7621"
-                        android:textSize="14sp"
+                        android:textSize="16sp"
                         android:textStyle="normal"
                 />
                 <TextView android:id="@+id/end"
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textColor="#6495ED"
-                          android:textSize="12sp"
+                          android:textSize="14sp"
                           android:textStyle="normal"
                 />
             </LinearLayout>
