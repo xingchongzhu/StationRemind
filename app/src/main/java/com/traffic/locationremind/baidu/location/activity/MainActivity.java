@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import android.widget.Toast;
 import com.baidu.location.BDLocation;
+import com.geek.thread.GeekThreadManager;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;

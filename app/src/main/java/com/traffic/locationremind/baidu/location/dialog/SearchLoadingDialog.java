@@ -9,6 +9,8 @@ import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.geek.thread.GeekThreadManager;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.database.DataManager;
@@ -28,5 +30,6 @@ public class SearchLoadingDialog extends Dialog{
     @Override
     public void dismiss() {
         super.dismiss();
+        GeekThreadManager.getInstance().stopAllGeekRunable();
     }
 }

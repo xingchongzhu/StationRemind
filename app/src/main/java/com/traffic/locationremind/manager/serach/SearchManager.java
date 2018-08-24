@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.geek.thread.GeekThreadManager;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
@@ -65,6 +66,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
     private DataManager mDataManager;
     private MainActivity activity;
     private SearchLoadingDialog mSearchLoadingDialog;
+    List<List<Integer>> allLines = new ArrayList<>();
     public class MyHandler extends Handler {
         private WeakReference<MainActivity> mActivity;
 
@@ -146,6 +148,9 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
     }
 
     public void sortChangeTime(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+        if(lastLinesLast.size() <2){
+            return;
+        }
         Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
             public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
                                Map.Entry<List<Integer>, List<StationInfo>> o2) {
@@ -318,15 +323,15 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
         getAutoCompleteData(context, text);
     }
 
-    StationInfo startStation = null, endStation = null;
+    StationInfo startStation = null, endStation = null,prestartStation,preendStation;
     /**
      * 点击搜索键时edit text触发的回调
      */
     @Override
     public void onSearch(final Context context, String start, String end) {
-        if(isSearch){
+        /*if(mSearchLoadingDialog != null && mSearchLoadingDialog.isShowing()){
             return;
-        }
+        }*/
         synchronized (lock) {
             String currentCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.CITYNAME);
             String locationCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.LOCATIONNAME);
@@ -339,7 +344,9 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
 
             String current = context.getResources().getString(R.string.current_location);
 
-            if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity)) {
+            if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity) ||
+                    (prestartStation != null && preendStation != null && prestartStation.getCname().equals(start) &&
+                    preendStation.getCname().equals(end))) {
                 return;
             }
             if (start.equals(current)) {
@@ -360,11 +367,11 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
                 endStation = allstations.get(end);
             }
             if (startStation == null) {
-                Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (endStation == null) {
-                Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
                 return;
             }
             Log.d("zxc1","onSearch ");
@@ -375,6 +382,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
             }
             mSearchLoadingDialog.show();
             lastLinesLast.clear();
+            allLines.clear();
             searchTaskNum = 0;
             finishTaskNum = 0;
             PathSerachUtil.getReminderLines(this, myHandler, startStation, endStation,
@@ -393,19 +401,37 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
     }
 
     @Override
+    public void updateSingleResult(List<Integer> list){
+        allLines.add(list);
+        lastLinesLast.clear();
+        Log.d("zxc01","updateSingleResult lastLinesLast.size = "+lastLinesLast.size());
+        lastLinesLast.addAll(PathSerachUtil.getReuslt(allLines, mDataManager, startStation, endStation));
+        Message message = myHandler.obtainMessage();
+        message.what = 0;
+        myHandler.sendMessage(message);
+        if(mSearchLoadingDialog != null && (lastLinesLast.size() >0)){
+            mSearchLoadingDialog.dismiss();
+        }
+
+    }
+
+    @Override
     public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines){
         //Log.d("zxc1","updateResult lastLinesLast = "+lastLinesLast);
         searchTaskNum ++;
-        if(mSearchLoadingDialog != null && finishTaskNum <= searchTaskNum){
+        if(mSearchLoadingDialog != null && (lines.size() >0 || searchTaskNum>= finishTaskNum)){
             mSearchLoadingDialog.dismiss();
+        }
+        if(lines == null || lines.size() <=0){
+            return;
         }
         lastLinesLast.addAll(lines);
         Log.d("zxc1","updateResult searchTaskNum = "+searchTaskNum+" lastLinesLast.size = "+lastLinesLast.size());
-        if(finishTaskNum <= searchTaskNum){
+       // if(finishTaskNum ){
             Message message = myHandler.obtainMessage();
             message.what = 0;
             myHandler.sendMessage(message);
             isSearch = false;
-        }
+       // }
     }
 }

@@ -13,6 +13,7 @@ import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.item.IteratorNodeTool;
 import com.traffic.locationremind.baidu.location.item.Node;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
+import com.traffic.locationremind.baidu.location.utils.SearchPath;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.geek.thread.GeekThreadManager;
@@ -215,6 +216,9 @@ public class PathSerachUtil {
     public static Map<List<Integer>, List<StationInfo>> getAllLineStation(Map<Integer, LineInfo> mLineInfoList, List<List<Integer>> transferLine
             , StationInfo start, final StationInfo end) {
         Map<List<Integer>, List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
+        if(transferLine == null){
+            return currentAllStationList;
+        }
         //取出一条路线
         int n = 0;
         for (List<Integer> list : transferLine) {
@@ -261,8 +265,6 @@ public class PathSerachUtil {
                 }
                 currentAllStationList.put(list, min);
             }
-            //Log.d("zxc", "----- end------------");
-
         }
         return currentAllStationList;
     }
@@ -438,7 +440,7 @@ public class PathSerachUtil {
         return nerstStationInfo;
     }
 
-    private static final int MINDIS = 500;
+    private static final int MINDIS = 800;
 
     public static StationInfo getNerastNextStation(BDLocation location, Map<Integer, LineInfo> mLineInfoList) {
         double min = Double.MAX_VALUE;
@@ -533,7 +535,7 @@ public class PathSerachUtil {
                         int startid = CommonFuction.convertToInt(lines[i], -1);
                         if (startid >= 0) {
                             n++;
-                            startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
+                            startThread(mSearchResultListener, startid, end.lineid, mDataManager, start, end);
                         }
                     }
                     mSearchResultListener.setLineNumber(n);
@@ -553,7 +555,7 @@ public class PathSerachUtil {
                         int startid = CommonFuction.convertToInt(lines[i], -1);
                         if (startid >= 0) {
                             n++;
-                            startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
+                            startThread(mSearchResultListener, start.lineid, startid, mDataManager, start, end);
                         }
                     }
                     mSearchResultListener.setLineNumber(n);
@@ -577,7 +579,7 @@ public class PathSerachUtil {
                                 int endid = CommonFuction.convertToInt(endLines[j], -1);
                                 if (endid > 0) {
                                     n++;
-                                    startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
+                                    startThread(mSearchResultListener, startid, endid, mDataManager, start, end);
                                 }
                             }
                         }
@@ -604,19 +606,25 @@ public class PathSerachUtil {
         });
         //找出所有路径
         return PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mDataManager.getLineInfoList(), transferLine, start, end));//查询最终线路
-
     }
 
     public static void startThread(final SearchResultListener mSearchResultListener, final int startlineid,
                                    final int endlineid, final DataManager mDataManager, final StationInfo start, final StationInfo end) {
-        GeekThreadManager.getInstance().execute(new GeekRunnable(ThreadPriority.HIGH) {
+        //final SearchPath SearchPath = new SearchPath();
+        GeekRunnable geekRunnable = new GeekRunnable(ThreadPriority.HIGH) {
             @Override
             public void run() {
-                GrfAllEdge grfAllEdge = new GrfAllEdge(mDataManager.getMaxLineid(), mDataManager.getAllLineNodes(), mDataManager.getMatirx());
-                List<List<Integer>> transferLine = grfAllEdge.serach(startlineid, endlineid);
-                mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
+                //GrfAllEdge grfAllEdge = new GrfAllEdge(mDataManager.getMaxLineid(), mDataManager.getAllLineNodes(), mDataManager.getMatirx());
+                //List<List<Integer>> transferLine = grfAllEdge.serach(startlineid, endlineid);
+                searchPath.serach(startlineid, endlineid, mDataManager.getNodeRalation());
+                /*if(searchPath != null) {
+                    mSearchResultListener.updateResult(getReuslt(searchPath.serach(startlineid, endlineid, mDataManager.getNodeRalation()), mDataManager, start, end));
+                }*/
             }
-        }, ThreadType.NORMAL_THREAD);
+        };
+        geekRunnable.searchPath = new SearchPath(mSearchResultListener);
+        GeekThreadManager.getInstance().addGeekRunnable(geekRunnable);
+        GeekThreadManager.getInstance().execute(geekRunnable, ThreadType.NORMAL_THREAD);
     }
 
     public static Map<Integer, Integer> getLineAllLined(List<StationInfo> list) {

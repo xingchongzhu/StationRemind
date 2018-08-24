@@ -4,14 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
-import com.traffic.location.remind.R;
-import com.traffic.locationremind.baidu.location.activity.MainActivity;
-import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
+
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.FileUtil;
@@ -40,7 +33,7 @@ public class DataManager{
 	private Map<Integer,Integer> lineColor = new HashMap<>();//路线对应颜色
 	private Object mLock = new Object();
 	private Map<String, StationInfo> allstations = new HashMap<>();
-    private int[][] matirx;
+    private int[][] matirx ,nodeRalation;
     private Integer allLineNodes[];
 
 	private int maxLineid = 0;
@@ -50,6 +43,10 @@ public class DataManager{
 	public int[][] getMatirx(){
 	    return matirx;
     }
+
+    public int[][] getNodeRalation(){
+		return nodeRalation;
+	}
 
     public Integer[] getAllLineNodes(){
 		return allLineNodes;
@@ -210,6 +207,30 @@ public class DataManager{
             }
         }
 		GrfAllEdge.printMatrix(total,matirx);
+		nodeRalation = null;
+		nodeRalation =new int[total][];
+		for(int i =0;i < matirx.length;i++){
+			int k = 0;
+			List<Integer> list = new ArrayList<>();
+			for(int j=0;j<matirx[i].length;j++){
+				if(matirx[i][j] ==1){
+					list.add(j);
+				}
+			}
+			nodeRalation[i] = new int[list.size()];
+			for(int l = 0;l < list.size();l++){
+				nodeRalation[i][l] = list.get(l);
+			}
+		}
+		StringBuffer str = new StringBuffer();
+		for(int i =0;i<nodeRalation.length;i++) {
+			str.delete(0,str.length());
+			for (int j = 0; j < nodeRalation[i].length; j++) {
+				str.append(nodeRalation[i][j]+" ->");
+			}
+			Log.d("zxc001"," i = "+i+" | "+str.toString());
+		}
+
     }
 
 	WeakReference<Callbacks> mCallbacks;

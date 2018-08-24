@@ -34,18 +34,9 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
         endstation =context.getResources().getString(R.string.end_station);
     }
 
-    public void clearData() {
-        this.mData.clear();
-        notifyDataSetChanged();
-    }
-
     public void setData(List<Map.Entry<List<Integer>,List<StationInfo>>> data) {
         this.mData = data;
         notifyDataSetChanged();
-    }
-
-    public void updateData(List<Map.Entry<List<Integer>,List<StationInfo>>> data) {
-        this.mData = data;
     }
 
     @Override
@@ -55,6 +46,9 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
 
     @Override
     public void convert(ViewHolder holder, int position) {
+        if(mData.size() <= 0){
+            return;
+        }
         Map.Entry<List<Integer>,List<StationInfo>> data = mData.get(position);
         StringBuffer change = new StringBuffer();
         int n = 0;

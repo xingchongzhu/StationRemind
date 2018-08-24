@@ -156,7 +156,8 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 						.show();*/
 			}
 		});
-		initOverlay();
+
+		//initOverlay();
 		cityInit();
 		hotCityInit();
 		hisCityInit();
@@ -623,6 +624,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 
 	// 初始化汉语拼音首字母弹出提示框
 	private void initOverlay() {
+
 		mReady = true;
 		LayoutInflater inflater = LayoutInflater.from(this);
 		overlay = (TextView) inflater.inflate(R.layout.overlay, null);
@@ -641,8 +643,8 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		getWindowManager().removeView(overlay);
-		overlay = null;
+		//getWindowManager().removeView(overlay);
+		//overlay = null;
 	}
 
 	private boolean isScroll = false;

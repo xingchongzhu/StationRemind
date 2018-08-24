@@ -5,13 +5,13 @@ android {
         debugkey {
             keyAlias 'mysigned'
             keyPassword 'yezi82231'
-            storeFile file('/home/zhuxingchong/WorkSpace/StationRemind/keystore/debugkey.jks')
+            storeFile file('/home/zhuxingchong/WorkSpace/myProject/StationRemind/keystore/debugkey.jks')
             storePassword 'yezi82231'
         }
         releasekey {
             keyAlias 'releasekey'
             keyPassword 'yezi82231'
-            storeFile file('/home/zhuxingchong/WorkSpace/StationRemind/keystore/releasekey.jks')
+            storeFile file('/home/zhuxingchong/WorkSpace/myProject/StationRemind/keystore/releasekey.jks')
             storePassword 'yezi82231'
         }
     }
@@ -23,7 +23,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "android.support.SearchPath.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -52,8 +52,8 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.0.0'
     implementation 'com.android.support:cardview-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.SearchPath:runner:1.0.2'
+    androidTestImplementation 'com.android.support.SearchPath.espresso:espresso-core:3.0.2'
     implementation files('libs/poi.jar')
     implementation files('libs/BaiduLBS_Android.jar')
     implementation files('libs/pinyin4android1.0.jar')

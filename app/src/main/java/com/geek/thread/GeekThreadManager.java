@@ -6,7 +6,9 @@ import com.geek.thread.task.GeekRunnable;
 import com.geek.thread.task.GeekTask;
 import com.geek.thread.task.GeekThread;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -25,7 +27,18 @@ public class GeekThreadManager {
     private SerialExecutor mSerialExecutor;
     private AtomicInteger mKeyIndex;
     private HashMap<Integer, Future> mFutureCache;
+    private List< GeekRunnable> geekRunnableMap = new ArrayList<>();
 
+    public void addGeekRunnable(GeekRunnable geekRunnable){
+        geekRunnableMap.add(geekRunnable);
+    }
+
+    public void stopAllGeekRunable(){
+        for(GeekRunnable geekRunnable:geekRunnableMap){
+            geekRunnable.searchPath.setStopRunState(true);
+        }
+        geekRunnableMap.clear();
+    }
     private GeekThreadManager(){
         mInitialized.set(false);
         init();

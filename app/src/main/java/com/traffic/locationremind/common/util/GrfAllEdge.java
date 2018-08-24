@@ -1,17 +1,5 @@
-/**
- * Copyright (C) 2015~2050 by foolstudio. All rights reserved.
- * <p>
- * ��Դ�ļ��д��벻����������������ҵ��;�����߱�������Ȩ��
- * <p>
- * ���ߣ�������
- * <p>
- * �������䣺foolstudio@qq.com
- */
-
 package com.traffic.locationremind.common.util;
 
-
-import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.*;
@@ -80,7 +68,7 @@ public class GrfAllEdge {
         // 对栈顶的邻接点依次递归调用，进行深度遍历
         for (int i = 1; i < this.total; i++) {
             // 有边，并且不在左上到右下的中心线上
-            if (this.matirx[k][i] == 1 ) {
+            if (this.matirx[k][i] == 1 && i != k) {
                 // 排除环路
                 if (stack.contains(i)) {
                     // 由某顶点A，深度访问其邻接点B时，由于是无向图，所以存在B到A的路径，在环路中，我们要排除这种情况
@@ -133,7 +121,7 @@ public class GrfAllEdge {
             }
             Log.d(TAG, str.toString());
         }
-        Log.d(TAG, "----------------- matrix -----------------");
+        Log.d("zxc001", "----------------- matrix -----------------");
     }
 
     // 设置[i][i]位置处的元素值为0，0表示图中的定点i未被访问，1表示图中的定点i已被访问

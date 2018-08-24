@@ -152,7 +152,7 @@ public class Utils {
     }
 
     /**
-     * @param view the scrollable view to test
+     * @param view the scrollable view to SearchPath
      * @return {@code true} iff the {@code view} content is currently scrolled to the top
      */
     public static boolean isScrolledToTop(View view) {

@@ -1,12 +1,15 @@
 package com.geek.thread.task;
 
 import com.geek.thread.ThreadPriority;
+import com.traffic.locationremind.baidu.location.utils.SearchPath;
 
 /**
  * Created by aotuman
  */
 public abstract class GeekRunnable implements Runnable, GeekPriorityComparable{
     private ThreadPriority mPriority = ThreadPriority.LOW;
+
+    public SearchPath searchPath;
 
     public GeekRunnable(ThreadPriority priority) {
         this.mPriority = priority;
