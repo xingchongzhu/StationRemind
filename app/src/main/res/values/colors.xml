@@ -2,7 +2,6 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
     <color name="colorToolbarBackground">#ffffff</color>
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
@@ -28,4 +27,18 @@
     <color name="btn_pressed_color">#3ca0ec</color>
     <color name="text_color">#836FFF</color>
     <color name="text1_color">#7171C6</color>
+
+    <color name="black_87p">#DE000000</color>
+    <color name="black_54p">#8A000000</color>
+    <color name="colorAccent">#DA4336</color>
+    <color name="white_08p">#14FFFFFF</color>
+    <color name="white_63p">#A0FFFFFF</color>
+    <color name="no_alarms">#4CFFFFFF</color>
+
+    <color name="transparent">#00000000</color>
+
+    <color name="clock_gray">	#2F4F4F</color>
+
+    <!-- shadowColor for widget text -->
+    <color name="widget_shadow_color">#67000000</color>
 </resources>

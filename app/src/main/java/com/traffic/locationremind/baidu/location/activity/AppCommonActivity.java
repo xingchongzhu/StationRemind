@@ -12,6 +12,7 @@ import android.support.v4.graphics.ColorUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import com.baidu.mapapi.SDKInitializer;
 
@@ -32,6 +33,11 @@ public class AppCommonActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setStatusBar(Color.WHITE);
         getPersimmions();
+        final Window win = getWindow();
+        win.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        win.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+                | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
     }
 
     /**

@@ -15,6 +15,7 @@ import com.traffic.locationremind.baidu.location.activity.MainViewActivity;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.FileUtil;
+import com.traffic.locationremind.common.util.GrfAllEdge;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -39,10 +40,20 @@ public class DataManager{
 	private Map<Integer,Integer> lineColor = new HashMap<>();//路线对应颜色
 	private Object mLock = new Object();
 	private Map<String, StationInfo> allstations = new HashMap<>();
+    private int[][] matirx;
+    private Integer allLineNodes[];
 
 	private int maxLineid = 0;
 
 	private static DataManager mDataManager;
+
+	public int[][] getMatirx(){
+	    return matirx;
+    }
+
+    public Integer[] getAllLineNodes(){
+		return allLineNodes;
+	}
 
 	public void releaseResource(){
 		mDataHelper.Close();
@@ -136,8 +147,11 @@ public class DataManager{
 		//在doInBackground方法中进行异步任务的处理.
 		@Override
 		protected Map<Integer,LineInfo> doInBackground(Context... params) {
-			//if(cityInfoList == null)
-		    	cityInfoList = mDataHelper.getAllCityInfo();
+			if (mDataHelper != null){
+				cityInfoList = mDataHelper.getAllCityInfo();
+			}else{
+				return null;
+			}
 			//获取传进来的参数
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
 			maxLineid = 0;
@@ -168,6 +182,13 @@ public class DataManager{
 			maxLineid+= 1;//找出路线最大编号加一
 			mLineInfoList = list;
 			setAllstations(mLineInfoList);
+			allLineNodes = null;
+			allLineNodes = new Integer[maxLineid];
+			for (int i = 0; i < maxLineid; i++) {//初始化所有线路
+				allLineNodes[i] = i;
+			}
+            initGrf(allLineCane,maxLineid);
+			//GrfAllEdge.createGraph(allLineNodes, allLineCane);
 			return list;
 		}
 
@@ -178,6 +199,18 @@ public class DataManager{
 			notificationUpdata();
 		}
 	}
+
+    // 初始化图数据
+    private void initGrf(Map<Integer, Map<Integer, Integer>> allLineCane,int total) {
+        matirx = null;
+        this.matirx = new int[total][total];
+        for (Map.Entry<Integer, Map<Integer, Integer>> entry : allLineCane.entrySet()) {
+            for (Map.Entry<Integer, Integer> value : entry.getValue().entrySet()) {
+                this.matirx[entry.getKey()][value.getValue()] = 1;
+            }
+        }
+		GrfAllEdge.printMatrix(total,matirx);
+    }
 
 	WeakReference<Callbacks> mCallbacks;
 	public interface Callbacks {

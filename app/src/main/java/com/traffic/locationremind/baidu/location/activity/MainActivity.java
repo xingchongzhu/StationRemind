@@ -138,12 +138,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mSearchManager.initData(this, mDataManager);
         mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
         currentCity = CommonFuction.getSharedPreferencesValue(this, CityInfo.CITYNAME);
-        /*if (ReadExcelDataUtil.getInstance().hasWrite) {
-            initData();
-        }*/
-        //if (CopyDBDataUtil.getInstance().hasWrite) {
-            initData();
-        //}
+        initData();
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
@@ -161,6 +156,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
             remindFragment.cancleRemind();
         }
+        if(getRemindState())
+            mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
     }
 
     private void initData() {
@@ -299,9 +296,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 mRemonderLocationService.setLocationChangerListener(new LocationChangerListener() {
                     @Override
                     public void loactionStation(BDLocation location) {
-                        if (location.getCity() != null && !hasLocation) {
+                        if (location.getCity() != null) {
                             String tempCity = location.getCity().substring(0,location.getCity().length() - 1);
-                            if(FileUtil.dbIsExist(MainActivity.this,mDataManager.getCityInfoList().get(tempCity)) &&
+                            CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.LOCATIONNAME,tempCity);
+                            if(!hasLocation && FileUtil.dbIsExist(MainActivity.this,mDataManager.getCityInfoList().get(tempCity)) &&
                                     mDataManager.getCityInfoList() != null && mDataManager.getCityInfoList().get(tempCity) != null) {
                                 setNewCity(tempCity);
                             }
@@ -416,25 +414,6 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         if (mRemonderLocationService != null) {
             BDLocation location = getBDLocation();
             if (location != null) {
-                // Log.d(TAG, "locationCurrentStation location.getCityCode() = " + location.getCityCode() + " lot = " + location.getLatitude() + " lat = " + location.getLongitude());
-
-                /*currentCityNo = mDataManager.getCityInfoList().get(location.getCityCode());
-                // Log.d(TAG, "locationCurrentStation currentCityInfo CityName = " + currentCityNo.getCityName());
-                if (currentCityNo != null) {
-                    String shpno = CommonFuction.getSharedPreferencesValue(MainActivity.this, CityInfo.CITYNAME);
-                    Map<Integer, LineInfo> tempList = mDataManager.getLineInfoList();
-                    if (!shpno.equals("" + currentCityNo)) {
-                        CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.CITYNAME, "" + currentCityNo);
-                        tempList = mDataManager.getDataHelper().getLineList(currentCityNo.getCityNo(), LineInfo.LINEID, "ASC");
-                        if (tempList != null) {
-                            for (Map.Entry<Integer, LineInfo> entry : tempList.entrySet()) {
-                                entry.getValue().setStationInfoList(mDataManager.getDataHelper().QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
-                            }
-                        }
-                    }
-                    //Log.d(TAG, "locationCurrentStation mLineInfoList = " + tempList.size());
-
-                }*/
                 nerstStationInfo = PathSerachUtil.getNerastStation(location, mDataManager.getLineInfoList());
 
                 if (nerstStationInfo != null) {

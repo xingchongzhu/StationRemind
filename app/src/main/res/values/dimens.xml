@@ -53,4 +53,14 @@
     <dimen name="current_bitmap_node_height">20dp</dimen>
     <dimen name="full_map_top_bottom_height">115dp</dimen>
     <dimen name="delete_btn_size">30dp</dimen>
+
+
+    <dimen name="big_font_size">32sp</dimen>
+    <dimen name="alarm_lockscreen_pulse_radius">128dp</dimen>
+    <dimen name="alarm_lockscreen_alarm_horizontal_padding">16dp</dimen>
+    <dimen name="alarm_lockscreen_alarm_vertical_padding">48dp</dimen>
+    <dimen name="alarm_lockscreen_bottom_margin">40dp</dimen>
+    <dimen name="fab_alarm_size">56dp</dimen>
+    <dimen name="bottom_text_size">16sp</dimen>
+    <dimen name="alarm_info_font_size">36sp</dimen>
 </resources>

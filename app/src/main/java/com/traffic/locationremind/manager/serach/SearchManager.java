@@ -2,6 +2,8 @@ package com.traffic.locationremind.manager.serach;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -14,6 +16,7 @@ import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
 import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
+import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
@@ -23,16 +26,15 @@ import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
+import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.ref.WeakReference;
+import java.util.*;
 
-public class SearchManager implements SearchView.SearchViewListener {
+public class SearchManager implements SearchView.SearchViewListener ,SearchResultListener {
 
     private final static String TAG = "SearchManager";
     /**
@@ -48,7 +50,11 @@ public class SearchManager implements SearchView.SearchViewListener {
     GridViewAdapter mGridViewAdapter;
 
     CardAdapter mCardAdapter = null;
+    int searchTaskNum = 0;
+    int finishTaskNum = 0;
+    List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<>();
 
+    private MyHandler myHandler;
     private List<String> recentList = new ArrayList<>();
     /**
      * 自动补全列表adapter
@@ -59,6 +65,114 @@ public class SearchManager implements SearchView.SearchViewListener {
     private DataManager mDataManager;
     private MainActivity activity;
     private SearchLoadingDialog mSearchLoadingDialog;
+    public class MyHandler extends Handler {
+        private WeakReference<MainActivity> mActivity;
+
+        public MyHandler(WeakReference<MainActivity> weakReference) {
+            mActivity = weakReference;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(lastLinesLast.size() <= 0){
+                return;
+            }
+            sortStationNum(lastLinesLast);
+            Map.Entry<List<Integer>, List<StationInfo>> first = lastLinesLast.get(0);
+            //去除相同
+            //换乘次数排序
+            sortChangeTime(lastLinesLast);
+            if(lastLinesLast.get(0) == first){
+                lastLinesLast.clear();
+                lastLinesLast.add(first);
+                mCardAdapter.setData(lastLinesLast);
+                return;
+            }
+            //去除相同
+            List<Map.Entry<List<Integer>, List<StationInfo>>> add = new ArrayList<>();
+            Map<Integer,Integer> array = new HashMap();
+            for(Map.Entry<List<Integer>, List<StationInfo>>entry: lastLinesLast){
+                boolean isEqual = false;
+                for(Map.Entry<List<Integer>, List<StationInfo>>listEntry: add){
+                    if(entry.getKey().toString().equals(listEntry.getKey().toString()) &&
+                            entry.getValue().size() == listEntry.getValue().size()){
+                        isEqual = true;
+                    }
+                }
+                if(!isEqual)
+                    add.add(entry);
+                array.put(entry.getKey().size(),entry.getKey().size());
+            }
+
+            //换乘次数分类
+            List<Integer> list = new ArrayList<>(array.keySet());
+            Collections.sort(list, new Comparator<Integer>() {
+                public int compare(Integer o1,Integer o2) {
+                    if (o1< o2) {
+                        return -1;
+                    } else if (o1 == o2) {
+                        return 0;
+                    }
+                    return 1;
+                }
+            });
+            List<Map.Entry<List<Integer>, List<StationInfo>>> needadd = new ArrayList<>();
+            List<Map.Entry<List<Integer>, List<StationInfo>>> templist = new ArrayList<>();
+            if(lastLinesLast != null)
+                lastLinesLast.clear();
+            for(Integer size:list){
+                needadd.clear();
+                templist.clear();
+                for(Map.Entry<List<Integer>, List<StationInfo>>entry: add){
+                    if(size == entry.getKey().size()){
+                        needadd.add(entry);
+                    }
+                }
+                sortStationNum(needadd);
+                if(needadd.size() >0){
+                    int number = needadd.get(0).getValue().size();
+                    for(Map.Entry<List<Integer>, List<StationInfo>>entry: needadd){
+                        if(number == entry.getValue().size()){
+                            templist.add(entry);
+                        }
+                    }
+                    lastLinesLast.addAll(templist);
+                }
+            }
+            sortChangeTime(lastLinesLast);
+            mCardAdapter.setData(lastLinesLast);
+        }
+    }
+
+    public void sortChangeTime(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
+            public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
+                               Map.Entry<List<Integer>, List<StationInfo>> o2) {
+                if (o1.getKey().size() < o2.getKey().size()) {
+                    return -1;
+                } else if (o1.getKey().size() == o2.getKey().size()) {
+                    return 0;
+                }
+                return 1;
+            }
+        });
+    }
+
+    public void sortStationNum(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+
+        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
+            public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
+                               Map.Entry<List<Integer>, List<StationInfo>> o2) {
+                if (o1.getValue().size() < o2.getValue().size()) {
+                    return -1;
+                } else if (o1.getValue().size() == o2.getValue().size()) {
+                    return 0;
+                }
+                return 1;
+            }
+        });
+    }
 
     /**
      * 搜索过程中自动补全数据
@@ -70,6 +184,7 @@ public class SearchManager implements SearchView.SearchViewListener {
      */
     public void initViews(final Context context, final SearchView searchView) {
         activity = (MainActivity) context;
+        myHandler = new MyHandler(new WeakReference<>(activity));
         this.searchView = searchView;
         ViewGroup serachLayoutManagerRoot = (ViewGroup)((MainActivity) context).findViewById(R.id.serach_layout_manager_root);
         serachResults = searchView.getResultListview();
@@ -88,7 +203,8 @@ public class SearchManager implements SearchView.SearchViewListener {
                 searchView.setSelectStation(position);
             }
         });
-
+        mCardAdapter = new CardAdapter(activity, new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>(), R.layout.serach_result_item_layout);
+        serachResults.setAdapter(mCardAdapter);
         getRecendData(context);
         mGridViewAdapter = new GridViewAdapter(context, recentList);
         recentSerachGrid.setAdapter(mGridViewAdapter);
@@ -164,15 +280,6 @@ public class SearchManager implements SearchView.SearchViewListener {
      */
     private void getDbData() {
         allstations = mDataManager.getAllstations();
-       // Log.d(TAG, "getDbData" + " allLines = " + allLines);
-        //allstations.clear();
-        /*if (allLines != null) {
-            for (Map.Entry<Integer, LineInfo> entry : allLines.entrySet()) {
-                for (StationInfo stationInfo : entry.getValue().getStationInfoList()) {
-                    allstations.put(stationInfo.getCname(), stationInfo);
-                }
-            }
-        }*/
     }
 
     /**
@@ -217,81 +324,88 @@ public class SearchManager implements SearchView.SearchViewListener {
      */
     @Override
     public void onSearch(final Context context, String start, String end) {
-        if(mSearchLoadingDialog != null){
-            mSearchLoadingDialog.dismiss();
-        }
-        //更新result数据
-        if(TextUtils.isEmpty(start) || TextUtils.isEmpty(end))
+        if(isSearch){
             return;
-
-        String current = context.getResources().getString(R.string.current_location);
-
-        if (start.equals(current)) {
-            StationInfo stationInfo = activity.getLocationCurrentStation();
-            if (stationInfo != null) {
-                startStation = stationInfo;
+        }
+        synchronized (lock) {
+            String currentCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.CITYNAME);
+            String locationCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.LOCATIONNAME);
+            if (mSearchLoadingDialog != null) {
+                mSearchLoadingDialog.dismiss();
             }
-        } else {
-            startStation = allstations.get(start);
-        }
+            //更新result数据
+            if (TextUtils.isEmpty(start) || TextUtils.isEmpty(end))
+                return;
 
-        if(end.equals(current)) {
-            StationInfo stationInfo = activity.getLocationCurrentStation();
-            if (stationInfo != null) {
-                endStation = stationInfo;
+            String current = context.getResources().getString(R.string.current_location);
+
+            if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity)) {
+                return;
             }
-        } else {
-            endStation = allstations.get(end);
-        }
-        if (startStation == null) {
-            Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (endStation == null) {
-            Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Log.d(TAG, "onSearch start = " + start + " end = " + end+" startStation.getCname() = "+startStation.getCname()+" endStation.getCname() = "+endStation.getCname());
-        new MyAsyncTask().execute("");
-    }
-    class MyAsyncTask extends AsyncTask<String,Void,List<Map.Entry<List<Integer>, List<StationInfo>>>> {
+            if (start.equals(current)) {
+                StationInfo stationInfo = activity.getLocationCurrentStation();
+                if (stationInfo != null) {
+                    startStation = stationInfo;
+                }
+            } else {
+                startStation = allstations.get(start);
+            }
 
-        //onPreExecute用于异步处理前的操作
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //此处将progressBar设置为可见.
-            if(mSearchLoadingDialog == null){
+            if (end.equals(current)) {
+                StationInfo stationInfo = activity.getLocationCurrentStation();
+                if (stationInfo != null) {
+                    endStation = stationInfo;
+                }
+            } else {
+                endStation = allstations.get(end);
+            }
+            if (startStation == null) {
+                Toast.makeText(context, "请输入有效起点站名", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (endStation == null) {
+                Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Log.d("zxc1","onSearch ");
+            Log.d(TAG, "onSearch start = " + start + " end = " + end + " startStation.getCname() = " + startStation.getCname() + " endStation.getCname() = " + endStation.getCname());
+            if (mSearchLoadingDialog == null) {
                 mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
                 mSearchLoadingDialog.setContentView(R.layout.search_loading);
             }
             mSearchLoadingDialog.show();
+            lastLinesLast.clear();
+            searchTaskNum = 0;
+            finishTaskNum = 0;
+            PathSerachUtil.getReminderLines(this, myHandler, startStation, endStation,
+                    activity.getBDLocation(), mDataManager);
         }
+    }
 
-        //在doInBackground方法中进行异步任务的处理.
-        @Override
-        protected List<Map.Entry<List<Integer>, List<StationInfo>>> doInBackground(String... params) {
-            //获取传进来的参数
-            List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = PathSerachUtil.getReminderLines(startStation, endStation,
-                    mDataManager.getMaxLineid(), activity.getBDLocation(), mDataManager.getLineInfoList(), mDataManager.getAllLineCane());
-            return lastLinesLast;
+    private boolean isSearch = false;
+
+    private Object lock = new Object();
+    @Override
+    public void setLineNumber(int number) {
+        Log.d("zxc1","setLineNumber number = "+number);
+        finishTaskNum = number;
+        isSearch = true;
+    }
+
+    @Override
+    public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines){
+        //Log.d("zxc1","updateResult lastLinesLast = "+lastLinesLast);
+        searchTaskNum ++;
+        if(mSearchLoadingDialog != null && finishTaskNum <= searchTaskNum){
+            mSearchLoadingDialog.dismiss();
         }
-
-        //onPostExecute用于UI的更新.此方法的参数为doInBackground方法返回的值.
-        @Override
-        protected void onPostExecute(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast) {
-            super.onPostExecute(lastLinesLast);
-            //隐藏progressBar
-            if(mSearchLoadingDialog != null){
-                mSearchLoadingDialog.dismiss();
-            }
-            if (mCardAdapter == null) {
-                mCardAdapter = new CardAdapter(activity, lastLinesLast, R.layout.serach_result_item_layout);
-                serachResults.setAdapter(mCardAdapter);
-            } else {
-                mCardAdapter.setData(lastLinesLast);
-            }
-
+        lastLinesLast.addAll(lines);
+        Log.d("zxc1","updateResult searchTaskNum = "+searchTaskNum+" lastLinesLast.size = "+lastLinesLast.size());
+        if(finishTaskNum <= searchTaskNum){
+            Message message = myHandler.obtainMessage();
+            message.what = 0;
+            myHandler.sendMessage(message);
+            isSearch = false;
         }
     }
 }

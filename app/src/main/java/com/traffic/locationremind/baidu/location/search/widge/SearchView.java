@@ -18,6 +18,7 @@ import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
 
@@ -77,6 +78,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
      *
      * @param listener 监听者
      */
+    private TextView city_select;
     public void setSearchViewListener(SearchViewListener listener) {
         mListener = listener;
     }
@@ -106,6 +108,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         startInput = (SearchEditView) findViewById(R.id.search_start_input);
         startDelete = (ImageView) findViewById(R.id.search_start_delete);
 
+        city_select = (TextView) findViewById(R.id.city_select);
         endInput = (SearchEditView) findViewById(R.id.search_end_input);
         endDelete = (ImageView) findViewById(R.id.search_end_delete);
 
@@ -221,6 +224,8 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         if(startInput != null)
             startInput.setText(getResources().getString(R.string.current_location));
         startInput.setSelection(startInput.getText().toString().length());
+        if(city_select != null)
+            city_select.setText( CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME));
     }
 
     private void hideSoftInput() {

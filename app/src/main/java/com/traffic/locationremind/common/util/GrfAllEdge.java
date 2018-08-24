@@ -29,9 +29,9 @@ public class GrfAllEdge {
     // 图的邻接矩阵
     private int[][] matirx;
     private boolean stop = false;
-    private final int MAXTRANSFERNUM = 4;//最多换乘3次,包含起点终点
+    private final int MAXTRANSFERNUM = 5;//最多换乘3次,包含起点终点
+    //private static GrfAllEdge grf;
 
-    StringBuffer str = new StringBuffer();
 
     private List<List<Integer>> allLine = new ArrayList<List<Integer>>();
 
@@ -80,7 +80,7 @@ public class GrfAllEdge {
         // 对栈顶的邻接点依次递归调用，进行深度遍历
         for (int i = 1; i < this.total; i++) {
             // 有边，并且不在左上到右下的中心线上
-            if (this.matirx[k][i] == 1 && k != i) {
+            if (this.matirx[k][i] == 1 ) {
                 // 排除环路
                 if (stack.contains(i)) {
                     // 由某顶点A，深度访问其邻接点B时，由于是无向图，所以存在B到A的路径，在环路中，我们要排除这种情况
@@ -109,28 +109,26 @@ public class GrfAllEdge {
         stack.pop();
     }
 
-    private void printMatrix() {
+    public static void printMatrix(int total,int[][] matirx) {
+        StringBuffer str = new StringBuffer();
         Log.d(TAG, "----------------- matrix -----------------");
         str.delete(0, str.length());
-        ;
         str.append(" |");
-        for (int i = 0; i < this.total; i++) {
+        for (int i = 0; i < total; i++) {
             str.append(i + ",");
         }
         Log.d(TAG, str.toString());
         str.delete(0, str.length());
-        ;
-        for (int i = 0; i < this.total; i++) {
+        for (int i = 0; i < total; i++) {
             str.append("---");
         }
         Log.d(TAG, str.toString());
-        for (int i = 0; i < this.total; i++) {
+        for (int i = 0; i < total; i++) {
             str.delete(0, str.length());
-            ;
             //Log.d(TAG," " + this.nodes[i] + "|");
             str.append(i + "|");
-            for (int j = 0; j < this.total; j++) {
-                str.append(this.matirx[i][j] + ",");
+            for (int j = 0; j < total; j++) {
+                str.append(matirx[i][j] + ",");
                 //Log.d(TAG,this.matirx[i][j] + "-");
             }
             Log.d(TAG, str.toString());
@@ -154,13 +152,42 @@ public class GrfAllEdge {
         }
     }
 
+    public GrfAllEdge(int total, Integer[] nodes,int[][] matirx) {
+        this.total = total;
+        this.nodes = nodes;
+        this.matirx = matirx;
+    }
+
+    public List<List<Integer>> serach(int origin, int goal){
+        //Log.d(TAG, "\n------ 寻找起点到终点的所有路径开始 ------origin = " + origin + " goal = " + goal);
+        Stack<Integer> stack = new Stack<>();
+        stack.push(origin);
+        Log.d(TAG, "查询 origin = "+origin+" 到 goal = "+goal);
+        dfsStack(goal, stack);
+        //Log.d(TAG, "\n------ 寻找起点到终点的所有路径结束 ------");
+        Log.d(TAG, "总共寻找到换乘小于4条线路径总共为 grf.allLine.lenght = "+allLine.size());
+        Collections.sort(allLine, new Comparator<List<Integer>>(){
+            public int compare(List<Integer> p1, List<Integer> p2) {
+                //按照换乘次数
+                if(p1.size() > p2.size()){
+                    return 1;
+                }
+                if(p1.size() == p2.size()){
+                    return 0;
+                }
+                return -1;
+            }
+        });
+        return allLine;
+    }
+
     public static List<List<Integer>> createGraph(Integer[] nodes, Map<Integer, Map<Integer, Integer>> allLineCane, int origin, int goal) {
         GrfAllEdge grf = new GrfAllEdge(nodes.length, nodes);//从一开始加
         grf.stop = false;
         grf.allLine.clear();
         grf.resetVisited();
         grf.initGrf(allLineCane);
-        grf.printMatrix();
+        //grf.printMatrix();
 
         //Log.d(TAG, "\n------ 寻找起点到终点的所有路径开始 ------origin = " + origin + " goal = " + goal);
         Stack<Integer> stack = new Stack<Integer>();

@@ -42,10 +42,17 @@
                   android:launchMode="singleTask"
                   android:screenOrientation="portrait">
         </activity>
+
+        <activity android:name="com.traffic.locationremind.baidu.location.notification.AlarmActivity"
+                  android:launchMode="singleTask"
+                  android:screenOrientation="portrait">
+
+        </activity>
         <activity android:name="com.traffic.locationremind.pinying.LocationCityActivity"
                   android:launchMode="singleTask"
                   android:windowSoftInputMode="adjustPan"
                   android:screenOrientation="portrait">
+
         </activity>
 
         <activity android:name="com.traffic.locationremind.baidu.location.activity.MainActivity"

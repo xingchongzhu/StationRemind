@@ -103,7 +103,7 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
                     canvas.drawCircle(LINEPADDLEFT,height,radio,mPaint);
                     String start = getContext().getResources().getString(R.string.start_station);
                     //起点 绘制字符串
-                    drawText(canvas,start+text+" ("+String.format(getResources().getString(R.string.station_number),size)+")",LINEPADDLEFT+radio*2,height-radio/2+mBounds.height()/2,getResources().getColor(R.color.green),changetTextSize);
+                    drawText(canvas,start+text+" ("+String.format(getResources().getString(R.string.station_number),size-1)+")",LINEPADDLEFT+radio*2,height-radio/2+mBounds.height()/2,getResources().getColor(R.color.green),changetTextSize);
 
                     //textHeight = mBounds.height()*HEIGHTSCALE;
                     //起点中间断开提醒
@@ -131,7 +131,7 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
 
                     //换乘上一条线
                     String string = getResources().getString(R.string.change_next_line);
-                    drawText(canvas,stationInfo.getCname()+" "+String.format(string,stationInfo.lineid+""),LINEPADDLEFT, height,getResources().getColor(R.color.brown),hintTextSize);
+                    drawText(canvas,stationInfo.getCname()+" "+String.format(string,dataManager.getLineInfoList().get(stationInfo.lineid).linename),LINEPADDLEFT, height,getResources().getColor(R.color.brown),hintTextSize);
                     height+= 0.5*textHeight;
 
                     mPaint.setStrokeWidth(normalTextSize);

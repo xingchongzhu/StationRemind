@@ -6,14 +6,24 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.item.IteratorNodeTool;
 import com.traffic.locationremind.baidu.location.item.Node;
+import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.geek.thread.GeekThreadManager;
+import com.geek.thread.GeekThreadPools;
+import com.geek.thread.ThreadPriority;
+import com.geek.thread.ThreadType;
+import com.geek.thread.task.GeekRunnable;
+import com.traffic.locationremind.manager.database.DataManager;
+import com.traffic.locationremind.manager.serach.SearchManager;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class PathSerachUtil {
@@ -234,18 +244,18 @@ public class PathSerachUtil {
 
             //多叉树查找所有路径
             //Log.d("zxc", "----- list = " + list);
-            IteratorNodeTool tool=new IteratorNodeTool();
-            Stack <Node>pathstack=new Stack();
+            IteratorNodeTool tool = new IteratorNodeTool();
+            Stack<Node> pathstack = new Stack();
             tool.iteratorNode(root, pathstack);
             List<List<StationInfo>> all = new ArrayList<>();
-            for(List<StationInfo>entry:tool.pathMap){
-                all.add(getLineStation(entry,mLineInfoList)) ;
+            for (List<StationInfo> entry : tool.pathMap) {
+                all.add(getLineStation(entry, mLineInfoList));
             }
             StringBuffer buffer = new StringBuffer();
-            if(all != null && all.size() > 0) {
+            if (all != null && all.size() > 0) {
                 List<StationInfo> min = all.get(0);
                 for (List<StationInfo> ll : all) {
-                    if(min.size() > ll.size()){
+                    if (min.size() > ll.size()) {
                         min = ll;
                     }
                 }
@@ -257,31 +267,31 @@ public class PathSerachUtil {
         return currentAllStationList;
     }
 
-    public static List<StationInfo> getLineStation(List list,Map<Integer, LineInfo> mLineInfoList){
+    public static List<StationInfo> getLineStation(List list, Map<Integer, LineInfo> mLineInfoList) {
         List<StationInfo> oneLineMap = new ArrayList<>();
         int size = list.size();
         //Log.d("zxc","----------start---------------");
         StringBuffer buf = new StringBuffer();
-        for(int i = 0;i < size;i++){
-            if(i+1 < size ){
-                Node start = (Node)list.get(i);
+        for (int i = 0; i < size; i++) {
+            if (i + 1 < size) {
+                Node start = (Node) list.get(i);
                 StationInfo stationInfo = (StationInfo) start.getNodeEntity();
-                Node end = (Node)list.get(i+1);
+                Node end = (Node) list.get(i + 1);
                 StationInfo endInfo = (StationInfo) end.getNodeEntity();
                 int lineid = stationInfo.lineid;
-                if(i != 0){
+                if (i != 0) {
                     lineid = endInfo.lineid;
                 }
                 LineInfo lineInfo = getLineInfoByLineid(mLineInfoList, lineid);
-                for(StationInfo stationInfo1:lineInfo.getStationInfoList()){
-                    if(stationInfo1.getCname().equals(endInfo.getCname())){
+                for (StationInfo stationInfo1 : lineInfo.getStationInfoList()) {
+                    if (stationInfo1.getCname().equals(endInfo.getCname())) {
                         endInfo = stationInfo1;
                     }
-                    if(stationInfo1.getCname().equals(stationInfo.getCname())){
+                    if (stationInfo1.getCname().equals(stationInfo.getCname())) {
                         stationInfo = stationInfo1;
                     }
                 }
-                PathSerachUtil.findLinedStation(lineInfo,stationInfo,endInfo,oneLineMap);
+                PathSerachUtil.findLinedStation(lineInfo, stationInfo, endInfo, oneLineMap);
 
             }
             /*Node start = (Node)list.get(i);
@@ -367,7 +377,11 @@ public class PathSerachUtil {
 
     //查询站台是否与目标线路有相同线路
     public static int isSameLine(StationInfo start, int lined) {
-        final String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+        String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+        if (!start.canTransfer()) {
+            lines = new String[1];
+            lines[0] = "" + start.lineid;
+        }
         int size = lines.length;
         for (int i = 0; i < size; i++) {//找出和终点站相同点不用换乘
             if (CommonFuction.convertToInt(lines[i], 0) == lined) {//找到相同线路站不用换乘
@@ -379,8 +393,17 @@ public class PathSerachUtil {
 
     //查询站台是否与目标线路有相同线路
     public static int isTwoStationSameLine(StationInfo start, StationInfo end) {
-        final String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
-        final String lines1[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+        String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+        String lines1[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+
+        if (!start.canTransfer()) {
+            lines = new String[1];
+            lines[0] = "" + start.lineid;
+        }
+        if (!end.canTransfer()) {
+            lines1 = new String[1];
+            lines1[0] = "" + end.lineid;
+        }
         int size = lines.length;
         int size1 = lines1.length;
         for (int i = 0; i < size; i++) {//找出和终点站相同点不用换乘
@@ -415,7 +438,7 @@ public class PathSerachUtil {
         return nerstStationInfo;
     }
 
-    private static final int MINDIS = 600;
+    private static final int MINDIS = 500;
 
     public static StationInfo getNerastNextStation(BDLocation location, Map<Integer, LineInfo> mLineInfoList) {
         double min = Double.MAX_VALUE;
@@ -443,6 +466,30 @@ public class PathSerachUtil {
         return nerstStationInfo;
     }
 
+    public static StationInfo getNerastNextStation(BDLocation location, List<StationInfo> list) {
+        double min = Double.MAX_VALUE;
+        double longitude = 0;
+        double latitude = 0;
+        double dis = 0;
+        StationInfo nerstStationInfo = null;
+        if (location != null && list != null) {
+            for (StationInfo stationInfo : list) {
+                longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
+                latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
+                dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(), location.getLatitude());
+                if (min > dis) {
+                    min = dis;
+                    nerstStationInfo = stationInfo;
+                }
+            }
+        }
+        Log.d("zxc", "getNerastNextStation min = " + min);
+        if (MINDIS < min) {
+            return null;
+        }
+        return nerstStationInfo;
+    }
+
     public static boolean arriveNextStatison(BDLocation location, StationInfo stationInfo) {
         double longitude = CommonFuction.convertToDouble(stationInfo.getLot(), 0);
         double latitude = CommonFuction.convertToDouble(stationInfo.getLat(), 0);
@@ -453,19 +500,11 @@ public class PathSerachUtil {
         return false;
     }
 
-    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getReminderLines(StationInfo start, final StationInfo end,
-                                                                                     int maxLineid, BDLocation location, Map<Integer, LineInfo> mLineInfoList, Map<Integer, Map<Integer, Integer>> allLineCane) {
-        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>();
-        if (end == null) {
-            return lastLinesLast;
-        }
+    public static void getReminderLines(SearchResultListener mSearchResultListener, SearchManager.MyHandler myHandler, StationInfo start, final StationInfo end,
+                                        BDLocation location, DataManager mDataManager) {
         List<List<Integer>> transferLine = new ArrayList<List<Integer>>();//所有换乘路线
-        final Integer allLineNodes[] = new Integer[maxLineid];
-        for (int i = 0; i < maxLineid; i++) {//初始化所有线路
-            allLineNodes[i] = i;
-        }
         if (start == null) {
-            start = PathSerachUtil.getNerastStation(location, mLineInfoList);
+            start = PathSerachUtil.getNerastStation(location, mDataManager.getLineInfoList());
         }
         if (start != null) {
             if (!start.canTransfer() && !end.canTransfer()) {//都不能换乘
@@ -473,8 +512,11 @@ public class PathSerachUtil {
                     List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
                     list.add(start.lineid);
                     transferLine.add(list);
+                    mSearchResultListener.setLineNumber(1);
+                    mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
                 } else {
-                    transferLine = GrfAllEdge.createGraph(allLineNodes, allLineCane, start.lineid, end.lineid);
+                    mSearchResultListener.setLineNumber(1);
+                    startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
                 }
             } else if (start.canTransfer() && !end.canTransfer()) {
                 int lined = PathSerachUtil.isSameLine(start, end.lineid);
@@ -482,15 +524,19 @@ public class PathSerachUtil {
                     List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
                     list.add(lined);
                     transferLine.add(list);
+                    mSearchResultListener.setLineNumber(1);
+                    mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
                 } else {
                     String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    int n = 0;
                     for (int i = 0; i < lines.length; i++) {
                         int startid = CommonFuction.convertToInt(lines[i], -1);
                         if (startid >= 0) {
-                            List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, startid, end.lineid);
-                            transferLine.addAll(temp);
+                            n++;
+                            startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
                         }
                     }
+                    mSearchResultListener.setLineNumber(n);
                 }
             } else if (!start.canTransfer() && end.canTransfer()) {
                 int lined = PathSerachUtil.isSameLine(end, start.lineid);
@@ -498,15 +544,19 @@ public class PathSerachUtil {
                     List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
                     list.add(lined);
                     transferLine.add(list);
+                    mSearchResultListener.setLineNumber(1);
+                    mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
                 } else {
                     String lines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    int n = 0;
                     for (int i = 0; i < lines.length; i++) {
                         int startid = CommonFuction.convertToInt(lines[i], -1);
                         if (startid >= 0) {
-                            List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, start.lineid, startid);
-                            transferLine.addAll(temp);
+                            n++;
+                            startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
                         }
                     }
+                    mSearchResultListener.setLineNumber(n);
                 }
             } else {
                 int lined = PathSerachUtil.isTwoStationSameLine(start, end);
@@ -514,31 +564,33 @@ public class PathSerachUtil {
                     List<Integer> list = new ArrayList<Integer>();//将要查询路线放入
                     list.add(lined);
                     transferLine.add(list);
+                    mSearchResultListener.setLineNumber(1);
+                    mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
                 } else {
                     String startLines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
                     String endLines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
+                    int n = 0;
                     for (int i = 0; i < startLines.length; i++) {//遍历所有情况
                         int startid = CommonFuction.convertToInt(startLines[i], -1);
                         if (startid > 0) {
                             for (int j = 0; j < endLines.length; j++) {
                                 int endid = CommonFuction.convertToInt(endLines[j], -1);
                                 if (endid > 0) {
-                                    List<List<Integer>> temp = GrfAllEdge.createGraph(allLineNodes, allLineCane, startid, endid);
-                                    transferLine.addAll(temp);
+                                    n++;
+                                    startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
                                 }
                             }
                         }
                     }
+                    mSearchResultListener.setLineNumber(n);
                 }
             }
         }
+    }
+
+    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getReuslt(List<List<Integer>> transferLine,
+                                                                              final DataManager mDataManager, final StationInfo start, final StationInfo end) {
         Collections.sort(transferLine, new Comparator<List<Integer>>() {
-            /*
-             * int compare(Person p1, Person p2) 返回一个基本类型的整型，
-             * 返回负数表示：p1 小于p2，
-             * 返回0 表示：p1和p2相等，
-             * 返回正数表示：p1大于p2
-             */
             public int compare(List<Integer> p1, List<Integer> p2) {
                 //按照换乘次数
                 if (p1.size() > p2.size()) {
@@ -550,14 +602,21 @@ public class PathSerachUtil {
                 return -1;
             }
         });
+        //找出所有路径
+        return PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mDataManager.getLineInfoList(), transferLine, start, end));//查询最终线路
 
-        if (start != null || end != null) {
-            //找出所有路径
-            Log.d(TAG, "getReminderLines find all line = " + transferLine.size() + " start = " + start.getCname() + " end = " + end.getCname());
-            lastLinesLast = PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mLineInfoList, transferLine, start, end));//查询最终线路
-        }
-        transferLine.clear();
-        return lastLinesLast;
+    }
+
+    public static void startThread(final SearchResultListener mSearchResultListener, final int startlineid,
+                                   final int endlineid, final DataManager mDataManager, final StationInfo start, final StationInfo end) {
+        GeekThreadManager.getInstance().execute(new GeekRunnable(ThreadPriority.HIGH) {
+            @Override
+            public void run() {
+                GrfAllEdge grfAllEdge = new GrfAllEdge(mDataManager.getMaxLineid(), mDataManager.getAllLineNodes(), mDataManager.getMatirx());
+                List<List<Integer>> transferLine = grfAllEdge.serach(startlineid, endlineid);
+                mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
+            }
+        }, ThreadType.NORMAL_THREAD);
     }
 
     public static Map<Integer, Integer> getLineAllLined(List<StationInfo> list) {

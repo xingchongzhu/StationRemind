@@ -43,7 +43,7 @@
     <!--<string name="line_tail">%s号线</string>-->
     <string name="change_number">换乘%s次</string>
     <string name="change_next_line">换乘%s号线</string>
-    <string name="station_number">共%s站</string>
+    <string name="station_number">%s站</string>
     <string name="start_station">起点：</string>
     <string name="end_station">终点：</string>
     <string name="location_errot">请检测网络或gps定位是否开启！</string>
@@ -57,9 +57,11 @@
     <string name="surples_station">剩%s站</string>
     <string name="changet_hint_tile">换乘提醒</string>
     <string name="arrive_station_title">到站提醒</string>
+    <string name="arrive">到站</string>
+    <string name="change">换乘</string>
     <string name="hint_arrive_end_station">你已抵达终点站</string>
     <string name="direction">方向</string>
-    <string name="change_station_hint">请在%s站换乘%s号线</string>
+    <string name="change_station_hint">请在%s站换乘</string>
     <string name="line_background_hint">到站提醒</string>
     <string name="set_remind_hint">请设置提醒路线</string>
     <string name="colloction_catalog">收藏列表</string>
@@ -68,5 +70,13 @@
     <string name="please_select_colloction_line">请选择收藏路线</string>
     <string name="next_station">下一站:</string>
     <string name="search_loading">查询...</string>
+
+
+    <string name="description_direction_right" msgid="5709209043267548985">"向右滑动可关闭提醒"</string>
+    <string name="description_direction_left" msgid="7448141043674998679">"向左滑动可暂停提醒"</string>
+    <string name="description_direction_both" msgid="1841309486023845685">"向左滑动可暂停，向右滑动可关闭"</string>
+    <string name="alarm_alert_snoozed_text" msgid="7064642998528766113">"注意换乘"</string>
+    <string name="alarm_alert_off_text" msgid="4472073417593915002">"已经抵达注意下车"</string>
+    <string name="stop_hint" msgid="4472073417593915002">"结束提醒再会!"</string>
 
 </resources>

@@ -42,4 +42,18 @@
         <item name="android:windowNoTitle">true</item><!--无标题-->
         <item name="android:backgroundDimEnabled">false</item><!--模糊-->
     </style>
+
+
+    <style name="display_time">
+        <item name="android:textSize">56sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="body">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="alarm_lockscreen_thin">
+        <item name="android:textSize">@dimen/alarm_info_font_size</item>
+        <item name="android:fontFamily">sans-serif-thin</item>
+    </style>
 </resources>

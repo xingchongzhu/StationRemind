@@ -86,6 +86,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                 setCurrentLine(position);
             }
         });
+
     }
 
     private void showDialog(final StationInfo stationInfo) {
@@ -148,30 +149,33 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                 }
             });
         setCurrentLine(0);
-        colorLineAdapter.setData(list);
+        if(colorLineAdapter != null)
+            colorLineAdapter.setData(list);
 
     }
 
     private void setCurrentLine(int index){
-        if(index >= list.size()){
-            currentLineInfoText.setBackgroundColor(Color.WHITE);
-            currentLineInfoText.setTextColor(Color.WHITE);
-            currentLineInfoText.setText("");
-            sceneMapAdapter.setData(null);
-            return;
+        if(currentLineInfoText != null) {
+            if (index >= list.size()) {
+                currentLineInfoText.setBackgroundColor(Color.WHITE);
+                currentLineInfoText.setTextColor(Color.WHITE);
+                currentLineInfoText.setText("");
+                sceneMapAdapter.setData(null);
+                return;
+            }
+            String string = list.get(index).linename + " (" + list.get(index).getForwad() + "," + list.get(index).getReverse() + ")\n" + list.get(index).getLineinfo();
+
+            currentLineInfoText.setText(string);
+            currentLineInfoText.setBackgroundColor(list.get(index).colorid);
         }
-       // String string = String.format(linenail,list.get(index).lineid+"")+" "
-        //        +list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+ list.get(index).getLineinfo();
-        String string = list.get(index).linename+" ("+list.get(index).getForwad()+","+list.get(index).getReverse()+")\n"+ list.get(index).getLineinfo();
+        if(sceneMap != null) {
+            sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));
+            int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (list.get(index).getStationInfoList().size() / 5 + 1);
+            ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
+            linearParams.height = height;
+            sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
+        }
 
-        currentLineInfoText.setText(string);
-        currentLineInfoText.setBackgroundColor(list.get(index).colorid);
-        sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));
-
-        int height = (int)activity.getResources().getDimension(R.dimen.count_line_node_rect_height)*list.get(index).getStationInfoList().size()/5+1;
-        ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
-        linearParams.height = height;
-        sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
     }
 
     @Override

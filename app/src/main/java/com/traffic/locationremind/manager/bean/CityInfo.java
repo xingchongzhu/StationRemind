@@ -4,6 +4,7 @@ package com.traffic.locationremind.manager.bean;
 public class CityInfo {
     public static String  CITYNO = "cityno";
     public static String CITYNAME = "cityname";
+    public static String LOCATIONNAME = "locationname";
     public static String PINGYING = "pingying";
 
     private String cityNo;//城市编码
