@@ -185,17 +185,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 this.startActivityForResult(intent,SELECTCITYREQUEST);
                 overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
                 break;
-            /*case R.id.colloction_btn:
-                List<LineObject> lineObjects = CommonFuction.getAllFavourite(this,mDataManager);
-                if(lineObjects.size() <= 0){
-                    Toast.makeText(this,getResources().getString(R.string.colloction_catalog_empty),Toast.LENGTH_SHORT).show();
-                }else{
-                    mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
-                    RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
-                    remindFragment.getScrollFavoriteManager().openScrollView(lineObjects);
-                }
-                break;*/
         }
+    }
+
+    public void searchStation(String start,String end){
+        showSerachView();
+        mSearchManager.setSearchText(start,end);
     }
 
     public void showSerach(View view) {

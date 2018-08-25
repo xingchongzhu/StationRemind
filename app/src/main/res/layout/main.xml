@@ -18,7 +18,7 @@
             android:layout_centerVertical="true"
             android:text="切换城市"
             android:textColor="@color/btn_press_color"
-            android:textSize="22sp" />
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <EditText

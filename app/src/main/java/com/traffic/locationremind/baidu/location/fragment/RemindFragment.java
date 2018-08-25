@@ -20,7 +20,7 @@ import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
-import com.traffic.locationremind.baidu.location.AlarmActivity;
+import com.traffic.locationremind.baidu.location.activity.AlarmActivity;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
 import com.traffic.locationremind.baidu.location.view.LineNodeView;
@@ -142,82 +142,85 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         }
     }
 
-    public void createLine(List<StationInfo> list) {
+    public void createLine(final List<StationInfo> list) {
         if (list == null || list.size() <= 0) {
             return;
         }
         this.list = list;
-        mScrollFavoriteManager.closeScrollView();
-        //remind_root.setVisibility(View.VISIBLE);
-        //hint_text.setVisibility(View.GONE);
-        needChangeStationList.clear();
-        linearlayout.removeAllViews();
-        Map<Integer, LineInfo> lineInfoMap = new HashMap<>();
-        StationInfo preStationInfo = null;
-        for (int i = 0; i < list.size(); i++) {
-            StationInfo stationInfo = list.get(i);
-            //创建textview
-            LineNodeView textView = new LineNodeView(getActivity());
-            textView.setId(i + 1000);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mScrollFavoriteManager.closeScrollView();
+                needChangeStationList.clear();
+                linearlayout.removeAllViews();
+                Map<Integer, LineInfo> lineInfoMap = new HashMap<>();
+                StationInfo preStationInfo = null;
+                for (int i = 0; i < list.size(); i++) {
+                    StationInfo stationInfo = list.get(i);
+                    //创建textview
+                    LineNodeView textView = new LineNodeView(getActivity());
+                    textView.setId(i + 1000);
 
-            textView.setStation(stationInfo);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(lineNodeWidth, lineNodeHeight);
-            linearlayout.addView(textView, layoutParams);
-            //添加到集合
-            textViewList.put(stationInfo.getCname(), textView);
-            if (i == 0) {//起点
-                currentStation = list.get(0);
-                int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
-                Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_start), size, size);
-                textView.setBitMap(bitmap);
-            } else {
-                nextStation = list.get(1);
-            }
-            //换乘点
-            if (preStationInfo != null && preStationInfo.lineid != stationInfo.lineid) {
-                needChangeStationList.add(stationInfo);
-                int size = (int) getResources().getDimension(R.dimen.transfer_bitmap_size);
-                Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_route_map_pin_dottransfer), size, size);
-                textView.setTransFerBitmap(bitmap);
-            } else if (preStationInfo != null && preStationInfo.lineid == stationInfo.lineid) {
-                if (preStationInfo.pm < stationInfo.pm) {
-                    lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
-                } else {
-                    lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getForwad());
+                    textView.setStation(stationInfo);
+                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(lineNodeWidth, lineNodeHeight);
+                    linearlayout.addView(textView, layoutParams);
+                    //添加到集合
+                    textViewList.put(stationInfo.getCname(), textView);
+                    if (i == 0) {//起点
+                        currentStation = list.get(0);
+                        int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
+                        Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_main_map_pin_start), size, size);
+                        textView.setStartBitMap(bitmap);
+                    } else {
+                        nextStation = list.get(1);
+                    }
+                    //换乘点
+                    if (preStationInfo != null && preStationInfo.lineid != stationInfo.lineid) {
+                        needChangeStationList.add(stationInfo);
+                        int size = (int) getResources().getDimension(R.dimen.transfer_bitmap_size);
+                        Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_route_map_pin_dottransfer), size, size);
+                        textView.setTransFerBitmap(bitmap);
+                    } else if (preStationInfo != null && preStationInfo.lineid == stationInfo.lineid) {
+                        if (preStationInfo.pm < stationInfo.pm) {
+                            lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
+                        } else {
+                            lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getForwad());
+                        }
+                    }
+                    //终点
+                    if (i == list.size() - 1) {
+                        int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
+                        Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_main_map_pin_end), size, size);
+                        textView.setStartBitMap(bitmap);
+                        needChangeStationList.add(stationInfo);
+                    }
+                    preStationInfo = stationInfo;
+                    int lineid = list.get(i).lineid;
+                    lineInfoMap.put(lineid, mDataManager.getLineInfoList().get(lineid));
                 }
-            }
-            //终点
-            if (i == list.size() - 1) {
-                int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
-                Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_end), size, size);
-                textView.setBitMap(bitmap);
-                needChangeStationList.add(stationInfo);
-            }
-            preStationInfo = stationInfo;
-            int lineid = list.get(i).lineid;
-            lineInfoMap.put(lineid, mDataManager.getLineInfoList().get(lineid));
-        }
-        String start = list.get(0).getCname() + " -> " + list.get(list.size() - 1).getCname();
-        start_and_end.setText(start);
+                String start = list.get(0).getCname() + " -> " + list.get(list.size() - 1).getCname();
+                start_and_end.setText(start);
 
-        String stationNum = String.format(getResources().getString(R.string.station_number), list.size() + "");
-        String changeNumstr = String.format(getResources().getString(R.string.change_number), lineInfoMap.size() + "");
-        line_change_introduce.setText(changeNumstr + "  " + stationNum);
+                String stationNum = String.format(getResources().getString(R.string.station_number), list.size() + "");
+                String changeNumstr = String.format(getResources().getString(R.string.change_number), lineInfoMap.size() + "");
+                line_change_introduce.setText(changeNumstr + "  " + stationNum);
 
-        String surplusNum = String.format(getResources().getString(R.string.surples_station), list.size() - 1 + "");
-        String currenStr = getResources().getString(R.string.current_station) + list.get(0).getCname();
-        String line = CommonFuction.getLineNo(DataManager.getInstance(getActivity()).getLineInfoList().get(list.get(0).lineid).linename)[0];
-        //String.format(getResources().getString(R.string.line_tail),list.get(0).lineid+"") ;
-        String direction = lineDirection.get(list.get(0).lineid) + getResources().getString(R.string.direction);
-        current_info_text.setText(surplusNum + "   " + currenStr + "   " + line + "   " + direction);
-        line_color_view.setLineInfoMap(lineInfoMap);
-        if (isRemind)
-            cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
-        cancle_remind_btn.setEnabled(true);
-        currentStation = list.get(0);
-        nextStation = list.get(0);
-        updateColloctionView();
-        tempChangeStationList = new ArrayList<>(needChangeStationList);
+                String surplusNum = String.format(getResources().getString(R.string.surples_station), list.size() - 1 + "");
+                String currenStr = getResources().getString(R.string.current_station) + list.get(0).getCname();
+                String line = CommonFuction.getLineNo(DataManager.getInstance(getActivity()).getLineInfoList().get(list.get(0).lineid).linename)[0];
+                //String.format(getResources().getString(R.string.line_tail),list.get(0).lineid+"") ;
+                String direction = lineDirection.get(list.get(0).lineid) + getResources().getString(R.string.direction);
+                current_info_text.setText(surplusNum + "   " + currenStr + "   " + line + "   " + direction);
+                line_color_view.setLineInfoMap(lineInfoMap);
+                if (isRemind)
+                    cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
+                cancle_remind_btn.setEnabled(true);
+                currentStation = list.get(0);
+                nextStation = list.get(0);
+                updateColloctionView();
+                tempChangeStationList = new ArrayList<>(needChangeStationList);
+            }
+        });
     }
 
     public void updateColloctionView() {
@@ -386,30 +389,16 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     public void loactionStation(BDLocation location) {
         MainActivity activity = (MainActivity) getActivity();
         mBDLocation = location;
-        /*StationInfo nerstStationInfo = nextStation;
-        if(mDataManager != null) {
-            StationInfo nerstStationInfo1 = PathSerachUtil.getNerastNextStation(location, mDataManager.getLineInfoList());
-            if (nerstStationInfo1 != null && !nextStation.getCname().equals(nerstStationInfo1.getCname())) {
-                adjustlocation++;
-                if (adjustlocation > LOCATIONTIMEOUTNUM) {
-                    nerstStationInfo = nerstStationInfo1;
-                    adjustlocation = 0;
-                }
-            } else {
-                adjustlocation = 0;
-            }
-        }*/
-        StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location,list);
+
+        StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);
         if (mScrollFavoriteManager != null)
             mScrollFavoriteManager.setLocation(location);
         if (activity == null || !activity.getPersimmions()) {
             return;
         } else if (nerstStationInfo != null) {
-            //CityInfo currentCityNo = mDataManager.getCityInfoList().get(location.getCityCode());
-            //boolean result = PathSerachUtil.arriveNextStatison(location,nerstStationInfo);
             if (true) {
                 LineNodeView lineNodeView = textViewList.get(nerstStationInfo.getCname());
-               // LineNodeView lineNodeView = textViewList.get(list.get(num++).getCname());
+                // LineNodeView lineNodeView = textViewList.get(list.get(num++).getCname());
                 if (lineNodeView != null) {
                     if (currentStationView != null) {
                         currentStationView.setBitMap(null);
@@ -443,21 +432,21 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                         for (StationInfo stationInfo : tempChangeStationList) {
                             if (list.get(list.size() - 1).getCname().equals(stationInfo.getCname()) &&
                                     stationInfo.getCname().equals(currentStation.getCname())) {
-                                Log.d(TAG, "arrive stationInfo.getCname()"+stationInfo.getCname());
+                                Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
                                 tempChangeStationList.remove(stationInfo);
                                 isRemind = false;
                                 //cancleNotification();
                                 //arriveNotification();
-                                sendHint(true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station),"");
+                                sendHint(true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station), "");
                                 break;
-                            } else if(stationInfo.getCname().equals(currentStation.getCname())){//换乘点
+                            } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
 
                                 tempChangeStationList.remove(stationInfo);
-                                String str = String.format(getResources().getString(R.string.change_station_hint),stationInfo.getCname())+
+                                String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
                                         DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid).linename;
                                 sendHint(false, getResources().getString(R.string.change), str,
                                         lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
-                                Log.d(TAG, "change stationInfo.getCname()"+stationInfo.getCname());
+                                Log.d(TAG, "change stationInfo.getCname()" + stationInfo.getCname());
                                 //changeNotification(str);
                                 break;
                             }
@@ -469,7 +458,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         }
     }
 
-    private void sendHint(boolean isArrive, String title, String content,String change) {
+    private void sendHint(boolean isArrive, String title, String content, String change) {
         Intent intent = new Intent(getActivity(), AlarmActivity.class);
         intent.putExtra("arrive", isArrive);
         intent.putExtra("title", title);

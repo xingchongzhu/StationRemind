@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.traffic.locationremind.baidu.location;
+package com.traffic.locationremind.baidu.location.activity;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.animation.*;

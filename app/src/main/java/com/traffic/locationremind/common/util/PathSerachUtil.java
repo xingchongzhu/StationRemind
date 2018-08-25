@@ -292,6 +292,9 @@ public class PathSerachUtil {
                 StationInfo stationInfo = (StationInfo) start.getNodeEntity();
                 Node end = (Node) list.get(i + 1);
                 StationInfo endInfo = (StationInfo) end.getNodeEntity();
+                if(stationInfo == null || endInfo == null){
+                    continue;
+                }
                 int lineid = stationInfo.lineid;
                 if (i != 0) {
                     lineid = endInfo.lineid;

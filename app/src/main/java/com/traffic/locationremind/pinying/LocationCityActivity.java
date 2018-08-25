@@ -184,8 +184,8 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	private void cityInit() {
 		CityInfo city = new CityInfo("定位", "0"); // 当前定位城市
 		allCity_lists.add(city);
-		city = new CityInfo("最近", "1"); // 最近访问的城市
-		allCity_lists.add(city);
+		//city = new CityInfo("最近", "1"); // 最近访问的城市
+		//allCity_lists.add(city);
 		city = new CityInfo("热门", "2"); // 热门城市
 		allCity_lists.add(city);
 		city = new CityInfo("全部", "3"); // 全部城市
@@ -457,7 +457,8 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 					city.setText("重新选择");
 					pbLocate.setVisibility(View.GONE);
 				}
-			} else if (viewType == 1) { // 最近访问城市
+			}
+			/*else if (viewType == 1) { // 最近访问城市
 				convertView = inflater.inflate(R.layout.recent_city, null);
 				GridView rencentCity = (GridView) convertView
 						.findViewById(R.id.recent_city);
@@ -469,16 +470,17 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 					public void onItemClick(AdapterView<?> parent, View view,
 											int position, long id) {
 						setSelectResult(city_history.get(position));
-						/*Toast.makeText(getApplicationContext(),
+						*//*Toast.makeText(getApplicationContext(),
 								city_history.get(position), Toast.LENGTH_SHORT)
-								.show();*/
+								.show();*//*
 
 					}
 				});
 				TextView recentHint = (TextView) convertView
 						.findViewById(R.id.recentHint);
 				recentHint.setText("最近访问的城市");
-			} else if (viewType == 2) {
+			} */
+			else if (viewType == 1) {
 				convertView = inflater.inflate(R.layout.recent_city, null);
 				GridView hotCity = (GridView) convertView
 						.findViewById(R.id.recent_city);
@@ -495,10 +497,9 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 					}
 				});
 				hotCity.setAdapter(new HotCityAdapter(context, this.hotList));
-				TextView hotHint = (TextView) convertView
-						.findViewById(R.id.recentHint);
+				TextView hotHint = (TextView) convertView.findViewById(R.id.recentHint);
 				hotHint.setText("热门城市");
-			} else if (viewType == 3) {
+			} else if (viewType == 2) {
 				convertView = inflater.inflate(R.layout.total_item, null);
 			} else {
 				if (convertView == null) {

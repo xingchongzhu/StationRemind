@@ -87,6 +87,15 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         }
     }
 
+    public void setSearchText(String start,String end){
+        if(searchView != null){
+            searchView.setStartInput(start);
+            searchView.setendInput(end);
+        }
+        if(autoCompleteData != null){
+            autoCompleteData.clear();
+        }
+    }
     /**
      * 搜索过程中自动补全数据
      */

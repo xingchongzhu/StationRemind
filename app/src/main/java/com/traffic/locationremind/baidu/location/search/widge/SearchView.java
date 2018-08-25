@@ -154,6 +154,13 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
 
     boolean isComplete = false;
 
+    public void setStartInput(String text){
+        startInput.setText(text);
+    }
+
+    public void setendInput(String text){
+        endInput.setText(text);
+    }
 
     public void setSelectStation(int position) {
         String text = ((StationInfo) lvTips.getAdapter().getItem(position)).getCname();

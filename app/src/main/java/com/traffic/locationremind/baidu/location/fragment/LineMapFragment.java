@@ -24,7 +24,7 @@ import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.*;
 
-public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWriteFinishListener, View.OnClickListener{
+public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWriteFinishListener, View.OnClickListener {
 
     private final static String TAG = "LineMapFragment";
 
@@ -45,32 +45,35 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private List<LineInfo> list = new ArrayList<>();
     //private String linenail = "";
     MainActivity activity;
+    StationInfo start,end;
     private SettingReminderDialog mSettingReminderDialog;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG,"onCreateView");
+        Log.d(TAG, "onCreateView");
         if (null != rootView) {
             ViewGroup parent = (ViewGroup) rootView.getParent();
             if (null != parent) {
                 parent.removeView(rootView);
             }
         } else {
-            rootView = inflater.inflate(R.layout.line_map_layout,container,false);
+            rootView = inflater.inflate(R.layout.line_map_layout, container, false);
             initView(rootView);// 控件初始化
         }
         return rootView;
     }
-    private void initView(View rootView){
+
+    private void initView(View rootView) {
         sceneMap = (GridView) rootView.findViewById(R.id.sceneMap);
         currentLineInfoText = (TextView) rootView.findViewById(R.id.text);
         lineMap = (GridView) rootView.findViewById(R.id.lineMap);
         //linenail = getResources().getString(R.string.line_tail);
-        mDataManager = ((MainActivity)getActivity()).getDataManager();
+        mDataManager = ((MainActivity) getActivity()).getDataManager();
 
         colorLineAdapter = new ColorLineAdapter(this.getActivity());
         lineMap.setAdapter(colorLineAdapter);
-        sceneMapAdapter = new AllLineAdapter(this.getActivity(),mDataManager);
+        sceneMapAdapter = new AllLineAdapter(this.getActivity(), mDataManager);
         sceneMap.setAdapter(sceneMapAdapter);
 
         sceneMap.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -90,7 +93,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     }
 
     private void showDialog(final StationInfo stationInfo) {
-        Log.d(TAG,"showDialog stationInfo.getCname() = "+stationInfo.getCname());
+        Log.d(TAG, "showDialog stationInfo.getCname() = " + stationInfo.getCname());
         List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname());
         String existInfostr = "";
         if (existInfoList != null) {
@@ -102,7 +105,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         if (mSettingReminderDialog != null) {
             mSettingReminderDialog.dismiss();
             mSettingReminderDialog = null;
-        }else{
+        } else {
         }
         mSettingReminderDialog = new SettingReminderDialog(getActivity(),
                 R.style.Dialog, new SettingReminderDialog.NoticeDialogListener() {
@@ -111,11 +114,20 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                 try {
                     switch (view.getId()) {
                         case R.id.start:
+                            start = stationInfo;
                             mSettingReminderDialog.dismiss();
-
                             break;
                         case R.id.end:
-
+                            mSettingReminderDialog.dismiss();
+                            end = stationInfo;
+                            String startText = start==null ? LineMapFragment.this.getActivity().getResources().getString(R.string.current_location):
+                                    start.getCname();
+                            String endText = end==null?LineMapFragment.this.getActivity().getResources().getString(R.string.current_location):
+                                    end.getCname();
+                            ((MainActivity)LineMapFragment.this.getActivity()).searchStation(startText,endText);
+                            Log.d(TAG,"startText = "+startText+" endText = "+endText);
+                            start = null;
+                            end = null;
                             break;
                     }
 
@@ -128,34 +140,35 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         mSettingReminderDialog.setContentView(R.layout.setting_reminder_dialog);
         mSettingReminderDialog.show();
     }
-    public void upadaData(){
-        if(mDataManager != null && mDataManager.getLineInfoList() != null){
+
+    public void upadaData() {
+        if (mDataManager != null && mDataManager.getLineInfoList() != null) {
             list.clear();
-            for(Map.Entry<Integer,LineInfo> entry:mDataManager.getLineInfoList().entrySet()){
+            for (Map.Entry<Integer, LineInfo> entry : mDataManager.getLineInfoList().entrySet()) {
                 list.add(entry.getValue());
             }
         }
 
         Collections.sort(list, new Comparator<LineInfo>() {
-                @Override
-                public int compare(LineInfo o1, LineInfo o2) {
-                   if(o1.getLineid() < o1.getLineid()){
-                       return -1;
-                   }else if(o1.getLineid() == o1.getLineid()){
-                       return 0;
-                   }else{
-                       return 1;
-                   }
+            @Override
+            public int compare(LineInfo o1, LineInfo o2) {
+                if (o1.getLineid() < o1.getLineid()) {
+                    return -1;
+                } else if (o1.getLineid() == o1.getLineid()) {
+                    return 0;
+                } else {
+                    return 1;
                 }
-            });
+            }
+        });
         setCurrentLine(0);
-        if(colorLineAdapter != null)
+        if (colorLineAdapter != null)
             colorLineAdapter.setData(list);
 
     }
 
-    private void setCurrentLine(int index){
-        if(currentLineInfoText != null) {
+    private void setCurrentLine(int index) {
+        if (currentLineInfoText != null) {
             if (index >= list.size()) {
                 currentLineInfoText.setBackgroundColor(Color.WHITE);
                 currentLineInfoText.setTextColor(Color.WHITE);
@@ -168,7 +181,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             currentLineInfoText.setText(string);
             currentLineInfoText.setBackgroundColor(list.get(index).colorid);
         }
-        if(sceneMap != null) {
+        if (sceneMap != null) {
             sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));
             int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (list.get(index).getStationInfoList().size() / 5 + 1);
             ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
