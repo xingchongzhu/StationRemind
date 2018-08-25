@@ -24,6 +24,7 @@ import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
 import com.traffic.locationremind.baidu.location.search.model.Bean;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
+import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
@@ -35,7 +36,7 @@ import com.traffic.locationremind.manager.database.DataManager;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-public class SearchManager implements SearchView.SearchViewListener ,SearchResultListener {
+public class SearchManager implements SearchView.SearchViewListener, SearchResultListener {
 
     private final static String TAG = "SearchManager";
     /**
@@ -45,7 +46,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
     private ListView serachResults;
     private GridView recentSerachGrid;
     private SearchView searchView;
-    private View loading;
+    //private View loading;
     private RemindSetViewListener mRemindSetViewListener;
 
     GridViewAdapter mGridViewAdapter;
@@ -67,6 +68,8 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
     private MainActivity activity;
     private SearchLoadingDialog mSearchLoadingDialog;
     List<List<Integer>> allLines = new ArrayList<>();
+    Map<String, List<Integer>> allLinesMap = new HashMap<>();
+
     public class MyHandler extends Handler {
         private WeakReference<MainActivity> mActivity;
 
@@ -77,106 +80,11 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if(lastLinesLast.size() <= 0){
+            if (lastLinesLast.size() <= 0) {
                 return;
             }
-            sortStationNum(lastLinesLast);
-            Map.Entry<List<Integer>, List<StationInfo>> first = lastLinesLast.get(0);
-            //去除相同
-            //换乘次数排序
-            sortChangeTime(lastLinesLast);
-            if(lastLinesLast.get(0) == first){
-                lastLinesLast.clear();
-                lastLinesLast.add(first);
-                mCardAdapter.setData(lastLinesLast);
-                return;
-            }
-            //去除相同
-            List<Map.Entry<List<Integer>, List<StationInfo>>> add = new ArrayList<>();
-            Map<Integer,Integer> array = new HashMap();
-            for(Map.Entry<List<Integer>, List<StationInfo>>entry: lastLinesLast){
-                boolean isEqual = false;
-                for(Map.Entry<List<Integer>, List<StationInfo>>listEntry: add){
-                    if(entry.getKey().toString().equals(listEntry.getKey().toString()) &&
-                            entry.getValue().size() == listEntry.getValue().size()){
-                        isEqual = true;
-                    }
-                }
-                if(!isEqual)
-                    add.add(entry);
-                array.put(entry.getKey().size(),entry.getKey().size());
-            }
-
-            //换乘次数分类
-            List<Integer> list = new ArrayList<>(array.keySet());
-            Collections.sort(list, new Comparator<Integer>() {
-                public int compare(Integer o1,Integer o2) {
-                    if (o1< o2) {
-                        return -1;
-                    } else if (o1 == o2) {
-                        return 0;
-                    }
-                    return 1;
-                }
-            });
-            List<Map.Entry<List<Integer>, List<StationInfo>>> needadd = new ArrayList<>();
-            List<Map.Entry<List<Integer>, List<StationInfo>>> templist = new ArrayList<>();
-            if(lastLinesLast != null)
-                lastLinesLast.clear();
-            for(Integer size:list){
-                needadd.clear();
-                templist.clear();
-                for(Map.Entry<List<Integer>, List<StationInfo>>entry: add){
-                    if(size == entry.getKey().size()){
-                        needadd.add(entry);
-                    }
-                }
-                sortStationNum(needadd);
-                if(needadd.size() >0){
-                    int number = needadd.get(0).getValue().size();
-                    for(Map.Entry<List<Integer>, List<StationInfo>>entry: needadd){
-                        if(number == entry.getValue().size()){
-                            templist.add(entry);
-                        }
-                    }
-                    lastLinesLast.addAll(templist);
-                }
-            }
-            sortChangeTime(lastLinesLast);
             mCardAdapter.setData(lastLinesLast);
         }
-    }
-
-    public void sortChangeTime(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
-        if(lastLinesLast.size() <2){
-            return;
-        }
-        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
-            public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
-                               Map.Entry<List<Integer>, List<StationInfo>> o2) {
-                if (o1.getKey().size() < o2.getKey().size()) {
-                    return -1;
-                } else if (o1.getKey().size() == o2.getKey().size()) {
-                    return 0;
-                }
-                return 1;
-            }
-        });
-    }
-
-    public void sortStationNum(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
-
-        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
-            public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
-                               Map.Entry<List<Integer>, List<StationInfo>> o2) {
-                if (o1.getValue().size() < o2.getValue().size()) {
-                    return -1;
-                } else if (o1.getValue().size() == o2.getValue().size()) {
-                    return 0;
-                }
-                return 1;
-            }
-        });
     }
 
     /**
@@ -191,12 +99,11 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
         activity = (MainActivity) context;
         myHandler = new MyHandler(new WeakReference<>(activity));
         this.searchView = searchView;
-        ViewGroup serachLayoutManagerRoot = (ViewGroup)((MainActivity) context).findViewById(R.id.serach_layout_manager_root);
+        ViewGroup serachLayoutManagerRoot = (ViewGroup) ((MainActivity) context).findViewById(R.id.serach_layout_manager_root);
         serachResults = searchView.getResultListview();
         lvResults = searchView.getLvTips();
         recentSerachGrid = searchView.getRecentSerachGrid();
         autoCompleteAdapter = new SearchAdapter(context, autoCompleteData, R.layout.item_bean_list);
-        loading = searchView.getLoading();
         //设置监听
         searchView.setSearchViewListener(this);
         //设置adapter
@@ -238,8 +145,6 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
                 return true;
             }
         });
-
-
     }
 
     /**
@@ -252,7 +157,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
         getAutoCompleteData(context, null);
     }
 
-    public void reloadData(Context context){
+    public void reloadData(Context context) {
         getDbData();
         getAutoCompleteData(context, null);
     }
@@ -323,16 +228,16 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
         getAutoCompleteData(context, text);
     }
 
-    StationInfo startStation = null, endStation = null,prestartStation,preendStation;
+    StationInfo startStation = null, endStation = null, prestartStation, preendStation;
+
     /**
      * 点击搜索键时edit text触发的回调
      */
     @Override
     public void onSearch(final Context context, String start, String end) {
-        /*if(mSearchLoadingDialog != null && mSearchLoadingDialog.isShowing()){
-            return;
-        }*/
+        AsyncTaskManager.getInstance().stopAllGeekRunable();
         synchronized (lock) {
+            searchView.hideSoftInput();
             String currentCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.CITYNAME);
             String locationCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.LOCATIONNAME);
             if (mSearchLoadingDialog != null) {
@@ -346,7 +251,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
 
             if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity) ||
                     (prestartStation != null && preendStation != null && prestartStation.getCname().equals(start) &&
-                    preendStation.getCname().equals(end))) {
+                            preendStation.getCname().equals(end))) {
                 return;
             }
             if (start.equals(current)) {
@@ -374,7 +279,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
                 //Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Log.d("zxc1","onSearch ");
+            Log.d("zxc1", "onSearch ");
             Log.d(TAG, "onSearch start = " + start + " end = " + end + " startStation.getCname() = " + startStation.getCname() + " endStation.getCname() = " + endStation.getCname());
             if (mSearchLoadingDialog == null) {
                 mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
@@ -383,6 +288,7 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
             mSearchLoadingDialog.show();
             lastLinesLast.clear();
             allLines.clear();
+            allLinesMap.clear();
             searchTaskNum = 0;
             finishTaskNum = 0;
             PathSerachUtil.getReminderLines(this, myHandler, startStation, endStation,
@@ -390,48 +296,47 @@ public class SearchManager implements SearchView.SearchViewListener ,SearchResul
         }
     }
 
-    private boolean isSearch = false;
-
     private Object lock = new Object();
+
     @Override
     public void setLineNumber(int number) {
-        Log.d("zxc1","setLineNumber number = "+number);
+        Log.d("zxc1", "setLineNumber number = " + number);
         finishTaskNum = number;
-        isSearch = true;
     }
 
     @Override
-    public void updateSingleResult(List<Integer> list){
+    public void updateSingleResult(List<Integer> list) {
+        if (allLinesMap.get(list.toString()) != null) {
+            return;
+        }
+        allLinesMap.put(list.toString(), list);
+        allLines.clear();
         allLines.add(list);
-        lastLinesLast.clear();
-        Log.d("zxc01","updateSingleResult lastLinesLast.size = "+lastLinesLast.size());
         lastLinesLast.addAll(PathSerachUtil.getReuslt(allLines, mDataManager, startStation, endStation));
-        Message message = myHandler.obtainMessage();
-        message.what = 0;
-        myHandler.sendMessage(message);
-        if(mSearchLoadingDialog != null && (lastLinesLast.size() >0)){
-            mSearchLoadingDialog.dismiss();
+        PathSerachUtil.getRecomendLines(lastLinesLast);
+        if (mSearchLoadingDialog != null && (lastLinesLast.size() > 0)) {
+            mSearchLoadingDialog.cancel();
         }
-
+        Message message =myHandler.obtainMessage();
+        message.what =0;
+        myHandler.sendMessageDelayed(message,100);
     }
 
     @Override
-    public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines){
+    public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines) {
         //Log.d("zxc1","updateResult lastLinesLast = "+lastLinesLast);
-        searchTaskNum ++;
-        if(mSearchLoadingDialog != null && (lines.size() >0 || searchTaskNum>= finishTaskNum)){
-            mSearchLoadingDialog.dismiss();
+        searchTaskNum++;
+        if (mSearchLoadingDialog != null && (lines.size() > 0 || searchTaskNum >= finishTaskNum)) {
+            mSearchLoadingDialog.cancel();;
         }
-        if(lines == null || lines.size() <=0){
+        if (lines == null || lines.size() <= 0) {
             return;
         }
         lastLinesLast.addAll(lines);
-        Log.d("zxc1","updateResult searchTaskNum = "+searchTaskNum+" lastLinesLast.size = "+lastLinesLast.size());
-       // if(finishTaskNum ){
-            Message message = myHandler.obtainMessage();
-            message.what = 0;
-            myHandler.sendMessage(message);
-            isSearch = false;
-       // }
+        Log.d("zxc1", "updateResult searchTaskNum = " + searchTaskNum + " lastLinesLast.size = " + lastLinesLast.size());
+        Message message =myHandler.obtainMessage();
+        message.what =0;
+        myHandler.sendMessageDelayed(message,100);
+        // }
     }
 }

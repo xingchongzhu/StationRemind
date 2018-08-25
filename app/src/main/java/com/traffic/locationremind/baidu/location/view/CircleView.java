@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.traffic.locationremind.baidu.location.notification;
+package com.traffic.locationremind.baidu.location.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

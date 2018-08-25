@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.traffic.locationremind.baidu.location.notification;
+package com.traffic.locationremind.baidu.location.activity;
 
 import android.animation.*;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
@@ -29,6 +29,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.notification.ThemeUtils;
 
 
 /**

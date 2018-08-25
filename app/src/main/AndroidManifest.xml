@@ -43,7 +43,7 @@
                   android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name="com.traffic.locationremind.baidu.location.notification.AlarmActivity"
+        <activity android:name="com.traffic.locationremind.baidu.location.AlarmActivity"
                   android:launchMode="singleTask"
                   android:screenOrientation="portrait">
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.traffic.locationremind.baidu.location.notification;
+package com.traffic.locationremind.baidu.location;
 
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.animation.*;
@@ -32,11 +32,12 @@ import android.util.Log;
 import android.view.*;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.ImageView;
-import android.widget.TextClock;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.notification.AnimatorUtils;
+import com.traffic.locationremind.baidu.location.activity.BaseActivity;
+import com.traffic.locationremind.baidu.location.view.CircleView;
 import com.traffic.locationremind.baidu.location.utils.TimerKlaxon;
-import com.traffic.locationremind.baidu.location.utils.VibratorUtil;
 
 import java.util.List;
 

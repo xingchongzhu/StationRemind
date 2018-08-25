@@ -39,6 +39,7 @@ import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.RemindSetViewManager;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
@@ -369,6 +370,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
+            AsyncTaskManager.getInstance().stopAllGeekRunable();
             if (mRemindSetViewManager.getRemindWindowState()) {
                 hideSetRemindView();
                 return true;

@@ -1,5 +1,6 @@
 package com.traffic.locationremind.baidu.location.utils;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Stack;
 
 
-public class SearchPath {
+public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integer>>> {
     /* 临时保存路径节点的栈 */
     public Stack<Node> stack = new Stack<Node>();
     /* 存储路径的集合 */
@@ -21,16 +22,53 @@ public class SearchPath {
     private static final int maxchange = 5;
     private SearchResultListener mSearchResultListener;
     private boolean stopRun = false;
+    private int origin=0,  goal=0;
+    private int[][] nodeRalation;
+    //onPreExecute用于异步处理前的操作
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
 
-    public SearchPath(SearchResultListener mSearchResultListener){
+    public SearchPath(SearchResultListener mSearchResultListener,int origin, int goal, int[][] nodeRalation) {
         this.mSearchResultListener = mSearchResultListener;
+        this.origin = origin;
+        this.goal = goal;
+        this.nodeRalation = nodeRalation;
     }
 
-    public SearchPath(){
+    //在doInBackground方法中进行异步任务的处理.
+    @Override
+    protected List<List<Integer>> doInBackground(String... params) {
+        return serach(origin, goal, nodeRalation);
+    }
+
+    @Override
+    protected void onProgressUpdate(List<Integer>... values) {
+        super.onProgressUpdate(values);
+        notificationUpdate((List<Integer>)values[0]);
+    }
+
+    //onPostExecute用于UI的更新.此方法的参数为doInBackground方法返回的值.
+    @Override
+    protected void onPostExecute(List<List<Integer>> list) {
+        super.onPostExecute(list);
+        stopRun = false;
+        stack.clear();
+        stack = null;
+        list.clear();
+        AsyncTaskManager.getInstance().removeGeekRunnable(this);
+    }
+
+    public SearchPath() {
 
     }
 
-    public void setStopRunState(boolean state){
+    public boolean getRunState() {
+        return stopRun;
+    }
+
+    public void setStopRunState(boolean state) {
         stopRun = state;
     }
 
@@ -45,8 +83,8 @@ public class SearchPath {
         return false;
     }
 
-    public void notificationUpdate(List<Integer> list){
-        if(mSearchResultListener != null)
+    public void notificationUpdate(List<Integer> list) {
+        if (mSearchResultListener != null)
             mSearchResultListener.updateSingleResult(list);
     }
 
@@ -69,15 +107,14 @@ public class SearchPath {
                 System.out.print(nNode.getName());
             }
         }
-        for(List<Integer> entry:sers){
-            if(entry.toString().equals(list.toString())){
+        for (List<Integer> entry : sers) {
+            if (entry.toString().equals(list.toString())) {
                 return;
             }
         }
         Log.d("zxc01", "showAndSavePath str = " + str.toString());
         sers.add(list); /* 转储 */
-        notificationUpdate(list);
-        // System.out.println("\n");
+        publishProgress(list);
     }
 
     /*
@@ -88,7 +125,7 @@ public class SearchPath {
      * eNode: 终点endNode
      */
     public boolean getPaths(Node cNode, Node pNode, Node sNode, Node eNode) {
-        if(stopRun){
+        if (stopRun) {
             return false;
         }
         Node nNode = null;
@@ -118,8 +155,7 @@ public class SearchPath {
                      * 如果nNode是最初的起始节点或者nNode就是cNode的上一节点或者nNode已经在栈中 ，
                      * 说明产生环路 ，应重新在与当前起始节点有连接关系的节点集中寻找nNode
                      */
-                    if (pNode != null
-                            && (nNode == sNode || nNode == pNode || isNodeInStack(nNode))) {
+                    if (pNode != null && (nNode == sNode || nNode == pNode || isNodeInStack(nNode))) {
                         i++;
                         if (i >= cNode.getRelationNodes().size())
                             nNode = null;
@@ -174,7 +210,7 @@ public class SearchPath {
     }
 
     public List<List<Integer>> serach(int origin, int goal, int[][] nodeRalation) {
-        Log.d("zxc01","findpath start = "+origin+" end = "+goal);
+        Log.d("zxc01", "findpath start = " + origin + " end = " + goal);
         /* 定义节点数组 */
         Node[] node = new Node[nodeRalation.length];
 
@@ -195,21 +231,7 @@ public class SearchPath {
         }
         /* 开始搜索所有路径 */
         getPaths(node[origin], node[origin - 1], node[0], node[goal]);
-        stack.clear();
-        stack = null;
-        Log.d("zxc01","findpath numbe sers.size = "+sers.size());
-        Collections.sort(sers, new Comparator<List<Integer>>() {
-            public int compare(List<Integer> p1, List<Integer> p2) {
-                //按照换乘次数
-                if (p1.size() > p2.size()) {
-                    return 1;
-                }
-                if (p1.size() == p2.size()) {
-                    return 0;
-                }
-                return -1;
-            }
-        });
+
         return sers;
     }
 }

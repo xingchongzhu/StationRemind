@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.geek.thread.GeekThreadManager;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.database.DataManager;
 
@@ -27,9 +28,12 @@ public class SearchLoadingDialog extends Dialog{
         setCanceledOnTouchOutside(false);
     }
 
+    public void cancel(){
+        super.dismiss();
+    }
     @Override
     public void dismiss() {
         super.dismiss();
-        GeekThreadManager.getInstance().stopAllGeekRunable();
+        AsyncTaskManager.getInstance().stopAllGeekRunable();
     }
 }

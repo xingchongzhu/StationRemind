@@ -21,6 +21,7 @@ import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,6 @@ public class RemindSetViewManager implements RemindSetViewListener {
     private TextView setRemindBtn;
     //private String lineTial = "";
     private SelectlineMap mSelectlineMap;
-
     private GoToFragmentListener mGoToFragmentListener;
     private PageNavigationView pageBottomTabLayout;
     private Activity activity;

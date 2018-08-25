@@ -228,7 +228,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
             city_select.setText( CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME));
     }
 
-    private void hideSoftInput() {
+    public void hideSoftInput() {
         //隐藏软键盘
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(startInput.getWindowToken(), 0); //强制隐藏键盘

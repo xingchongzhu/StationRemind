@@ -24,6 +24,7 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
     String startStation = "";
     String endstation = "";
     DataManager dataManager;
+    Object object = new Object();
     public CardAdapter(Context context, List<Map.Entry<List<Integer>,List<StationInfo>>> data, int layoutId) {
         super(context, data, layoutId);
         dataManager = DataManager.getInstance(context);
@@ -35,8 +36,10 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
     }
 
     public void setData(List<Map.Entry<List<Integer>,List<StationInfo>>> data) {
-        this.mData = data;
-        notifyDataSetChanged();
+        synchronized (object) {
+            this.mData = data;
+            notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -46,27 +49,32 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
 
     @Override
     public void convert(ViewHolder holder, int position) {
-        if(mData.size() <= 0){
-            return;
-        }
-        Map.Entry<List<Integer>,List<StationInfo>> data = mData.get(position);
-        StringBuffer change = new StringBuffer();
-        int n = 0;
-        for(Integer i:data.getKey()){
-            if(n < data.getKey().size()-1) {
-                change.append( CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0]+ "->");
+        synchronized (object) {
+            if (mData.size() <= 0) {
+                return;
             }
-            else {
-                change.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0]);
+            Map.Entry<List<Integer>, List<StationInfo>> data = mData.get(position);
+            StringBuffer change = new StringBuffer();
+            int n = 0;
+            for (Integer i : data.getKey()) {
+                if(dataManager.getLineInfoList().get(i) != null) {
+                    if (n < data.getKey().size() - 1) {
+                        change.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0] + "->");
+                    } else {
+                        change.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0]);
+                    }
+                }
+                n++;
             }
-            n++;
+
+            String str = startStation + data.getValue().get(0).getCname() + "  " + endstation + data.getValue().get(data.getValue().size() - 1).getCname();
+
+            if(data.getKey().size() >1 ) {
+                holder.setText(R.id.change_numner, String.format(lineChange, data.getKey().size() - 1 + ""));
+            }
+            holder.setText(R.id.change_lineid, change.toString())
+                    .setText(R.id.station_number, String.format(staionsCNumber, data.getValue().size() + "") + "")
+                    .setText(R.id.station_start_end, str);
         }
-
-        String str = startStation+data.getValue().get(0).getCname()+"  "+endstation+data.getValue().get(data.getValue().size()-1).getCname();
-
-        holder.setText(R.id.change_numner, String.format(lineChange,data.getKey().size()-1+""))
-                .setText(R.id.change_lineid, change.toString())
-                .setText(R.id.station_number, String.format(staionsCNumber,data.getValue().size()-1+"")+"")
-                .setText(R.id.station_start_end, str);
     }
 }

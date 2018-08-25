@@ -13,6 +13,7 @@ import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.item.IteratorNodeTool;
 import com.traffic.locationremind.baidu.location.item.Node;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
+import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
 import com.traffic.locationremind.baidu.location.utils.SearchPath;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -87,52 +88,109 @@ public class PathSerachUtil {
         }
     }
 
-    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getLastRecomendLines(Map<List<Integer>, List<StationInfo>> currentAllStationList) {
-        List<Map.Entry<List<Integer>, List<StationInfo>>> infoIds = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>(currentAllStationList.entrySet());
-
-        Collections.sort(infoIds, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
-            /*
-             * 返回负数表示：p1 小于p2，
-             * 返回0 表示：p1和p2相等，
-             * 返回正数表示：p1大于p2
-             */
-            public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
-                               Map.Entry<List<Integer>, List<StationInfo>> o2) {
-                if (o1.getValue().size() < o2.getValue().size()) {
+    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getRecomendLines(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+        if(lastLinesLast.size() <= 0){
+            return lastLinesLast;
+        }
+        PathSerachUtil.sortStationNum(lastLinesLast);
+        Map.Entry<List<Integer>, List<StationInfo>> first = lastLinesLast.get(0);
+        //去除相同
+        //换乘次数排序
+        PathSerachUtil.sortChangeTime(lastLinesLast);
+        if(lastLinesLast.get(0) == first){
+            lastLinesLast.clear();
+            lastLinesLast.add(first);
+            //mCardAdapter.setData(lastLinesLast);
+            return lastLinesLast;
+        }
+        //去除相同
+        List<Map.Entry<List<Integer>, List<StationInfo>>> add = new ArrayList<>();
+        Map<Integer,Integer> array = new HashMap();
+        for(Map.Entry<List<Integer>, List<StationInfo>>entry: lastLinesLast){
+            boolean isEqual = false;
+            for(Map.Entry<List<Integer>, List<StationInfo>>listEntry: add){
+                if(entry.getKey().toString().equals(listEntry.getKey().toString()) &&
+                        entry.getValue().size() == listEntry.getValue().size()){
+                    isEqual = true;
+                }
+            }
+            if(!isEqual)
+                add.add(entry);
+            array.put(entry.getKey().size(),entry.getKey().size());
+        }
+        //换乘次数分类
+        List<Integer> list = new ArrayList<>(array.keySet());
+        Collections.sort(list, new Comparator<Integer>() {
+            public int compare(Integer o1,Integer o2) {
+                if (o1< o2) {
                     return -1;
-                } else if (o1.getValue().size() == o2.getValue().size()) {
+                } else if (o1 == o2) {
                     return 0;
                 }
                 return 1;
             }
         });
-        if (infoIds.size() <= MAXRECOMENDLINENUMBER) {
-            return infoIds;
-        }
-        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLines = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>();
-        //Log.d(TAG,"---------------------no filte----------------------------------");
-        //printAllRecomindLine(infoIds);//打印所有路线
-        //Log.d(TAG,"---------------------filte 20 ----------------------------------");
-        if (infoIds.size() > MAXLINENUMBER) {//保留前20条路线
-            int n = 0;
-            for (Map.Entry<List<Integer>, List<StationInfo>> entry : infoIds) {
-                if (n < MAXLINENUMBER)
-                    lastLines.add(entry);
-                n++;
+        List<Map.Entry<List<Integer>, List<StationInfo>>> needadd = new ArrayList<>();
+        List<Map.Entry<List<Integer>, List<StationInfo>>> templist = new ArrayList<>();
+        if(lastLinesLast != null)
+            lastLinesLast.clear();
+        for(Integer size:list){
+            needadd.clear();
+            templist.clear();
+            for(Map.Entry<List<Integer>, List<StationInfo>>entry: add){
+                if(size == entry.getKey().size()){
+                    needadd.add(entry);
+                }
             }
-            infoIds.clear();
-        } else {
-            lastLines.addAll(infoIds);
+            PathSerachUtil.sortStationNum(needadd);
+            if(needadd.size() >0){
+                int number = needadd.get(0).getValue().size();
+                for(Map.Entry<List<Integer>, List<StationInfo>>entry: needadd){
+                    if(number == entry.getValue().size()){
+                        templist.add(entry);
+                    }
+                }
+                lastLinesLast.addAll(templist);
+            }
         }
-        //printAllRecomindLine(lastLines);//打印所有路线
-        //Log.d(TAG,"---------------------filte 20 ----------------------------------");
-        // 对HashMap中的key 进行排序
-        Collections.sort(lastLines, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
-            /*
-             * 返回负数表示：p1 小于p2，
-             * 返回0 表示：p1和p2相等，
-             * 返回正数表示：p1大于p2
-             */
+        needadd.clear();
+        templist.clear();
+        PathSerachUtil.sortChangeTime(lastLinesLast);
+        /*Map.Entry<List<Integer>, List<StationInfo>> minChange = null,minStaions= null;
+        for(Map.Entry<List<Integer>, List<StationInfo>> entry:lastLinesLast){
+            if(minChange == null){
+                minChange = entry;
+                minStaions = entry;
+                continue;
+            }
+            if(entry.getKey().size() < minChange.getKey().size()){
+                minChange = entry;
+            }
+            if(entry.getValue().size() < minChange.getValue().size()){
+                minStaions = entry;
+            }
+        }
+        for(Map.Entry<List<Integer>, List<StationInfo>> entry:lastLinesLast){
+            if(entry.getKey().size() > minStaions.getKey().size() &&
+                    entry.getValue().size() > minChange.getValue().size()){
+                continue;
+            }
+            needadd.add(entry);
+        }
+        lastLinesLast.clear();*/
+        return lastLinesLast;
+    }
+    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getLastRecomendLines(Map<List<Integer>, List<StationInfo>> currentAllStationList) {
+        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>(currentAllStationList.entrySet());
+        currentAllStationList.clear();
+        return getRecomendLines(lastLinesLast);
+    }
+
+    public static void sortChangeTime(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+        if(lastLinesLast.size() <2){
+            return;
+        }
+        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
             public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
                                Map.Entry<List<Integer>, List<StationInfo>> o2) {
                 if (o1.getKey().size() < o2.getKey().size()) {
@@ -143,63 +201,14 @@ public class PathSerachUtil {
                 return 1;
             }
         });
-        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>();
-        if (lastLines.size() > MAXRECOMENDLINENUMBER) {//最终保留推荐线路不超过5条
+    }
 
-            int size = lastLines.size();
-            lastLinesLast.add(lastLines.get(0));
-            for (int i = 1; i < size; i++) {
-                if (lastLines.get(i).getKey().size() == lastLinesLast.get(0).getKey().size()) {
-                    lastLinesLast.add(lastLines.get(i));
-                }
-            }
-            lastLines.removeAll(lastLinesLast);
-            size = lastLines.size();
+    public static void sortStationNum(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
 
-            for (int i = 0; i < size; i++) {
-                Map.Entry<List<Integer>, List<StationInfo>> entry = lastLines.get(i);
-                if (i < MAXRECOMENDLINENUMBER) {
-                    lastLinesLast.add(entry);
-                }
-                Log.d(TAG, "getReminderLines getKey = " + entry.getKey() + " size = " + entry.getValue().size());
-            }
-        } else {
-            lastLinesLast.addAll(lastLines);
+        if(lastLinesLast.size() < 2){
+            return;
         }
-        List<Map.Entry<List<Integer>, List<StationInfo>>> remove = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>();
-        for (Map.Entry<List<Integer>, List<StationInfo>> entry : lastLinesLast) {
-            int size = entry.getKey().size();
-            for (int i = 0; i < size; i++) {
-                boolean needRemove = true;
-                for (StationInfo stationInfo : entry.getValue()) {
-                    if (entry.getKey().get(i) == stationInfo.lineid) {
-                        needRemove = false;
-                        break;
-                    }
-                }
-                if (needRemove) {
-
-                    remove.add(entry);
-                    break;
-                }
-            }
-        }
-        for (Map.Entry<List<Integer>, List<StationInfo>> entry : remove) {
-            Log.d("needRemove", "need remove entry key =" + entry.getKey());
-            for (Map.Entry<List<Integer>, List<StationInfo>> entry1 : lastLinesLast) {
-                if (entry1.getKey() == entry.getKey()) {
-                    lastLinesLast.remove(entry1);
-                    break;
-                }
-            }
-        }
-        lastLines.clear();
         Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
-            /*
-             * 返回负数表示：p1 小于p2，
-             * 返回0 表示：p1和p2相等，
-             * 返回正数表示：p1大于p2
-             */
             public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
                                Map.Entry<List<Integer>, List<StationInfo>> o2) {
                 if (o1.getValue().size() < o2.getValue().size()) {
@@ -210,28 +219,31 @@ public class PathSerachUtil {
                 return 1;
             }
         });
-        return lastLinesLast;
     }
-
     public static Map<List<Integer>, List<StationInfo>> getAllLineStation(Map<Integer, LineInfo> mLineInfoList, List<List<Integer>> transferLine
             , StationInfo start, final StationInfo end) {
         Map<List<Integer>, List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
-        if(transferLine == null){
+        if(transferLine == null || transferLine.size() <=0){
             return currentAllStationList;
         }
         //取出一条路线
         int n = 0;
         for (List<Integer> list : transferLine) {
-
             StationInfo startStation = null, endStation = null;
             final int size = list.size();
             //构建多叉树
             //起点
             LineInfo lineInfo = getLineInfoByLineid(mLineInfoList, list.get(0));
+            if(lineInfo == null){
+                continue;
+            }
             startStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), start.getCname());//再找相同站台
             Node root = new Node(startStation);//根节点
             //终点
             lineInfo = getLineInfoByLineid(mLineInfoList, list.get(size - 1));
+            if(lineInfo == null){
+                continue;
+            }
             endStation = getStationInfoByLineidAndName(lineInfo.getStationInfoList(), end.getCname());//再找相同站台
             for (int i = 0; i < size; i++) {
                 final int lined = list.get(i);
@@ -610,21 +622,19 @@ public class PathSerachUtil {
 
     public static void startThread(final SearchResultListener mSearchResultListener, final int startlineid,
                                    final int endlineid, final DataManager mDataManager, final StationInfo start, final StationInfo end) {
-        //final SearchPath SearchPath = new SearchPath();
+        /*//final SearchPath SearchPath = new SearchPath();
         GeekRunnable geekRunnable = new GeekRunnable(ThreadPriority.HIGH) {
             @Override
             public void run() {
-                //GrfAllEdge grfAllEdge = new GrfAllEdge(mDataManager.getMaxLineid(), mDataManager.getAllLineNodes(), mDataManager.getMatirx());
-                //List<List<Integer>> transferLine = grfAllEdge.serach(startlineid, endlineid);
                 searchPath.serach(startlineid, endlineid, mDataManager.getNodeRalation());
-                /*if(searchPath != null) {
-                    mSearchResultListener.updateResult(getReuslt(searchPath.serach(startlineid, endlineid, mDataManager.getNodeRalation()), mDataManager, start, end));
-                }*/
             }
         };
-        geekRunnable.searchPath = new SearchPath(mSearchResultListener);
+        geekRunnable.searchPath = new SearchPath(mSearchResultListener,startlineid, endlineid, mDataManager.getNodeRalation());
         GeekThreadManager.getInstance().addGeekRunnable(geekRunnable);
-        GeekThreadManager.getInstance().execute(geekRunnable, ThreadType.NORMAL_THREAD);
+        GeekThreadManager.getInstance().execute(geekRunnable, ThreadType.NORMAL_THREAD);*/
+        SearchPath searchPath = new SearchPath(mSearchResultListener,startlineid, endlineid, mDataManager.getNodeRalation());
+        AsyncTaskManager.getInstance().addGeekRunnable(searchPath);
+        searchPath.execute("");
     }
 
     public static Map<Integer, Integer> getLineAllLined(List<StationInfo> list) {

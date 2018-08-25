@@ -27,7 +27,7 @@ public class GeekThreadManager {
     private SerialExecutor mSerialExecutor;
     private AtomicInteger mKeyIndex;
     private HashMap<Integer, Future> mFutureCache;
-    private List< GeekRunnable> geekRunnableMap = new ArrayList<>();
+    private List<GeekRunnable> geekRunnableMap = new ArrayList<>();
 
     public void addGeekRunnable(GeekRunnable geekRunnable){
         geekRunnableMap.add(geekRunnable);
@@ -39,6 +39,17 @@ public class GeekThreadManager {
         }
         geekRunnableMap.clear();
     }
+
+    public boolean isSearch(){
+        boolean isSearch = false;
+        for(GeekRunnable geekRunnable:geekRunnableMap){
+            if(!geekRunnable.searchPath.getRunState()){
+                isSearch = true;
+            }
+        }
+        return isSearch;
+    }
+
     private GeekThreadManager(){
         mInitialized.set(false);
         init();
