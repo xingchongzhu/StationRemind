@@ -298,6 +298,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             lastLinesLast.clear();
             allLines.clear();
             allLinesMap.clear();
+            mCardAdapter.setData(null);
             searchTaskNum = 0;
             finishTaskNum = 0;
             PathSerachUtil.getReminderLines(this, myHandler, startStation, endStation,
