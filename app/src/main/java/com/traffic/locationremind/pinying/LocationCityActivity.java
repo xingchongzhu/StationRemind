@@ -84,7 +84,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 		resultList = (ListView) findViewById(R.id.search_result);
 		sh = (EditText) findViewById(R.id.sh);
 		tv_noresult = (TextView) findViewById(R.id.tv_noresult);
-		helper = DataHelper.getInstance(this);
+		helper = new DataHelper(this);
 		sh.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -644,6 +644,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		helper.Close();
 		//getWindowManager().removeView(overlay);
 		//overlay = null;
 	}

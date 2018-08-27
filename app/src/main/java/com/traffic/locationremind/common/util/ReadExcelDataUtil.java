@@ -69,7 +69,7 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 	protected Boolean doInBackground(Application... params) {
 
 		//List<CityModel> list = new ArrayList<CityModel>();
-		dbHelper = DataHelper.getInstance(params[0]);
+		dbHelper = new DataHelper(params[0]);
 
 		if(dbHelper.getCount(SqliteHelper.TB_LINE) > 0) {
 			return true;
@@ -310,6 +310,7 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			dbHelper.Close();
 		}else{
 			return false;
 			//publishProgress("数据源excel表格不存在");

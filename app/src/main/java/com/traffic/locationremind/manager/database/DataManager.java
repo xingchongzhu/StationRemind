@@ -67,13 +67,14 @@ public class DataManager{
 			mLineInfoList.clear();
 		if(mLoadDataListener != null)
 			mLoadDataListener.clear();
+		mDataManager = null;
 	}
 
 	public CityInfo getCurrentCityNo(){
 		return currentCityNo;
 	}
 	public DataManager(Context context){
-		this.mDataHelper = DataHelper.getInstance(context);
+
 	}
 
 	public void loadData(Context context){
@@ -111,6 +112,8 @@ public class DataManager{
 		if(mDataManager == null){
 			mDataManager = new DataManager(context);
 		}
+		if(mDataManager.mDataHelper == null)
+			mDataManager.mDataHelper = new DataHelper(context);
 		return mDataManager;
 	}
 

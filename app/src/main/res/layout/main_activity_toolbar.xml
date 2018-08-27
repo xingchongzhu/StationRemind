@@ -36,7 +36,7 @@
                 android:drawableLeft="@drawable/ic_search_grey"
                 android:layout_centerVertical="true"
                 android:drawablePadding="5dp"
-                android:hint="站台 路线 城市"
+                android:hint="@string/search_hint"
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:imeOptions="actionSearch"
@@ -44,16 +44,6 @@
                 android:textColor="@color/blue"
                 android:textSize="12sp"/>
 
-
-       <!-- <ImageView
-                android:layout_alignParentRight="true"
-                android:id="@+id/colloction_btn"
-                android:layout_width="@dimen/search_height_btn"
-                android:layout_height="@dimen/search_height_btn"
-                android:layout_centerVertical="true"
-                android:padding="5dp"
-                android:background="@drawable/favtor"
-        />-->
     </RelativeLayout>
 
 

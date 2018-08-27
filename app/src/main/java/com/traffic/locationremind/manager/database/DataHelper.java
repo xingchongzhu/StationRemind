@@ -25,14 +25,6 @@ public class DataHelper {
     private SQLiteDatabase cityDb;
     private DBHelper cityDbHelper;
     private DBHelper dbHelper;
-    private static DataHelper mDataHelper;
-
-    public static DataHelper getInstance(Context context) {
-        if (mDataHelper == null) {
-            mDataHelper = new DataHelper(context);
-        }
-        return mDataHelper;
-    }
 
     public DataHelper(Context context) {
         cityDbHelper = new DBHelper(context);

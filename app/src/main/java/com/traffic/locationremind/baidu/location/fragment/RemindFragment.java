@@ -464,7 +464,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         intent.putExtra("title", title);
         intent.putExtra("content", content);
         intent.putExtra("change", change);
-        getActivity().startActivity(intent);
+        getActivity().startActivityForResult(intent,1);
     }
 
     public NotificationObject createNotificationObject(StationInfo currentStation, StationInfo nextStation) {

@@ -38,11 +38,6 @@
                 android:name="com.baidu.lbsapi.API_KEY"
                 android:value="e1fk6y9QFLj5gcxVNSQe9ClYEsM542A3"/> <!-- http://lbsyun.baidu.com/apiconsole/key -->
 
-        <activity android:name="com.traffic.locationremind.baidu.location.activity.MainViewActivity"
-                  android:launchMode="singleTask"
-                  android:screenOrientation="portrait">
-        </activity>
-
         <activity android:name="com.traffic.locationremind.baidu.location.activity.AlarmActivity"
                   android:launchMode="singleTask"
                   android:screenOrientation="portrait">

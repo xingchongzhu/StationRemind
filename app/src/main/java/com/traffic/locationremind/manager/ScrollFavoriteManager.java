@@ -31,6 +31,7 @@ public class ScrollFavoriteManager {
     EditText lat;
     EditText lot;
     EditText name;
+    RelativeLayout relativeLayout;
     private ScrollLayout.OnScrollChangedListener mOnScrollChangedListener = new ScrollLayout.OnScrollChangedListener() {
         @Override
         public void onScrollProgressChanged(float currentProgress) {
@@ -50,6 +51,7 @@ public class ScrollFavoriteManager {
             if (currentStatus.equals(ScrollLayout.Status.EXIT)) {
                 btn_layout.setVisibility(View.VISIBLE);
                 textTitle.setVisibility(View.GONE);
+                mScrollLayout.setVisibility(View.GONE);
                 fragment.updateColloctionView();
             }
         }
@@ -69,7 +71,7 @@ public class ScrollFavoriteManager {
 
     private void initView(final RemindFragment fragment, View view) {
         this.fragment = fragment;
-        RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(R.id.remind_root);
+        relativeLayout = (RelativeLayout) view.findViewById(R.id.remind_root);
         mScrollLayout = (ScrollLayout) view.findViewById(R.id.scroll_down_layout);
         textTitle = (TextView) view.findViewById(R.id.text_title);
         btn_layout = (CardView) view.findViewById(R.id.btn_layout);
@@ -135,9 +137,11 @@ public class ScrollFavoriteManager {
 
     public void openScrollView(List<LineObject> lineObjects) {
         mFavouriteAdapter.setData(lineObjects);
+        mScrollLayout.setVisibility(View.VISIBLE);
         btn_layout.setVisibility(View.GONE);
         mScrollLayout.setToOpen();
         textTitle.setVisibility(View.VISIBLE);
+
     }
 
     public void closeScrollView() {

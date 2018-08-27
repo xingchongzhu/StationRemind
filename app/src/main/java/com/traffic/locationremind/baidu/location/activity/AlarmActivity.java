@@ -424,8 +424,8 @@ public class AlarmActivity extends BaseActivity
         getAlertAnimator(mDismissButton, getResources().getString(R.string.stop_hint), null /* infoText */,
                 getString(R.string.alarm_alert_off_text) /* accessibilityText */,
                 Color.WHITE, mCurrentHourColor).start();
-        ///VibratorUtil.StopVibrate(this);
         TimerKlaxon.stop(this);
+        setResult(MainActivity.SHUTDOWNACTIVITY);
     }
 
 

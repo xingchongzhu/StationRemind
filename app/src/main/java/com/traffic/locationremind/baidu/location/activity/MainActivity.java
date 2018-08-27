@@ -61,6 +61,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     public final static int SELECTCITYREQUEST = 2018;
     public final static int SELECTCITYRESULTCODE = 2019;
+    public final static int SHUTDOWNACTIVITY = 2020;
     private final static String TAG = "MainActivity";
 
     private RemonderLocationService.UpdateBinder mUpdateBinder;
@@ -320,6 +321,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                     setNewCity(tempCity);
                 }
             }
+        }
+        if(resultCode == SHUTDOWNACTIVITY){
+            finish();
         }
     }
 

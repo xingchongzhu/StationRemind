@@ -108,7 +108,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 case STARTLOCATION:
                     mRemonderLocationService.setStartReminder();
                     mRemonderLocationService.setStationInfoList(sceneMap.getMarkList());
-                    start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stop_location));
+                    start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stoplocation));
                     currentLineInfoText.setText(PathSerachUtil.printAllRecomindLine(lastLinesLast));//打印所有路线);
                     break;
             }
@@ -154,7 +154,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         start_location_reminder.setOnClickListener(this);
         city_select.setOnClickListener(this);
 
-        mDataHelper = DataHelper.getInstance(this);
+        mDataHelper = new DataHelper(this);
 
         ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
         if (ReadExcelDataUtil.getInstance().hasWrite) {
@@ -171,7 +171,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         }
         Intent bindIntent = new Intent(MainViewActivity.this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
-        start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.start_location));
+        start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.startlocation));
         CommonFuction.writeBooleanSharedPreferences(this,CommonFuction.ISREMINDER,false);
     }
 
@@ -211,7 +211,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     mRemonderLocationService.startLocationService();
                 }
                 if(CommonFuction.getSharedPreferencesBooleanValue(MainViewActivity.this, CommonFuction.ISREMINDER)) {
-                    start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.start_location));
+                    start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.startlocation));
                     mRemonderLocationService.setCancleReminder();
                     sceneMap.resetMardEndState();
                     canSetReminder = 0;
@@ -565,6 +565,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             unbindService(connection);
             mRemonderLocationService = null;
         }
+        mDataHelper.Close();
     }
 
     private void showDialog(final MarkObject markObject) {
@@ -608,6 +609,10 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+            @Override
+            public void selectLine(int num){
+
             }
         }, markObject.mStationInfo.getTransfer(), existInfostr,
                 "" + markObject.mStationInfo.getLineid(), currentCityNo.getCityName(), markObject.mStationInfo.getCname());
@@ -735,6 +740,10 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 mSelectLineDialog = new SelectLineDialog(MainViewActivity.this, R.style.Dialog, new NoticeDialogListener() {
                     @Override
                     public void onClick(View view) {
+                        initData();
+                    }
+                    @Override
+                    public void selectLine(int lineid) {
                         initData();
                     }
                 }, nerstStationInfo, mLineInfoList);

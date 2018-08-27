@@ -245,6 +245,9 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
     @Override
     public void onSearch(final Context context, String start, String end) {
         AsyncTaskManager.getInstance().stopAllGeekRunable();
+        if(allstations == null || allstations.size() <= 0){
+            getDbData();
+        }
         synchronized (lock) {
             searchView.hideSoftInput();
             String currentCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.CITYNAME);

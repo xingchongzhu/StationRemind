@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@color/white"
-                android:text="@string/start_location"
+                android:text="@string/startlocation"
                 android:visibility="gone"/>
 
             <Button

@@ -28,14 +28,8 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
     private final static String TAG = "LineMapFragment";
 
-    private final static int INITMAPCOLOR = 1;//初始化当前城市地铁显示
-    private final static int SHOWCURRENTLINED = 2;//当前选择路线
-    private final static int STARTLOCATION = 3;//开始定位
     private GridView sceneMap;
     private GridView lineMap;
-    private ImageView scaleMorebtn;
-    private ImageView scaleLessbtn;
-    private ImageView button_location;
     private TextView currentLineInfoText;
 
     private AllLineAdapter sceneMapAdapter;
@@ -43,7 +37,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private View rootView;
     private DataManager mDataManager;
     private List<LineInfo> list = new ArrayList<>();
-    //private String linenail = "";
     MainActivity activity;
     StationInfo start,end;
     private SettingReminderDialog mSettingReminderDialog;
@@ -135,6 +128,12 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                     e.printStackTrace();
                 }
             }
+
+            @Override
+            public void selectLine(int lineid){
+                setCurrentLineByLineid(lineid);
+                mSettingReminderDialog.dismiss();
+            }
         }, stationInfo.getTransfer(), existInfostr,
                 "" + stationInfo.getLineid(), mDataManager.getCurrentCityNo().getCityName(), stationInfo.getCname());
         mSettingReminderDialog.setContentView(R.layout.setting_reminder_dialog);
@@ -164,6 +163,33 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         setCurrentLine(0);
         if (colorLineAdapter != null)
             colorLineAdapter.setData(list);
+
+    }
+
+    private void setCurrentLineByLineid(int lineid) {
+        LineInfo lineInfo = mDataManager.getLineInfoList().get(lineid);
+        if (currentLineInfoText != null) {
+            if (lineid >= list.size()) {
+                currentLineInfoText.setBackgroundColor(Color.WHITE);
+                currentLineInfoText.setTextColor(Color.WHITE);
+                currentLineInfoText.setText("");
+                sceneMapAdapter.setData(null);
+                return;
+            }
+            String string = lineInfo.linename + " (" +
+                    lineInfo.getForwad() + "," +
+                    lineInfo.getReverse() + ")\n" + lineInfo.getLineinfo();
+
+            currentLineInfoText.setText(string);
+            currentLineInfoText.setBackgroundColor(lineInfo.colorid);
+        }
+        if (sceneMap != null) {
+            sceneMapAdapter.setData(lineInfo);
+            int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (lineInfo.getStationInfoList().size() / 5 + 1);
+            ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
+            linearParams.height = height;
+            sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
+        }
 
     }
 
