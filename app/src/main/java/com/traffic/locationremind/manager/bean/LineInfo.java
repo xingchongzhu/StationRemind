@@ -36,6 +36,7 @@ public class LineInfo {
 
     public void setRGBCOOLOR(String rgbColor){
         this.rgbColor = rgbColor;
+        rgbColor.replaceAll(" ", "");
         String color[]=rgbColor.split(",");
         int cc[]={0,0,0};
         //Log.d("ttxx","setRGBCOOLOR rgbColor = "+rgbColor);

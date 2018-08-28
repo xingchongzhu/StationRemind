@@ -3,18 +3,8 @@ package com.traffic.locationremind.baidu.location.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.Display;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 
-import com.geek.thread.GeekThreadManager;
-import com.traffic.location.remind.R;
-import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
-import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.manager.database.DataManager;
+import com.traffic.locationremind.manager.AsyncTaskManager;
 
 
 public class SearchLoadingDialog extends Dialog{

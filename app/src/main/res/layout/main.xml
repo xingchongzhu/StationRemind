@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="切换城市"
+            android:text="@string/select_city"
             android:textColor="@color/btn_press_color"
             android:textSize="18sp" />
     </RelativeLayout>
@@ -24,13 +24,13 @@
     <EditText
         android:id="@+id/sh"
         android:layout_width="fill_parent"
-        android:layout_height="55dp"
+        android:layout_height="45dp"
         android:layout_below="@id/title"
         android:layout_margin="10dip"
         android:background="@drawable/search_edittext_shape"
         android:drawableLeft="@drawable/wb_search_icon"
         android:drawablePadding="5dp"
-        android:hint="输入城市名或拼音"
+        android:hint="@string/input_city_name_or_pingyin"
         android:padding="10dip"
         android:textColor="#515151"
         android:textSize="16dp" >
@@ -68,7 +68,7 @@
         android:layout_below="@id/sh"
         android:gravity="center"
         android:padding="10dp"
-        android:text="抱歉,暂时没有找到相关城市"
+        android:text="@string/sorry_no_search_city"
         android:textColor="#000000"
         android:textSize="16sp"
         android:visibility="gone" />

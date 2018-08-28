@@ -17,7 +17,7 @@
                 android:id="@+id/city_select"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:textSize="16dp"
+                android:textSize="20dp"
                 android:textColor="#6A5ACD"
                 android:layout_gravity="start"
                 android:text="深圳"
@@ -29,6 +29,7 @@
                 android:id="@+id/edit_button"
                 android:layout_width="match_parent"
                 android:layout_toRightOf="@id/city_select"
+                android:layout_margin="8dp"
                 android:layout_height="@dimen/search_height_btn"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/search_edittext_shape"
@@ -41,7 +42,8 @@
                 android:focusableInTouchMode="false"
                 android:imeOptions="actionSearch"
                 android:inputType="text"
-                android:textColor="@color/blue"
+                android:textColorHint="#6A5ACD"
+                android:textColor="@color/edit_window"
                 android:textSize="12sp"/>
 
     </RelativeLayout>

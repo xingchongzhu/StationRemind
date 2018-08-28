@@ -64,4 +64,16 @@
     <string name="alarm_alert_off_text" >"已经抵达注意下车"</string>
     <string name="stop_hint">"结束提醒再会!"</string>
     <string name="search_hint">起点|终点</string>
+    <string name="search_result_empty">查询结果为空</string>
+    <string name="input_city_name_or_pingyin">输入城市名或拼音</string>
+    <string name="sorry_no_search_city">抱歉,暂时没有找到相关城市</string>
+    <string name="location">定位</string>
+    <string name="hot">热门</string>
+    <string name="all">全部</string>
+    <string name="is_location">正在定位</string>
+    <string name="now_location_city">当前定位城市</string>
+    <string name="not_location_city">未定位到城市,请选择</string>
+    <string name="select_again">重新选择</string>
+    <string name="hot_city">热门城市</string>
+    <string name="nearst">最近</string>
 </resources>

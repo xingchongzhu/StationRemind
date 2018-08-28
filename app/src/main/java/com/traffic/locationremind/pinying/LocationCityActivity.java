@@ -182,13 +182,13 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 
 
 	private void cityInit() {
-		CityInfo city = new CityInfo("定位", "0"); // 当前定位城市
+		CityInfo city = new CityInfo(getResources().getString(R.string.location), "0"); // 当前定位城市
 		allCity_lists.add(city);
 		//city = new CityInfo("最近", "1"); // 最近访问的城市
 		//allCity_lists.add(city);
-		city = new CityInfo("热门", "2"); // 热门城市
+		city = new CityInfo(getResources().getString(R.string.hot), "2"); // 热门城市
 		allCity_lists.add(city);
-		city = new CityInfo("全部", "3"); // 全部城市
+		city = new CityInfo(getResources().getString(R.string.all), "3"); // 全部城市
 		allCity_lists.add(city);
 		city_lists = getCityList();
 		allCity_lists.addAll(city_lists);
@@ -442,19 +442,19 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 				ProgressBar pbLocate = (ProgressBar) convertView
 						.findViewById(R.id.pbLocate);
 				if (locateProcess == 1) { // 正在定位
-					locateHint.setText("正在定位");
+					locateHint.setText(getResources().getString(R.string.is_location));
 					city.setVisibility(View.GONE);
 					pbLocate.setVisibility(View.VISIBLE);
 				} else if (locateProcess == 2) { // 定位成功
-					locateHint.setText("当前定位城市");
+					locateHint.setText(getResources().getString(R.string.now_location_city));
 					city.setVisibility(View.VISIBLE);
 					city.setText(currentCity);
 					//mLocationClient.stop();
 					pbLocate.setVisibility(View.GONE);
 				} else if (locateProcess == 3) {
-					locateHint.setText("未定位到城市,请选择");
+					locateHint.setText(getResources().getString(R.string.not_location_city));
 					city.setVisibility(View.VISIBLE);
-					city.setText("重新选择");
+					city.setText(getResources().getString(R.string.select_again));
 					pbLocate.setVisibility(View.GONE);
 				}
 			}
@@ -498,7 +498,7 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 				});
 				hotCity.setAdapter(new HotCityAdapter(context, this.hotList));
 				TextView hotHint = (TextView) convertView.findViewById(R.id.recentHint);
-				hotHint.setText("热门城市");
+				hotHint.setText(getResources().getString(R.string.hot_city));
 			} else if (viewType == 2) {
 				convertView = inflater.inflate(R.layout.total_item, null);
 			} else {
@@ -690,13 +690,13 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 		if (pattern.matcher(c + "").matches()) {
 			return (c + "").toUpperCase();
 		} else if (str.equals("0")) {
-			return "定位";
+			return getResources().getString(R.string.location);
 		} else if (str.equals("1")) {
-			return "最近";
+			return getResources().getString(R.string.nearst);
 		} else if (str.equals("2")) {
-			return "热门";
+			return getResources().getString(R.string.hot);
 		} else if (str.equals("3")) {
-			return "全部";
+			return getResources().getString(R.string.all);
 		} else {
 			return "#";
 		}

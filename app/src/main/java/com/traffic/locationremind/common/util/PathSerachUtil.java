@@ -1,31 +1,17 @@
 package com.traffic.locationremind.common.util;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
 import com.baidu.location.BDLocation;
-import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.item.IteratorNodeTool;
 import com.traffic.locationremind.baidu.location.item.Node;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
-import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
+import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.baidu.location.utils.SearchPath;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
-import com.geek.thread.GeekThreadManager;
-import com.geek.thread.GeekThreadPools;
-import com.geek.thread.ThreadPriority;
-import com.geek.thread.ThreadType;
-import com.geek.thread.task.GeekRunnable;
 import com.traffic.locationremind.manager.database.DataManager;
-import com.traffic.locationremind.manager.serach.SearchManager;
+import com.traffic.locationremind.manager.SearchManager;
 
-import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class PathSerachUtil {

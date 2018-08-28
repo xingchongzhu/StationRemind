@@ -1,7 +1,6 @@
-package com.traffic.locationremind.manager.serach;
+package com.traffic.locationremind.manager;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -11,25 +10,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
-import com.geek.thread.GeekThreadManager;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
-import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
-import com.traffic.locationremind.baidu.location.search.model.Bean;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
-import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
+import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
-import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
-import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
@@ -336,20 +330,28 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
     }
 
     @Override
+    public void cancleDialog(List<Map.Entry<List<Integer>, List<StationInfo>>> lines) {
+        if (mSearchLoadingDialog != null) {
+            mSearchLoadingDialog.cancel();
+        }
+        if(!AsyncTaskManager.getInstance().isSearch() && lastLinesLast== null || lastLinesLast.size() <= 0){
+            Toast.makeText(activity,activity.getResources().getString(R.string.search_result_empty),Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
     public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines) {
         //Log.d("zxc1","updateResult lastLinesLast = "+lastLinesLast);
-        searchTaskNum++;
-        if (mSearchLoadingDialog != null && (lines.size() > 0 || searchTaskNum >= finishTaskNum)) {
-            mSearchLoadingDialog.cancel();;
-        }
-        if (lines == null || lines.size() <= 0) {
-            return;
+        if (mSearchLoadingDialog != null) {
+            mSearchLoadingDialog.cancel();
         }
         lastLinesLast.addAll(lines);
-        Log.d("zxc1", "updateResult searchTaskNum = " + searchTaskNum + " lastLinesLast.size = " + lastLinesLast.size());
+        PathSerachUtil.getRecomendLines(lastLinesLast);
         Message message =myHandler.obtainMessage();
         message.what =0;
         myHandler.sendMessageDelayed(message,100);
-        // }
+        if(!AsyncTaskManager.getInstance().isSearch() && lastLinesLast== null || lastLinesLast.size() <= 0){
+            Toast.makeText(activity,activity.getResources().getString(R.string.search_result_empty),Toast.LENGTH_LONG).show();
+        }
     }
 }

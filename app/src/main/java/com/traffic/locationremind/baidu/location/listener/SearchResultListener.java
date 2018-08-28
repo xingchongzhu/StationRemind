@@ -8,5 +8,6 @@ import java.util.Map;
 public interface SearchResultListener{
     void updateSingleResult(List<Integer> list);
     void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast);
+    void cancleDialog(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast);
     void setLineNumber(int number);
 }

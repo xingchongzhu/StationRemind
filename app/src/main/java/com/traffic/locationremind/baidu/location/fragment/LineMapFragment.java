@@ -2,6 +2,9 @@ package com.traffic.locationremind.baidu.location.fragment;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -40,11 +43,19 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     MainActivity activity;
     StationInfo start,end;
     private SettingReminderDialog mSettingReminderDialog;
+    private int currentIndex = 0;
+
+    private Handler handler = new Handler() {
+
+        public void handleMessage(Message msg) {
+            setCurrentLine(msg.what);
+        }
+
+    };
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
         if (null != rootView) {
             ViewGroup parent = (ViewGroup) rootView.getParent();
             if (null != parent) {
@@ -54,12 +65,19 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             rootView = inflater.inflate(R.layout.line_map_layout, container, false);
             initView(rootView);// 控件初始化
         }
+        if(savedInstanceState != null){
+            upadaData();
+            setCurrentLine(currentIndex);
+        }
+        Log.d(TAG, "onCreateView rootView = "+rootView+" savedInstanceState = "+savedInstanceState);
         return rootView;
     }
 
     private void initView(View rootView) {
+        Log.d(TAG, "initView rootView = "+rootView);
         sceneMap = (GridView) rootView.findViewById(R.id.sceneMap);
         currentLineInfoText = (TextView) rootView.findViewById(R.id.text);
+        Log.d(TAG, "initView currentLineInfoText = "+currentLineInfoText);
         lineMap = (GridView) rootView.findViewById(R.id.lineMap);
         //linenail = getResources().getString(R.string.line_tail);
         mDataManager = ((MainActivity) getActivity()).getDataManager();
@@ -194,6 +212,8 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     }
 
     private void setCurrentLine(int index) {
+
+        currentIndex = index;
         if (currentLineInfoText != null) {
             if (index >= list.size()) {
                 currentLineInfoText.setBackgroundColor(Color.WHITE);

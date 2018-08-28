@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import com.traffic.location.remind.R;
 
 public class MyLetterListView extends View {
 
@@ -20,14 +21,23 @@ public class MyLetterListView extends View {
 
 	public MyLetterListView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		init();
 	}
 
 	public MyLetterListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public MyLetterListView(Context context) {
 		super(context);
+		init();
+	}
+
+	private void init(){
+		b[0] = getResources().getString(R.string.location);
+		b[1] = getResources().getString(R.string.hot);
+		b[2] = getResources().getString(R.string.all);
 	}
 
 	@Override

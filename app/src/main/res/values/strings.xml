@@ -6,7 +6,7 @@
     <string name="stoplocation">finish location</string>
     <string name="loading">loading...</string>
     <string name="subway">metro</string>
-    <string name="select_city">switch city</string>
+    <string name="select_city">Switch City</string>
     <string name="full_subway">Global graph</string>
     <string name="scal_btn">Enlarge</string>
     <string name="full_subway_title">All routes</string>
@@ -64,4 +64,16 @@
     <string name="alarm_alert_off_text" >Arrived take care. Get off.</string>
     <string name="stop_hint">End reminder again!</string>
     <string name="search_hint">Start|End</string>
+    <string name="search_result_empty">search result empty</string>
+    <string name="input_city_name_or_pingyin">input city name or pingying</string>
+    <string name="sorry_no_search_city">Sorry no search city</string>
+    <string name="location">Location</string>
+    <string name="hot">Hot</string>
+    <string name="all">All</string>
+    <string name="is_location">Locationing</string>
+    <string name="now_location_city">Current location</string>
+    <string name="not_location_city">Location fail,please select</string>
+    <string name="select_again">Select again</string>
+    <string name="hot_city">Hot city</string>
+    <string name="nearst">Nearst</string>
 </resources>

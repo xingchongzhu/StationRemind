@@ -1,6 +1,6 @@
-package com.traffic.locationremind.baidu.location.utils;
+package com.traffic.locationremind.manager;
 
-import com.geek.thread.task.GeekRunnable;
+import com.traffic.locationremind.baidu.location.utils.SearchPath;
 
 import java.util.ArrayList;
 import java.util.List;

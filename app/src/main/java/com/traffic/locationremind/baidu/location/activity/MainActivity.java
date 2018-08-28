@@ -1,17 +1,12 @@
 package com.traffic.locationremind.baidu.location.activity;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.annotation.ColorInt;
-import android.support.v4.graphics.ColorUtils;
+import android.os.PersistableBundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,9 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import android.widget.Toast;
 import com.baidu.location.BDLocation;
-import com.geek.thread.GeekThreadManager;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
@@ -34,26 +27,22 @@ import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
-import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
-import com.traffic.locationremind.baidu.location.utils.AsyncTaskManager;
+import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.RemindSetViewManager;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
 import com.traffic.locationremind.manager.bean.CityInfo;
-import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
-import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.manager.database.DataManager;
-import com.traffic.locationremind.manager.serach.SearchManager;
+import com.traffic.locationremind.manager.SearchManager;
 import com.traffic.locationremind.pinying.LocationCityActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
@@ -95,6 +84,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_behavior);
         mDataManager = DataManager.getInstance(this);
         mDataManager.addLoadDataListener(this);
@@ -103,17 +93,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
 
-       // colloction_btn = (ImageView) findViewById(R.id.colloction_btn);
-        //colloction_btn.setOnClickListener(this);
-
         pageBottomTabLayout = (PageNavigationView) findViewById(R.id.tab);
 
         mRemindSetViewManager = new RemindSetViewManager();
         mRemindSetViewManager.setGoToFragmentListener(this);
         mRemindSetViewManager.initView(this, mDataManager);
 
-        //ReadExcelDataUtil.getInstance().addDbWriteFinishListener(this);
-        //CopyDBDataUtil.getInstance().addDbWriteFinishListener(this);
         mNavigationController = pageBottomTabLayout.material()
                 .addItem(R.drawable.all_icon, getString(R.string.full_subway_title))
                 .addItem(R.drawable.line_icon, getString(R.string.line_title))
@@ -122,7 +107,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         root = (ViewGroup) findViewById(R.id.root);
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
-        mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(), mNavigationController,mRemindSetViewManager);
+        mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(),
+                mNavigationController,mRemindSetViewManager);
         viewPager.setAdapter(mViewPagerAdapter);
 
         mNavigationController.setupWithViewPager(viewPager);
@@ -145,6 +131,16 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        //  super.onSaveInstanceState(outState, outPersistentState);
     }
 
     public DataManager getDataManager() {

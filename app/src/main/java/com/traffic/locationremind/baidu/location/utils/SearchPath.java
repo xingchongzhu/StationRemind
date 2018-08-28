@@ -5,10 +5,9 @@ import android.util.Log;
 
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
 import com.traffic.locationremind.baidu.location.object.Node;
+import com.traffic.locationremind.manager.AsyncTaskManager;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -58,6 +57,8 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
         stack = null;
         list.clear();
         AsyncTaskManager.getInstance().removeGeekRunnable(this);
+        if (mSearchResultListener != null)
+            mSearchResultListener.cancleDialog(null);
     }
 
     public SearchPath() {
@@ -184,29 +185,6 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
             }
         } else
             return false;
-    }
-
-    public void main(int[][] nodeRalation) {
-        /* 定义节点数组 */
-        Node[] node = new Node[nodeRalation.length];
-
-        for (int i = 0; i < nodeRalation.length; i++) {
-            node[i] = new Node();
-            node[i].setName(i);
-        }
-
-        /* 定义与节点相关联的节点集合 */
-        for (int i = 0; i < nodeRalation.length; i++) {
-            ArrayList<Node> List = new ArrayList<Node>();
-
-            for (int j = 0; j < nodeRalation[i].length; j++) {
-                List.add(node[nodeRalation[i][j]]);
-            }
-            node[i].setRelationNodes(List);
-            List = null;  //释放内存
-        }
-        /* 开始搜索所有路径 */
-        getPaths(node[1], null, node[0], node[4]);
     }
 
     public List<List<Integer>> serach(int origin, int goal, int[][] nodeRalation) {
