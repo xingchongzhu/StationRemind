@@ -179,8 +179,20 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             }
         });
         setCurrentLine(0);
-        if (colorLineAdapter != null)
+        if (colorLineAdapter != null) {
             colorLineAdapter.setData(list);
+        }
+        if (mDataManager != null && mDataManager.getLineInfoList() != null) {
+            if (mDataManager.getLineInfoList().size() < 6) {
+                ViewGroup.LayoutParams linearParams = lineMap.getLayoutParams();
+                linearParams.height = (int) getResources().getDimension(R.dimen.single_color_height);
+                lineMap.setLayoutParams(linearParams);
+            }else{
+                ViewGroup.LayoutParams linearParams = lineMap.getLayoutParams();
+                linearParams.height = (int) getResources().getDimension(R.dimen.line_color_height);
+                lineMap.setLayoutParams(linearParams);
+            }
+        }
 
     }
 

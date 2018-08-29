@@ -76,7 +76,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     private List<ActivityListener> activityListenerList = new ArrayList<>();
 
     private CityInfo currentCityNo = null;
-    private Toolbar mToolbarSet;
+    //private Toolbar mToolbarSet;
     private ImageView colloction_btn;
     private String currentCity = "北京";
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mDataManager = DataManager.getInstance(this);
         mDataManager.addLoadDataListener(this);
 
-        mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
+        //mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
 

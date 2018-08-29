@@ -71,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
-                android:layout_height="110dp"
+                android:layout_height="@dimen/line_color_height"
                 android:scrollbars="none"
                 android:horizontalSpacing="5dp"
                 android:verticalSpacing="2dp"

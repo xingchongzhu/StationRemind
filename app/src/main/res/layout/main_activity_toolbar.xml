@@ -1,52 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.Toolbar
+
+<FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/lightwhite"
-        android:popupTheme="@style/AppTheme">
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+>
 
-    <RelativeLayout
+    <com.traffic.locationremind.baidu.location.view.SearchEditView
+            android:id="@+id/edit_button"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_margin="5dp">
-        <TextView
-                android:id="@+id/city_select"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:textSize="22dp"
-                android:textColor="#6A5ACD"
-                android:layout_gravity="start"
-                android:text="深圳"
-                android:gravity="center"
-                android:drawableRight="@drawable/city_select"
-                android:textStyle="bold"/>
+            android:layout_height="@dimen/search_height_btn"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/search_edittext_shape"
+            android:drawableLeft="@drawable/ic_search_grey"
+            android:layout_centerVertical="true"
+            android:drawablePadding="5dp"
+            android:paddingLeft="5dp"
+            android:hint="@string/search_hint"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:textColorHint="#6A5ACD"
+            android:textColor="@color/edit_window"
+            android:textSize="12sp"/>
+    <TextView
+            android:id="@+id/city_select"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="20dp"
+            android:layout_marginRight="15dp"
+            android:textColor="#6A5ACD"
+            android:layout_centerVertical="true"
+            android:layout_gravity="right"
+            android:text="深圳"
+            android:gravity="center"
+            android:drawableRight="@drawable/city_select"
+            android:textStyle="bold"/>
+</FrameLayout>
 
-        <com.traffic.locationremind.baidu.location.view.SearchEditView
-                android:id="@+id/edit_button"
-                android:layout_width="match_parent"
-                android:layout_toRightOf="@id/city_select"
-                android:layout_margin="8dp"
-                android:layout_height="@dimen/search_height_btn"
-                android:layout_gravity="center_vertical"
-                android:background="@drawable/search_edittext_shape"
-                android:layout_marginLeft="5dp"
-                android:drawableLeft="@drawable/ic_search_grey"
-                android:layout_centerVertical="true"
-                android:drawablePadding="5dp"
-                android:hint="@string/search_hint"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:textColorHint="#6A5ACD"
-                android:textColor="@color/edit_window"
-                android:textSize="12sp"/>
-
-    </RelativeLayout>
-
-
-</android.support.v7.widget.Toolbar>
