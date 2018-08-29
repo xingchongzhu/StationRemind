@@ -23,6 +23,7 @@ import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.activity.AlarmActivity;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
+import com.traffic.locationremind.baidu.location.utils.NotificationUtils;
 import com.traffic.locationremind.baidu.location.view.LineNodeView;
 import com.traffic.locationremind.baidu.location.view.RemindLineColorView;
 import com.traffic.locationremind.common.util.CommonFuction;
@@ -96,6 +97,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     public void setData(List<StationInfo> list) {
         isRemind = true;
+        if(getMainActivity() != null) {
+            getMainActivity().setRemindState(true);
+        }
         this.list = list;
         for (StationInfo stationInfo : list) {
             stationInfo.colorId = mDataManager.getLineInfoList().get(stationInfo.lineid).colorid;
@@ -109,6 +113,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     public void initdata(List<StationInfo> list) {
         isRemind = false;
+        if(getMainActivity() != null) {
+            getMainActivity().setRemindState(false);
+        }
         this.list = list;
         for (StationInfo stationInfo : list) {
             stationInfo.colorId = mDataManager.getLineInfoList().get(stationInfo.lineid).colorid;
@@ -116,6 +123,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         createLine(list);
     }
 
+    private MainActivity getMainActivity(){
+        return (MainActivity)getActivity();
+    }
     public void upadaData() {
         list = null;
         if (linearlayout != null)
@@ -125,6 +135,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         if (mScrollFavoriteManager != null)
             mScrollFavoriteManager.closeScrollView();
         cancleRemind();
+        if(getMainActivity() != null) {
+            getMainActivity().setRemindState(false);
+        }
+
         if (cancle_remind_btn != null)
             cancle_remind_btn.setEnabled(false);
         currentStation = null;
@@ -146,6 +160,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         if (list == null || list.size() <= 0) {
             return;
         }
+
         this.list = list;
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -221,6 +236,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 tempChangeStationList = new ArrayList<>(needChangeStationList);
             }
         });
+        if(getMainActivity() != null) {
+            getMainActivity().setRemindList(list,needChangeStationList,lineDirection);
+        }
     }
 
     public void updateColloctionView() {
@@ -322,11 +340,20 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             case R.id.cancle_remind_btn:
                 if (isRemind) {
                     isRemind = false;
-                    cancleNotification();
+                    if(getMainActivity() != null) {
+                        getMainActivity().setRemindState(false);
+                    }
+                    if (cancle_remind_btn != null) {
+                        cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
+                        cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
+                        setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+                    }
                 } else {
                     tempChangeStationList = new ArrayList<>(needChangeStationList);
                     isRemind = true;
-                    num = 0;
+                    if(getMainActivity() != null) {
+                        getMainActivity().setRemindState(true);
+                    }
                     cancle_remind_btn.setTextColor(getResources().getColor(R.color.blue));
                     cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
                     setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.is_remind));
@@ -381,13 +408,12 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         return mBDLocation;
     }
 
-    int adjustlocation = 0;
-    int num = 0;
-    private final static int LOCATIONTIMEOUTNUM = 30;
 
     @Override
     public void loactionStation(BDLocation location) {
-        MainActivity activity = (MainActivity) getActivity();
+        if(getMainActivity() != null) {
+            MainActivity activity = getMainActivity();
+        }
         mBDLocation = location;
 
         StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);
@@ -414,15 +440,16 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                         }
                         n++;
                     }
-                    horizontalScrollView.scrollTo(lineNodeWidth * n, horizontalScrollView.getScrollY());
+
                     String surplusNum = String.format(getResources().getString(R.string.surples_station), (list.size() - n) - 1 + "");
                     String currenStr = getResources().getString(R.string.current_station) + lineNodeView.getStationInfo().getCname();
                     String line = CommonFuction.getLineNo(DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid).linename)[0];
-                    //String.format(getResources().getString(R.string.line_tail),lineNodeView.getStationInfo().lineid+"") ;
                     String direction = lineDirection.get(lineNodeView.getStationInfo().lineid) + getResources().getString(R.string.direction);
                     current_info_text.setText(surplusNum + "   " + currenStr + "   " + line + "   " + direction);
-
                     currentStation = lineNodeView.getStationInfo();
+                    if(currentStation != null && nextStation != null && currentStation.getCname().equals(nextStation.getCname())){
+                        horizontalScrollView.scrollTo(lineNodeWidth * n, horizontalScrollView.getScrollY());
+                    }
                     if (n + 1 < list.size() - 1) {
                         nextStation = list.get(n + 1);
                     }
@@ -435,57 +462,24 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                                 Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
                                 tempChangeStationList.remove(stationInfo);
                                 isRemind = false;
-                                //cancleNotification();
-                                //arriveNotification();
-                                sendHint(true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station), "");
+                                //sendHint(true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station), "");
                                 break;
                             } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
 
                                 tempChangeStationList.remove(stationInfo);
                                 String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
                                         DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid).linename;
-                                sendHint(false, getResources().getString(R.string.change), str,
-                                        lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
+                                //sendHint(false, getResources().getString(R.string.change), str,
+                                 //       lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
                                 Log.d(TAG, "change stationInfo.getCname()" + stationInfo.getCname());
-                                //changeNotification(str);
                                 break;
                             }
                         }
-                        updataNotification(createNotificationObject(currentStation, nextStation));
+                        //updataNotification(createNotificationObject(currentStation, nextStation));
                     }
                 }
             }
         }
-    }
-
-    private void sendHint(boolean isArrive, String title, String content, String change) {
-        Intent intent = new Intent(getActivity(), AlarmActivity.class);
-        intent.putExtra("arrive", isArrive);
-        intent.putExtra("title", title);
-        intent.putExtra("content", content);
-        intent.putExtra("change", change);
-        getActivity().startActivityForResult(intent,1);
-    }
-
-    public NotificationObject createNotificationObject(StationInfo currentStation, StationInfo nextStation) {
-        if (currentStation == null) {
-            return null;
-        }
-        String linename = "";
-        String currentStationName = "";
-        String direction = "";
-        String nextStationName = "";
-        String time = "2分钟";
-        if (currentStation != null) {
-            linename = DataManager.getInstance(getActivity()).getLineInfoList().get(currentStation.lineid).linename;
-            currentStationName = getResources().getString(R.string.current_station) + currentStation.getCname();
-            direction = lineDirection.get(currentStation.lineid) + getResources().getString(R.string.direction);
-        }
-        if (nextStation != null) {
-            nextStationName = getResources().getString(R.string.next_station) + nextStation.getCname();
-        }
-        NotificationObject mNotificationObject = new NotificationObject(linename, currentStationName, direction, nextStationName, time);
-        return mNotificationObject;
     }
 
     @Override
@@ -503,7 +497,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     public void cancleRemind() {
         isRemind = false;
-        cancleNotification();
+        //cancleNotification();
     }
 
     public boolean getRemindState() {
@@ -524,10 +518,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     @Override
     public boolean moveTaskToBack() {
         Log.d(TAG, "moveTaskToBack isRemind = " + isRemind);
-        if (isRemind) {
-            NotificationObject mNotificationObject = createNotificationObject(currentStation, nextStation);
+       /* if (isRemind) {
+            NotificationObject mNotificationObject = NotificationUtils.createNotificationObject(getActivity(),lineDirection,currentStation, nextStation);
             setNotification(mNotificationObject);
-        }
+        }*/
         return true;
     }
 

@@ -26,6 +26,7 @@ import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.AlarmActivity;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;

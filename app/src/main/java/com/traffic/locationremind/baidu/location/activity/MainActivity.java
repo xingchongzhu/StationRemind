@@ -43,6 +43,7 @@ import com.traffic.locationremind.pinying.LocationCityActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends AppCommonActivity implements View.OnClickListener,
@@ -157,6 +158,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
         if(getRemindState())
             mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        if (mRemonderLocationService != null) {
+            mRemonderLocationService.cancleNotification();
+        }
     }
 
     private void initData() {
@@ -307,6 +311,18 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
     };
 
+    public void setRemindState(boolean state){
+        if (mRemonderLocationService != null) {
+            mRemonderLocationService.setStartReminder(state);
+        }
+    }
+
+    public void setRemindList(List<StationInfo> list, List<StationInfo> needChangeStationList,Map<Integer, String> lineDirection){
+        if (mRemonderLocationService != null) {
+            mRemonderLocationService.setStationInfoList(list,needChangeStationList,lineDirection);
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -357,6 +373,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     public void notificationMoveTaskToBack() {
+        if (mRemonderLocationService != null) {
+            mRemonderLocationService.moveTaskToBack();
+        }
         for (ActivityListener activityListener : activityListenerList) {
             activityListener.moveTaskToBack();
         }

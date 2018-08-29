@@ -2,6 +2,8 @@ package com.traffic.locationremind.baidu.location.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -14,13 +16,15 @@ import com.traffic.locationremind.baidu.location.activity.LocationApplication;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
+import com.traffic.locationremind.baidu.location.utils.NotificationUtils;
+import com.traffic.locationremind.baidu.location.view.LineNodeView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.NotificationUtil;
+import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * @author baidu
@@ -29,7 +33,7 @@ public class RemonderLocationService extends Service {
 
     private final static String TAG = "RemonderLocationService";
     public final static String CLOSE_REMINDER_SERVICE = "close.reminder.service";
-    private UpdateBinder downLoadBinder=new UpdateBinder();
+    private UpdateBinder downLoadBinder = new UpdateBinder();
     private LocationService locationService;
     /**
      * 回调
@@ -37,17 +41,17 @@ public class RemonderLocationService extends Service {
     private Callback callback;
     private LocationChangerListener mLocationChangerListener;
     public static boolean state = false;
-    /**
-     * Timer实时更新数据的
-     */
-    private double longitude,latitude;
 
     BDLocation currentLocation;
-    private List<MarkObject> mStationInfoList = null;//地图站台信息
 
     private NotificationUtil mNotificationUtil;
     private boolean isReminder = false;
     private boolean locationServiceHasStart = false;
+    List<StationInfo> list, tempChangeStationList;
+    StationInfo nextStation, currentStation;
+    private Map<Integer, String> lineDirection;
+    private List<StationInfo> needChangeStationList;
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO Auto-generated method stub
@@ -69,18 +73,20 @@ public class RemonderLocationService extends Service {
 
     /**
      * 内部类继承Binder
-     * @author lenovo
      *
+     * @author lenovo
      */
     public class UpdateBinder extends Binder {
         /**
          * 声明方法返回值是MyService本身
+         *
          * @return
          */
         public RemonderLocationService getService() {
             return RemonderLocationService.this;
         }
     }
+
     /**
      * 服务创建的时候调用
      */
@@ -99,18 +105,18 @@ public class RemonderLocationService extends Service {
 
     }
 
-    public void setLocationChangerListener(LocationChangerListener locationChangerListener){
+    public void setLocationChangerListener(LocationChangerListener locationChangerListener) {
         this.mLocationChangerListener = locationChangerListener;
     }
 
-    public void startLocationService(){
-        if(locationService != null && !locationServiceHasStart){
+    public void startLocationService() {
+        if (locationService != null && !locationServiceHasStart) {
             locationService.start();
             locationServiceHasStart = true;
         }
     }
 
-    public BDLocation getCurrentLocation(){
+    public BDLocation getCurrentLocation() {
         return currentLocation;
     }
 
@@ -125,141 +131,118 @@ public class RemonderLocationService extends Service {
         public void onReceiveLocation(BDLocation location) {
             // TODO Auto-generated method stub
 
-            //double lot =0,lat = 0;
             if (null != location
                     && location.getLocType() != BDLocation.TypeServerError) {
-                //StringBuffer sb = new StringBuffer(256);
-                /**
-                 * 时间也可以使用systemClock.elapsedRealtime()方法 获取的是自从开机以来，每次回调的时间；
-                 * location.getTime() 是指服务端出本次结果的时间，如果位置不发生变化，则时间不变
-                 */
-
-                if(!CommonFuction.isvalidLocation(location)){
-                    Log.d(TAG,"BDAbstractLocationListener location invale ");
+                if (!CommonFuction.isvalidLocation(location)) {
+                    Log.d(TAG, "BDAbstractLocationListener location invale ");
                     currentLocation = null;
                     return;
                 }
-               // Log.d(TAG,"BDAbstractLocationListener location = "+location+" callback");
                 currentLocation = location;
-                if(isReminder && callback != null){
+                if (isReminder && callback != null) {
                     callback.loactionStation(location);
                 }
-                if(mLocationChangerListener != null){
+                if (mLocationChangerListener != null) {
                     mLocationChangerListener.loactionStation(location);
                 }
-                //lot = location.getLongitude();
-                //lat = location.getLatitude();
-                //sb.append("\nlatitude : ");// 纬度
-                //currentStationInfo.setLat(""+location.getLatitude());
-                //sb.append(location.getLatitude());
-                //sb.append("\nlontitude : ");// 经度
-                //Log.d(TAG,"BDAbstractLocationListener lot ="+lot+" lat = "+lat);
-                //currentStationInfo.setLot(""+location.getLongitude());
-                //sb.append(location.getLongitude());
-                //sb.append("\nradius : ");// 半径
-                //sb.append(location.getRadius());
-                //sb.append("\nCountryCode : ");// 国家码
-                //sb.append(location.getCountryCode());
-                //sb.append("\nCountry : ");// 国家名称
-                //sb.append(location.getCountry());
-                //sb.append("\ncitycode : ");// 城市编码
-                //sb.append(location.getCityCode());
-                //sb.append("\ncity : ");// 城市
-                //currentStationInfo.setCityNo(""+location.getCityCode());
-                //currentStationInfo.setCname(location.getCity());
 
-                /*
-                 * 得到最新数据
-                 */
-                //mStationInfo.setStationInfo(sb.toString());
-                //callback.setCurrentStation(mStationInfo);//
-
-                /*if(mStationInfoList != null && isReminder){
-                    double dis = 0;
-                    String startStation="",endStation="",currentStation="";
-                    final int mStationInfoList_size = mStationInfoList.size();// Moved  mStationInfoList.size() call out of the loop to local variable mStationInfoList_size
-                    for(int n = 0; n< mStationInfoList_size; n++){
-                        longitude = CommonFuction.convertToDouble(mStationInfoList.get(n).mStationInfo.getLot(),0);
-                        latitude =  CommonFuction.convertToDouble(mStationInfoList.get(n).mStationInfo.getLat(),0);
-                        dis = CommonFuction.getDistanceLat(longitude,latitude,lot,lat);
-                        if(mStationInfoList.get(n).isStartStation){
-                            startStation = mStationInfoList.get(n).mStationInfo.getCname();
-                        }
-                        if(mStationInfoList.get(n).isEndStation){
-                            endStation = mStationInfoList.get(n).mStationInfo.getCname();
-                        }
-                        if(mStationInfoList.get(n).isCurrentStation){
-                            currentStation = mStationInfoList.get(n).mStationInfo.getCname();
-                        }
-                        callback.setCurrentStation(startStation,endStation,currentStation);
-                        if(dis<= CommonFuction.RANDDIS){//抵达某站台
-                            final int mStationInfoList_size1 = mStationInfoList.size();// Moved  mStationInfoList.size() call out of the loop to local variable mStationInfoList_size
-                            for(int j = 0; j< mStationInfoList_size1; j++){
-                                mStationInfoList.get(j).isCurrentStation = false;
-                            }
-                            mStationInfoList.get(n).isCurrentStation = true;
-                            currentStation = mStationInfoList.get(n).mStationInfo.getCname();
-                            callback.setCurrentStation(startStation,endStation,currentStation);
-                            CommonFuction.writeSharedPreferences(RemonderLocationService.this,CommonFuction.CURRENTSTATIONNAME,mStationInfoList.get(n).mStationInfo.getCname());
-                            if(mStationInfoList.get(n).isEndStation){//到站通知
-                                if(callback != null){
-                                    callback.arriaved(true);
-                                    setCancleReminder();
-                                }
+                if (list != null && list.size() > 0) {
+                    StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);
+                    if (nerstStationInfo != null) {
+                        currentStation = nerstStationInfo;
+                        int n = 0;
+                        for (StationInfo stationInfo : list) {
+                            if (stationInfo.getCname().equals(currentStation.getCname())) {
                                 break;
                             }
-                            continue;
+                            n++;
+                        }
+
+                        if (n + 1 < list.size() - 1) {
+                            nextStation = list.get(n + 1);
+                        }
+
+                        Log.d(TAG, "loactionStation getCname = " + currentStation.getCname() + " isRemind = " + isReminder);
+                        if (isReminder) {
+                            for (StationInfo stationInfo : tempChangeStationList) {
+                                if (list.get(list.size() - 1).getCname().equals(stationInfo.getCname()) &&
+                                        stationInfo.getCname().equals(currentStation.getCname())) {
+                                    Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
+                                    tempChangeStationList.remove(stationInfo);
+                                    isReminder = false;
+                                    cancleNotification();
+                                    NotificationUtils.sendHint(getApplicationContext(), true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station), "");
+                                    break;
+                                } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
+                                    tempChangeStationList.remove(stationInfo);
+                                    String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
+                                            DataManager.getInstance(getApplicationContext()).getLineInfoList().get(currentStation.lineid).linename;
+                                    NotificationUtils.sendHint(getApplicationContext(), false, getResources().getString(R.string.change), str,
+                                            lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
+                                    Log.d(TAG, "change stationInfo.getCname()" + stationInfo.getCname());
+                                    break;
+                                }
+                            }
+                            updataNotification(NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation));
                         }
                     }
-                }*/
 
+                }
             }
         }
+
     };
+
+    public boolean moveTaskToBack() {
+        Log.d(TAG, "moveTaskToBack isRemind = " + isReminder);
+        if (isReminder) {
+            NotificationObject mNotificationObject = NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation);
+            setNotification(mNotificationObject);
+        }
+        return true;
+    }
+
+    public void setNotification(NotificationObject mNotificationObject) {
+        mNotificationUtil.showNotification(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject);
+    }
+
+    public void updataNotification(NotificationObject mNotificationObject) {
+        mNotificationUtil.updateProgress(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject);
+    }
+
 
     /**
      * 提供接口回调方法
+     *
      * @param
      */
 
-    public void setStartReminder(){
-        isReminder = true;
-        CommonFuction.writeBooleanSharedPreferences(this,CommonFuction.ISREMINDER,true);
+    public void setStartReminder(Boolean state) {
+        isReminder = state;
+        if (!isReminder) {
+            cancleNotification();
+        }else if(needChangeStationList != null){
+            tempChangeStationList = new ArrayList<>(needChangeStationList);
+        }
     }
+
     public void setCallback(Callback callback) {
         this.callback = callback;
     }
 
-    public void setCancleReminder(){
+    public void setCancleReminder() {
         isReminder = false;
-        CommonFuction.writeBooleanSharedPreferences(this,CommonFuction.ISREMINDER,false);
         mNotificationUtil.cancel(NotificationUtil.notificationId);
     }
 
-    public void cancleNotification(){
+    public void cancleNotification() {
         mNotificationUtil.cancel(NotificationUtil.notificationId);
-    }
-
-    public void setNotification(boolean state) {
-        mNotificationUtil = new NotificationUtil(this);
-        boolean ismark = CommonFuction.getSharedPreferencesBooleanValue(this,CommonFuction.ISREMINDER);
-        Log.d(TAG,"isremark = "+ismark);
-        if(ismark){
-            NotificationObject mNotificationObject = new NotificationObject("1号地铁","老街","机场东","华强北","2分钟");
-            mNotificationUtil.showNotification(getApplication(),NotificationUtil.notificationId,mNotificationObject);
-        }
-    }
-
-    public void setEndStation(StationInfo mStationInfo){
-        longitude = CommonFuction.convertToDouble(mStationInfo.getLot(),0);
-        latitude = CommonFuction.convertToDouble(mStationInfo.getLat(),0);
     }
 
     /**
      * 回调接口
      *
      * @author lenovo
-     *
      */
     public static interface Callback {
         /**
@@ -268,10 +251,14 @@ public class RemonderLocationService extends Service {
          * @return
          */
         void setCurrentStation(String startCname, String endName, String current);
+
         void arriaved(boolean state);
+
         void loactionStation(BDLocation location);
+
         void errorHint(String error);
     }
+
     /**
      * 服务销毁的时候调用
      */
@@ -283,36 +270,21 @@ public class RemonderLocationService extends Service {
         /**
          * 停止Timer
          */
-        if(locationService != null){
+        if (locationService != null) {
             locationService.unregisterListener(mListener); // 注销掉监听
             locationService.stop(); // 停止定位服务
         }
         setCancleReminder();
-        Log.d(TAG,"onDestroy ");
+        Log.d(TAG, "onDestroy ");
     }
 
-    public void setStationInfoList(List<MarkObject> mStationInfoList){
-        this.mStationInfoList = mStationInfoList;
-        if(mStationInfoList != null && mStationInfoList.size() > 0){
-            CommonFuction.writeSharedPreferences(this,CommonFuction.CURRENTLINEID,""+mStationInfoList.get(0).mStationInfo.getLineid());
-            //CommonFuction.writeSharedPreferences(this,CommonFuction.CURRENTCITYNO,""+mStationInfoList.get(0).mStationInfo.getCityNo());
+    public void setStationInfoList(List<StationInfo> list, List<StationInfo> needChangeStationList,Map<Integer, String> lineDirection) {
+        this.list = list;
+        tempChangeStationList = new ArrayList<>(needChangeStationList);
+        this.lineDirection = lineDirection;
+    }
 
-            final int mStationInfoList_size = mStationInfoList.size();// Moved  mStationInfoList.size() call out of the loop to local variable mStationInfoList_size
-            for(int n = 0; n< mStationInfoList_size; n++){
-                if(mStationInfoList.get(n).isStartStation){
-                    CommonFuction.writeSharedPreferences(this,CommonFuction.STARTSTATIONNAME,mStationInfoList.get(n).mStationInfo.getCname());
-                    continue;
-                }
-                if(mStationInfoList.get(n).isEndStation){
-                    CommonFuction.writeSharedPreferences(this,CommonFuction.ENDSTATIONNAME,mStationInfoList.get(n).mStationInfo.getCname());
-                    continue;
-                }
-                if(mStationInfoList.get(n).isCurrentStation){
-                    CommonFuction.writeSharedPreferences(this,CommonFuction.CURRENTSTATIONNAME,mStationInfoList.get(n).mStationInfo.getCname());
-                    continue;
-                }
-            }
-        }
-
+    public void setDirection(Map<Integer, String> lineDirection) {
+        this.lineDirection = lineDirection;
     }
 }

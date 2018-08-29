@@ -106,8 +106,8 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                     break;
 
                 case STARTLOCATION:
-                    mRemonderLocationService.setStartReminder();
-                    mRemonderLocationService.setStationInfoList(sceneMap.getMarkList());
+                   // mRemonderLocationService.setStartReminder();
+                   // mRemonderLocationService.setStationInfoList(sceneMap.getMarkList());
                     start_location_reminder.setText(MainViewActivity.this.getResources().getString(R.string.stoplocation));
                     currentLineInfoText.setText(PathSerachUtil.printAllRecomindLine(lastLinesLast));//打印所有路线);
                     break;
@@ -535,7 +535,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         super.onStop();
         RemonderLocationService.state = false;
         if (mRemonderLocationService != null) {
-            mRemonderLocationService.setNotification(true);
+           // mRemonderLocationService.setNotification(true);
         }
     }
 
@@ -599,7 +599,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                             sceneMap.setMardEndState(true, markObject.mStationInfo.getCname());
                             sceneMap.postInvalidate();
                             if (mRemonderLocationService != null) {
-                                mRemonderLocationService.setEndStation(markObject.mStationInfo);
+                                //mRemonderLocationService.setEndStation(markObject.mStationInfo);
                             }
                             canSetReminder++;
                             endStationInfo = markObject.mStationInfo;
