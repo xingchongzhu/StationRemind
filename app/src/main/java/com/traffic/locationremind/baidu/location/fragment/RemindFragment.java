@@ -97,14 +97,15 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     public void setData(List<StationInfo> list) {
         isRemind = true;
-        if(getMainActivity() != null) {
-            getMainActivity().setRemindState(true);
-        }
+
         this.list = list;
         for (StationInfo stationInfo : list) {
             stationInfo.colorId = mDataManager.getLineInfoList().get(stationInfo.lineid).colorid;
         }
         createLine(list);
+        if(getMainActivity() != null) {
+            getMainActivity().setRemindState(true);
+        }
     }
 
     public DataManager getDataManager() {

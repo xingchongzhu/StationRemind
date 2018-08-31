@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.RemoteViews;
@@ -36,7 +37,7 @@ import java.util.Map;
 
 public class NotificationUtil {
 
-	public final static int notificationId = 1;
+	public final static int notificationId = 4;
 	public final static int changeNotificationId = 2;
 	public final static int arriveNotificationId = 3;
 	//private Context mContext;
@@ -53,7 +54,7 @@ public class NotificationUtil {
 		map = new HashMap<Integer, Notification>();
 	}
 
-	public void showNotification(Context context,int notificationId, NotificationObject mNotificationObject) {
+	public Notification showNotification(Context context,int notificationId, NotificationObject mNotificationObject) {
 		//notification();
 
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
@@ -62,7 +63,7 @@ public class NotificationUtil {
 			String name = "my_package_channel";//渠道名字
 			String id = "my_package_channel_1"; // 渠道ID
 			String description = "my_package_first_channel"; // 渠道解释说明
-			PendingIntent pendingIntent;//非紧急意图，可设置可不设置
+			//PendingIntent pendingIntent;//非紧急意图，可设置可不设置
 			//判断是否是8.0上设备
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 				int importance = NotificationManager.IMPORTANCE_HIGH;
@@ -80,6 +81,7 @@ public class NotificationUtil {
 			// 创建通知对象
 			//Notification notification = new Notification();
 			NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
+			notification.setPriority(Notification.PRIORITY_HIGH);// 设置该通知优先级
 			// 设置通知栏滚动显示文字
 			//notification.tickerText = mContext.getResources().getString(R.string.arrived_reminder);
 			notification.setTicker(context.getResources().getString(R.string.arrived_reminder));;
@@ -93,29 +95,32 @@ public class NotificationUtil {
 			notification.setColor(Color.parseColor("#880000FF"));
 			notification.setContentText(context.getString(R.string.line_background_hint));
 			// 设置通知的特性: 通知被点击后，自动消失
-			notification.setAutoCancel(true);
+			//notification.setAutoCancel(true);
 			//notification.flags = Notification.FLAG_AUTO_CANCEL;
 			// 设置点击通知栏操作
 			Intent in = new Intent(context, MainActivity.class);// 点击跳转到指定页面
 			PendingIntent pIntent = PendingIntent.getActivity(context, 0, in, 0);
 			notification.setContentIntent(pIntent);
+
 			//notification.contentIntent = pIntent;
 			// 设置通知的显示视图
 			RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.reminder_notify);
 
 			//remoteViews.setTextViewCompoundDrawablesRelative(R.id.line,mNotificationObject.getLineName());
-            remoteViews.setTextViewText(R.id.line,mNotificationObject.getLineName());
-            remoteViews.setTextViewText(R.id.start,mNotificationObject.getStartStation());
-            remoteViews.setTextViewText(R.id.end,mNotificationObject.getEndStation());
-            remoteViews.setTextViewText(R.id.next,mNotificationObject.getNextStation());
-            remoteViews.setTextViewText(R.id.time,mNotificationObject.getTime());
+			if(mNotificationObject != null) {
+				remoteViews.setTextViewText(R.id.line, mNotificationObject.getLineName());
+				remoteViews.setTextViewText(R.id.start, mNotificationObject.getStartStation());
+				remoteViews.setTextViewText(R.id.end, mNotificationObject.getEndStation());
+				remoteViews.setTextViewText(R.id.next, mNotificationObject.getNextStation());
+				remoteViews.setTextViewText(R.id.time, mNotificationObject.getTime());
+			}
 
 			// 设置暂停按钮的点击事件
-			Intent close = new Intent(context,MainActivity.class);// 设置跳转到对应界面
-			close.setAction(RemonderLocationService.CLOSE_REMINDER_SERVICE);
-			PendingIntent pauseIn = PendingIntent.getService(context, 0, in, 0);
+			//Intent close = new Intent(context,MainActivity.class);// 设置跳转到对应界面
+			//close.setAction(RemonderLocationService.CLOSE_REMINDER_SERVICE);
+			//PendingIntent pauseIn = PendingIntent.getService(context, 0, in, 0);
 			// 这里可以通过Bundle等传递参数
-			remoteViews.setOnClickPendingIntent(R.id.close, pauseIn);
+			//remoteViews.setOnClickPendingIntent(R.id.close, pauseIn);
 			/********** 简单分隔 **************************/
 			// 设置通知的显示视图
 			notification.setCustomContentView(remoteViews);
@@ -124,9 +129,10 @@ public class NotificationUtil {
 
 			manager.notify(notificationId,notifi);
 
-			//manager.notify(notificationId, notification);
 			map.put(notificationId, notifi);// 存入Map中
+            return notifi;
 		}
+		return map.get(notificationId);
 	}
 
 	public void arrivedNotification(Context context,int notificationId) {

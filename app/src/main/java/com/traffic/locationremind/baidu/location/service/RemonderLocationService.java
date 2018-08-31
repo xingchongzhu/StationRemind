@@ -1,18 +1,27 @@
 package com.traffic.locationremind.baidu.location.service;
 
-import android.app.Service;
+import android.app.*;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Binder;
-import android.os.IBinder;
+import android.graphics.Color;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.*;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import android.widget.Toast;
 import com.baidu.location.BDAbstractLocationListener;
 import com.baidu.location.BDLocation;
+import com.baidu.location.BDNotifyListener;
+import com.baidu.location.LocationClient;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.LocationApplication;
+import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.object.NotificationObject;
@@ -24,6 +33,7 @@ import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -52,7 +62,9 @@ public class RemonderLocationService extends Service {
     private Map<Integer, String> lineDirection;
     private List<StationInfo> needChangeStationList;
 
-    @Override
+    private PowerManager pm;
+    private PowerManager.WakeLock wakeLock;
+
     public IBinder onBind(Intent intent) {
         // TODO Auto-generated method stub
         System.out.println("=====onBind=====");
@@ -66,30 +78,14 @@ public class RemonderLocationService extends Service {
         return super.onUnbind(intent);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
 
-    /**
-     * 内部类继承Binder
-     *
-     * @author lenovo
-     */
     public class UpdateBinder extends Binder {
-        /**
-         * 声明方法返回值是MyService本身
-         *
-         * @return
-         */
         public RemonderLocationService getService() {
             return RemonderLocationService.this;
         }
     }
 
-    /**
-     * 服务创建的时候调用
-     */
+
     @Override
     public void onCreate() {
         // TODO Auto-generated method stub
@@ -98,11 +94,15 @@ public class RemonderLocationService extends Service {
         locationService = ((LocationApplication) getApplication()).locationService;
         // 获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
         locationService.registerListener(mListener);
-        /*
-         * 执行Timer 2000毫秒后执行，5000毫秒执行一次
-         */
-        mNotificationUtil = new NotificationUtil(this);
 
+        mNotificationUtil = new NotificationUtil(this);
+        //创建PowerManager对象
+        pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        //保持cpu一直运行，不管屏幕是否黑屏
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RemonderLocationService");
+        wakeLock.acquire();
+
+        //useForeground();
     }
 
     public void setLocationChangerListener(LocationChangerListener locationChangerListener) {
@@ -113,6 +113,8 @@ public class RemonderLocationService extends Service {
         if (locationService != null && !locationServiceHasStart) {
             locationService.start();
             locationServiceHasStart = true;
+            //locationService.setBDNotifyListener(myListener);
+            //timer.schedule(task, 0, 5000);
         }
     }
 
@@ -125,6 +127,8 @@ public class RemonderLocationService extends Service {
      * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
      *
      */
+    int n = 0;
+    int number = 0;
     private BDAbstractLocationListener mListener = new BDAbstractLocationListener() {
 
         @Override
@@ -147,7 +151,15 @@ public class RemonderLocationService extends Service {
                 }
 
                 if (list != null && list.size() > 0) {
-                    StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);
+
+                    StationInfo nerstStationInfo = list.get(n);//PathSerachUtil.getNerastNextStation(location, list);
+                    if (number > 2) {
+                        number = 0;
+                        if (n < list.size()) {
+                            n++;
+                        }
+                    }
+                    number++;
                     if (nerstStationInfo != null) {
                         currentStation = nerstStationInfo;
                         int n = 0;
@@ -192,8 +204,10 @@ public class RemonderLocationService extends Service {
         }
 
     };
+    private boolean isBacrground = false;
 
     public boolean moveTaskToBack() {
+        isBacrground = true;
         Log.d(TAG, "moveTaskToBack isRemind = " + isReminder);
         if (isReminder) {
             NotificationObject mNotificationObject = NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation);
@@ -202,8 +216,16 @@ public class RemonderLocationService extends Service {
         return true;
     }
 
+    public void moveInForeground(){
+        isBacrground = false;
+    }
+
     public void setNotification(NotificationObject mNotificationObject) {
-        mNotificationUtil.showNotification(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject);
+
+        //locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId, mNotificationUtil.showNotification(getApplicationContext(),
+         //       NotificationUtil.notificationId, mNotificationObject));
+        mNotificationUtil.showNotification(getApplicationContext(),
+                NotificationUtil.notificationId, mNotificationObject);
     }
 
     public void updataNotification(NotificationObject mNotificationObject) {
@@ -218,11 +240,18 @@ public class RemonderLocationService extends Service {
      */
 
     public void setStartReminder(Boolean state) {
+        n = 0;
         isReminder = state;
         if (!isReminder) {
             cancleNotification();
-        }else if(needChangeStationList != null){
+        } else if (needChangeStationList != null) {
             tempChangeStationList = new ArrayList<>(needChangeStationList);
+        }
+        if (isReminder) {
+            NotificationObject mNotificationObject = NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation);
+            //setNotification(mNotificationObject);
+        } else {
+            cancleNotification();
         }
     }
 
@@ -232,11 +261,15 @@ public class RemonderLocationService extends Service {
 
     public void setCancleReminder() {
         isReminder = false;
-        mNotificationUtil.cancel(NotificationUtil.notificationId);
+        stopForeground(true);
+        if (mNotificationUtil != null)
+            mNotificationUtil.cancel(NotificationUtil.notificationId);
     }
 
     public void cancleNotification() {
-        mNotificationUtil.cancel(NotificationUtil.notificationId);
+        stopForeground(true);
+        if (mNotificationUtil != null)
+            mNotificationUtil.cancel(NotificationUtil.notificationId);
     }
 
     /**
@@ -265,20 +298,18 @@ public class RemonderLocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // TODO Auto-generated method stub
-        System.out.println("=========onDestroy======");
-        /**
-         * 停止Timer
-         */
         if (locationService != null) {
+            //locationService.getLocationClient().disableLocInForeground(true);// 关闭前台定位，同时移除通知栏
             locationService.unregisterListener(mListener); // 注销掉监听
             locationService.stop(); // 停止定位服务
         }
         setCancleReminder();
+
+        wakeLock.release();
         Log.d(TAG, "onDestroy ");
     }
 
-    public void setStationInfoList(List<StationInfo> list, List<StationInfo> needChangeStationList,Map<Integer, String> lineDirection) {
+    public void setStationInfoList(List<StationInfo> list, List<StationInfo> needChangeStationList, Map<Integer, String> lineDirection) {
         this.list = list;
         tempChangeStationList = new ArrayList<>(needChangeStationList);
         this.lineDirection = lineDirection;

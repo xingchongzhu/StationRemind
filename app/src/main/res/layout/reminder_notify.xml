@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_width="20dp"
         android:layout_height="20dp"
+        android:visibility="gone"
         android:background="@drawable/tc_notification_failed"
         />
     <LinearLayout

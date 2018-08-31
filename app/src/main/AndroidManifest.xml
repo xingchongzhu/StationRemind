@@ -21,7 +21,7 @@
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher_round"
             android:label="@string/app_name"
-
+            android:persistent="true"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
 
@@ -29,7 +29,8 @@
         <!--        <service android:name="com.baidu.location.f"
                     android:enabled="true"
                     android:process=":remote" />-->
-        <service android:name="com.baidu.location.f" android:enabled="true" android:process=":remote"
+        <service android:name="com.baidu.location.f" android:enabled="true"
+                 android:persistent="true"
                  android:permission="android.permission.BAIDU_LOCATION_SERVICE">
         </service>
         <!-- AK鉴权 -->
@@ -52,6 +53,7 @@
 
         <activity android:name="com.traffic.locationremind.baidu.location.activity.MainActivity"
                   android:launchMode="singleTask"
+                  android:persistent="true"
                   android:windowSoftInputMode="adjustPan"
                   android:screenOrientation="portrait">
             <intent-filter>
@@ -61,7 +63,20 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.traffic.locationremind.baidu.location.service.RemonderLocationService"/>
+       <!-- <activity android:name="com.traffic.locationremind.baidu.location.activity.ForegroundActivity"
+                  android:launchMode="singleTask"
+                  android:persistent="true"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>-->
+
+        <service android:name="com.traffic.locationremind.baidu.location.service.RemonderLocationService"
+                 android:persistent="true"/>
 
     </application>
 

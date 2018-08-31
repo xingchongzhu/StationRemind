@@ -27,12 +27,12 @@
             android:inputType="text"
             android:textColorHint="#6A5ACD"
             android:textColor="@color/edit_window"
-            android:textSize="12sp"/>
+            android:textSize="12dp"/>
     <TextView
             android:id="@+id/city_select"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textSize="20dp"
+            android:textSize="16dp"
             android:layout_marginRight="15dp"
             android:textColor="#6A5ACD"
             android:layout_centerVertical="true"

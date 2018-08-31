@@ -1,8 +1,14 @@
 package com.traffic.locationremind.baidu.location.activity;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
@@ -30,7 +36,9 @@ import com.traffic.locationremind.baidu.location.listener.LocationChangerListene
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
+import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.baidu.location.utils.NotificationUtils;
 import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.RemindSetViewManager;
@@ -132,6 +140,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
+       // useForground();
     }
 
     @Override
@@ -156,10 +165,53 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
             remindFragment.cancleRemind();
         }
-        if(getRemindState())
+        if(getRemindState()) {
             mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        }
         if (mRemonderLocationService != null) {
+            mRemonderLocationService.moveInForeground();
+        }
+        /*if (mRemonderLocationService != null) {
             mRemonderLocationService.cancleNotification();
+        }*/
+
+    }
+
+    NotificationUtils mNotificationUtils;
+    Notification notification;
+    public void useForground(){
+        //设置后台定位
+        //android8.0及以上使用NotificationUtils
+        if (Build.VERSION.SDK_INT >= 26) {
+            mNotificationUtils = new NotificationUtils(this);
+            Notification.Builder builder2 = mNotificationUtils.getAndroidChannelNotification("适配android 8限制后台定位功能", "正在后台定位");
+            notification = builder2.build();
+        } else {
+            //获取一个Notification构造器
+            Notification.Builder builder = new Notification.Builder(MainActivity.this);
+            Intent nfIntent = new Intent(MainActivity.this, MainActivity.class);
+
+            builder.setContentIntent(PendingIntent.
+                    getActivity(MainActivity.this, 0, nfIntent, 0)) // 设置PendingIntent
+                    .setContentTitle("") // 设置下拉列表里的标题
+                    .setSmallIcon(R.mipmap.notification_icon) // 设置状态栏内的小图标
+                    .setContentText("正在后台定位") // 设置上下文内容
+                    .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
+
+            notification = builder.build(); // 获取构建好的Notification
+        }
+        notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
+        LocationService locationService = ((LocationApplication) getApplication()).locationService;
+        locationService.getLocationClient().enableLocInForeground(1,notification);
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (getRemindState()) {
+            notificationMoveTaskToBack();
         }
     }
 
@@ -401,14 +453,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);
-                    notificationMoveTaskToBack();
                     return true;
                 }
             }
-            if (keyCode == KeyEvent.KEYCODE_HOME) {
-                notificationMoveTaskToBack();
-                return true;
-            }
+
         }
 
         return super.onKeyDown(keyCode, event);
@@ -447,6 +495,8 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         super.onDestroy();
         unbindService(connection);
         mDataManager.releaseResource();
+        LocationService locationService = ((LocationApplication) getApplication()).locationService;
+        locationService.getLocationClient().disableLocInForeground(true);
 
     }
 }

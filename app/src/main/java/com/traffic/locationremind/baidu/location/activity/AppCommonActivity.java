@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import com.baidu.mapapi.SDKInitializer;
+import com.traffic.locationremind.baidu.location.service.LocationService;
 
 import java.util.ArrayList;
 
@@ -107,6 +108,8 @@ public class AppCommonActivity extends AppCompatActivity {
 
     @TargetApi(23)
     private boolean addPermission(ArrayList<String> permissionsList, String permission) {
+        LocationService locationService = ((LocationApplication) getApplication()).locationService;
+        locationService.getLocationClient().restart();
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) { // 如果应用没有获得对应权限,则添加到列表中,准备批量申请
             if (shouldShowRequestPermissionRationale(permission)) {
                 return true;

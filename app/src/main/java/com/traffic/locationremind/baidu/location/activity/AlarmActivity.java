@@ -80,7 +80,7 @@ public class AlarmActivity extends BaseActivity
     private static final int ALARM_BOUNCE_DURATION_MILLIS = 500;
     private static final int ALERT_REVEAL_DURATION_MILLIS = 500;
     private static final int ALERT_FADE_DURATION_MILLIS = 500;
-    private static final int ALERT_DISMISS_DELAY_MILLIS = 2000;
+    private static final int ALERT_DISMISS_DELAY_MILLIS = 1500;
 
     private static final float BUTTON_SCALE_DEFAULT = 0.7f;
     private static final int BUTTON_DRAWABLE_ALPHA_DEFAULT = 165;
