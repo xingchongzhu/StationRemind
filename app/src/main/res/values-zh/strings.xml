@@ -76,4 +76,5 @@
     <string name="select_again">重新选择</string>
     <string name="hot_city">热门城市</string>
     <string name="nearst">最近</string>
+    <string name="background_location">后台定位</string>
 </resources>

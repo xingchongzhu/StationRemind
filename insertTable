@@ -45,7 +45,7 @@ CREATE TABLE stationtt (
     transfer    VARCHAR 
 );
 
-insert into stationts(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
+insert into station(lineid,pm,cname,pname,aname,lot,lat,stationinfo,transfer)
  select 0,1,stationName,PinYin,PinYinInitial,stationLong,stationLat,'',
  0 from STATIONS
 

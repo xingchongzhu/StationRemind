@@ -35,7 +35,7 @@ public class LocationService {
             if (client == null) {
                 client = new LocationClient(locationContext);
                 client.setLocOption(getDefaultLocationClientOption());
-                useForground(locationContext);
+               // useForground(locationContext);
             }
         }
     }
@@ -45,26 +45,24 @@ public class LocationService {
     public void useForground(Context context){
         //设置后台定位
         //android8.0及以上使用NotificationUtils
-        if (Build.VERSION.SDK_INT >= 26) {
-            mNotificationUtils = new NotificationUtils(context);
-            Notification.Builder builder2 = mNotificationUtils.getAndroidChannelNotification("适配android 8限制后台定位功能", "正在后台定位");
-            notification = builder2.build();
-        } else {
+        Notification.Builder builder;
+        //if (Build.VERSION.SDK_INT >= 26) {
+           // mNotificationUtils = new NotificationUtils(context);
+          //  builder = mNotificationUtils.getAndroidChannelNotification("适配android 8限制后台定位功能", "正在后台定位");
+       /* } else {
             //获取一个Notification构造器
-            Notification.Builder builder = new Notification.Builder(context);
+            builder = new Notification.Builder(context);
             Intent nfIntent = new Intent(context, MainActivity.class);
-
             builder.setContentIntent(PendingIntent.
                     getActivity(context, 0, nfIntent, 0)) // 设置PendingIntent
                     .setContentTitle("") // 设置下拉列表里的标题
                     .setSmallIcon(R.mipmap.notification_icon) // 设置状态栏内的小图标
                     .setContentText("正在后台定位") // 设置上下文内容
                     .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
-
-            notification = builder.build(); // 获取构建好的Notification
         }
-        notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
-        client.enableLocInForeground(1,notification);
+        notification = builder.build(); // 获取构建好的Notification
+        notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音*/
+       // client.enableLocInForeground(1,notification);
     }
 
     public void setBDNotifyListener(BDNotifyListener myListener){

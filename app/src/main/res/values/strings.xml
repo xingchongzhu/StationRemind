@@ -76,4 +76,5 @@
     <string name="select_again">Select again</string>
     <string name="hot_city">Hot city</string>
     <string name="nearst">Nearst</string>
+    <string name="background_location">Background Location</string>
 </resources>

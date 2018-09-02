@@ -43,7 +43,7 @@ public class RemonderLocationService extends Service {
 
     private final static String TAG = "RemonderLocationService";
     public final static String CLOSE_REMINDER_SERVICE = "close.reminder.service";
-    private UpdateBinder downLoadBinder = new UpdateBinder();
+    private UpdateBinder updateBinder= new UpdateBinder();
     private LocationService locationService;
     /**
      * 回调
@@ -66,10 +66,7 @@ public class RemonderLocationService extends Service {
     private PowerManager.WakeLock wakeLock;
 
     public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
-        System.out.println("=====onBind=====");
-
-        return downLoadBinder;
+        return updateBinder;
     }
 
     @Override
@@ -78,13 +75,11 @@ public class RemonderLocationService extends Service {
         return super.onUnbind(intent);
     }
 
-
     public class UpdateBinder extends Binder {
         public RemonderLocationService getService() {
             return RemonderLocationService.this;
         }
     }
-
 
     @Override
     public void onCreate() {
@@ -94,15 +89,13 @@ public class RemonderLocationService extends Service {
         locationService = ((LocationApplication) getApplication()).locationService;
         // 获取locationservice实例，建议应用中只初始化1个location实例，然后使用，可以参考其他示例的activity，都是通过此种方式获取locationservice实例的
         locationService.registerListener(mListener);
-
         mNotificationUtil = new NotificationUtil(this);
+        //startForeground(NotificationUtil.arriveNotificationId,mNotificationUtil.arrivedNotification(getApplicationContext(),NotificationUtil.arriveNotificationId));
         //创建PowerManager对象
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         //保持cpu一直运行，不管屏幕是否黑屏
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RemonderLocationService");
         wakeLock.acquire();
-
-        //useForeground();
     }
 
     public void setLocationChangerListener(LocationChangerListener locationChangerListener) {
@@ -113,8 +106,6 @@ public class RemonderLocationService extends Service {
         if (locationService != null && !locationServiceHasStart) {
             locationService.start();
             locationServiceHasStart = true;
-            //locationService.setBDNotifyListener(myListener);
-            //timer.schedule(task, 0, 5000);
         }
     }
 
@@ -130,7 +121,6 @@ public class RemonderLocationService extends Service {
     int n = 0;
     int number = 0;
     private BDAbstractLocationListener mListener = new BDAbstractLocationListener() {
-
         @Override
         public void onReceiveLocation(BDLocation location) {
             // TODO Auto-generated method stub
@@ -152,12 +142,15 @@ public class RemonderLocationService extends Service {
 
                 if (list != null && list.size() > 0) {
 
-                    StationInfo nerstStationInfo = list.get(n);//PathSerachUtil.getNerastNextStation(location, list);
-                    if (number > 2) {
+                    StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);//list.get(n);
+                    /*if (number > 2) {
                         number = 0;
                         if (n < list.size()) {
                             n++;
                         }
+                    }*/
+                    if(isBacrground){
+                        locationService.getLocationClient().requestLocation();
                     }
                     number++;
                     if (nerstStationInfo != null) {
@@ -202,8 +195,8 @@ public class RemonderLocationService extends Service {
                 }
             }
         }
-
     };
+
     private boolean isBacrground = false;
 
     public boolean moveTaskToBack() {
@@ -221,24 +214,24 @@ public class RemonderLocationService extends Service {
     }
 
     public void setNotification(NotificationObject mNotificationObject) {
-
-        //locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId, mNotificationUtil.showNotification(getApplicationContext(),
-         //       NotificationUtil.notificationId, mNotificationObject));
-        mNotificationUtil.showNotification(getApplicationContext(),
+        Notification mNotification = mNotificationUtil.showNotification(getApplicationContext(),
                 NotificationUtil.notificationId, mNotificationObject);
+        startForeground(NotificationUtil.notificationId,mNotification);
+        //locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId,mNotificationUtil.showNotification(getApplicationContext(),
+        //        NotificationUtil.notificationId, mNotificationObject));
     }
 
     public void updataNotification(NotificationObject mNotificationObject) {
-        mNotificationUtil.updateProgress(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject);
+        locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId,
+               mNotificationUtil.updateProgress(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject));
+        //mNotificationUtil.updateProgress(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject);
     }
-
 
     /**
      * 提供接口回调方法
      *
      * @param
      */
-
     public void setStartReminder(Boolean state) {
         n = 0;
         isReminder = state;
@@ -278,11 +271,6 @@ public class RemonderLocationService extends Service {
      * @author lenovo
      */
     public static interface Callback {
-        /**
-         * 得到实时更新的数据
-         *
-         * @return
-         */
         void setCurrentStation(String startCname, String endName, String current);
 
         void arriaved(boolean state);

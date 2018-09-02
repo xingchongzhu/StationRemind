@@ -39,6 +39,7 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
     //在doInBackground方法中进行异步任务的处理.
     @Override
     protected List<List<Integer>> doInBackground(String... params) {
+        Log.d("zxc01","origin = "+origin+" goal = "+goal);
         return serach(origin, goal, nodeRalation);
     }
 
@@ -130,56 +131,40 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
             return false;
         }
         Node nNode = null;
-        /* 如果符合条件判断说明出现环路，不能再顺着该路径继续寻路，返回false */
-        if (cNode != null && pNode != null && cNode == pNode)
+        if (cNode != null && pNode != null && cNode == pNode) {
             return false;
-
+        }
         if (cNode != null) {
             int i = 0;
-            /* 起始节点入栈 */
             stack.push(cNode);
-            /* 如果该起始节点就是终点，说明找到一条路径 */
             if (cNode == eNode) {
-                /* 转储并打印输出该路径，返回true */
                 showAndSavePath();
                 return true;
             }
-            /* 如果不是,继续寻路 */
             else {
-                /*
-                 * 从与当前起始节点cNode有连接关系的节点集中按顺序遍历得到一个节点
-                 * 作为下一次递归寻路时的起始节点
-                 */
                 nNode = cNode.getRelationNodes().get(i);
                 while (nNode != null) {
-                    /*
-                     * 如果nNode是最初的起始节点或者nNode就是cNode的上一节点或者nNode已经在栈中 ，
-                     * 说明产生环路 ，应重新在与当前起始节点有连接关系的节点集中寻找nNode
-                     */
                     if (pNode != null && (nNode == sNode || nNode == pNode || isNodeInStack(nNode))) {
                         i++;
-                        if (i >= cNode.getRelationNodes().size())
+                        if (i >= cNode.getRelationNodes().size()) {
                             nNode = null;
-                        else
+                        }
+                        else {
                             nNode = cNode.getRelationNodes().get(i);
+                        }
                         continue;
                     }
-                    /* 以nNode为新的起始节点，当前起始节点cNode为上一节点，递归调用寻路方法 */
-                    if (getPaths(nNode, cNode, sNode, eNode))/* 递归调用 */ {
-                        /* 如果找到一条路径，则弹出栈顶节点 */
+                    if (getPaths(nNode, cNode, sNode, eNode)){
                         stack.pop();
                     }
-                    /* 继续在与cNode有连接关系的节点集中测试nNode */
                     i++;
-                    if (i >= cNode.getRelationNodes().size())
+                    if (i >= cNode.getRelationNodes().size()) {
                         nNode = null;
-                    else
+                    }
+                    else {
                         nNode = cNode.getRelationNodes().get(i);
+                    }
                 }
-                /*
-                 * 当遍历完所有与cNode有连接关系的节点后，
-                 * 说明在以cNode为起始节点到终点的路径已经全部找到
-                 */
                 stack.pop();
                 return false;
             }
@@ -208,7 +193,7 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
             List = null;  //释放内存
         }
         /* 开始搜索所有路径 */
-        getPaths(node[origin], node[origin - 1], node[0], node[goal]);
+        getPaths(node[origin], null, node[0], node[goal]);
 
         return sers;
     }

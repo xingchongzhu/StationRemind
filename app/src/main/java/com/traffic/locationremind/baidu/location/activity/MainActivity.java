@@ -140,7 +140,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
-       // useForground();
+       useForground();
     }
 
     @Override
@@ -202,7 +202,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
         notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
         LocationService locationService = ((LocationApplication) getApplication()).locationService;
-        locationService.getLocationClient().enableLocInForeground(1,notification);
+        locationService.getLocationClient().enableLocInForeground(1001,notification);
     }
 
 

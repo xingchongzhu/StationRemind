@@ -84,6 +84,7 @@ public class ForegroundActivity extends Activity {
             notification = builder.build(); // 获取构建好的Notification
         }
         notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
+        mClient.enableLocInForeground(1, notification);
     }
 
 

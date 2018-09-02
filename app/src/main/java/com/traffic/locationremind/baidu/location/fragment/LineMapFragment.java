@@ -198,14 +198,17 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
     private void setCurrentLineByLineid(int lineid) {
         LineInfo lineInfo = mDataManager.getLineInfoList().get(lineid);
+        if(lineInfo == null){
+            return;
+        }
         if (currentLineInfoText != null) {
-            if (lineid >= list.size()) {
+            /*if (lineid >= list.size()) {
                 currentLineInfoText.setBackgroundColor(Color.WHITE);
                 currentLineInfoText.setTextColor(Color.WHITE);
                 currentLineInfoText.setText("");
                 sceneMapAdapter.setData(null);
                 return;
-            }
+            }*/
             String string = lineInfo.linename + " (" +
                     lineInfo.getForwad() + "," +
                     lineInfo.getReverse() + ")\n" + lineInfo.getLineinfo();

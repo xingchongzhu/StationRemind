@@ -127,15 +127,14 @@ public class NotificationUtil {
 			// 发出通知
 			Notification notifi = notification.build();
 
-			manager.notify(notificationId,notifi);
-
+			//manager.notify(notificationId,notifi);
 			map.put(notificationId, notifi);// 存入Map中
             return notifi;
 		}
 		return map.get(notificationId);
 	}
 
-	public void arrivedNotification(Context context,int notificationId) {
+	public Notification arrivedNotification(Context context,int notificationId) {
 		//notification();
 
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
@@ -163,24 +162,24 @@ public class NotificationUtil {
 		NotificationCompat.Builder notification = new NotificationCompat.Builder(context);
 		// 设置通知栏滚动显示文字
 		//notification.tickerText = mContext.getResources().getString(R.string.arrived_reminder);
-		notification.setVibrate(new long[]{500, 500, 500, 500, 500, 500});
-        notification.setContentText(context.getResources().getString(R.string.hint_arrive_end_station));
-        notification.setContentTitle(context.getResources().getString(R.string.arrive_station_title));
+		//notification.setVibrate(new long[]{500, 500, 500, 500, 500, 500});
+        //notification.setContentText(context.getResources().getString(R.string.arrive_station_title));
+        notification.setContentTitle(context.getResources().getString(R.string.location));
 		// 设置显示时间
 		//notification.when = System.currentTimeMillis();
-		notification.setWhen(System.currentTimeMillis());
+		//notification.setWhen(System.currentTimeMillis());
 		notification.setChannelId(id);
 		// 设置通知显示的图标
 		//notification.icon = R.drawable.cm_mainmap_notice_green;
 		notification.setSmallIcon(R.mipmap.notification_icon);
 		notification.setColor(Color.parseColor("#880000FF"));
 		// 设置通知的特性: 通知被点击后，自动消失
-		notification.setAutoCancel(true);
+		notification.setAutoCancel(false);
 		// 发出通知
 		Notification notifi = notification.build();
 
-		manager.notify(notificationId,notifi);
-
+		//manager.notify(notificationId,notifi);
+		return notifi;
 		//manager.notify(notificationId, notification);
 		//map.put(notificationId, notifi);// 存入Map中
 		//}
@@ -252,7 +251,7 @@ public class NotificationUtil {
 		map.remove(notificationId);
 	}
 
-	public void updateProgress(Context context,int notificationId, NotificationObject mNotificationObject) {
+	public Notification updateProgress(Context context,int notificationId, NotificationObject mNotificationObject) {
 		Notification notify = map.get(notificationId);
 		if (null != notify) {
 			// 修改进度条
@@ -261,7 +260,8 @@ public class NotificationUtil {
             notify.contentView.setTextViewText(R.id.end,mNotificationObject.getEndStation());
             notify.contentView.setTextViewText(R.id.next,mNotificationObject.getNextStation());
             notify.contentView.setTextViewText(R.id.time,mNotificationObject.getTime());
-			manager.notify(notificationId, notify);
+			//manager.notify(notificationId, notify);
 		}
+		return notify;
 	}
 }
