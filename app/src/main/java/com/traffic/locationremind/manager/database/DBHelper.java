@@ -32,6 +32,11 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static String CHANGCHUN_DB_NAME = "changchun.db";
 	public static String KUNMING_DB_NAME = "kunming.db";
 	public static String DALIAN_DB_NAME = "dalian.db";
+	public static String SUZHOU_DB_NAME = "suzhou.db";
+    public static String HAERBIN_DB_NAME = "haerbin.db";
+	public static String ZHENGZHOU_DB_NAME = "zhengzhou.db";
+	public static String CHANGSHA_DB_NAME = "changsha.db";
+	public static String NINGBO_DB_NAME = "ningbo.db";
 
 	private final Context myContext;
 

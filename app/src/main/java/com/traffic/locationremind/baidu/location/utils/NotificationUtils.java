@@ -28,7 +28,7 @@ public class NotificationUtils extends ContextWrapper {
         createChannels();
     }
 
-    public static void sendHint(Context context,boolean isArrive, String title, String content, String change) {
+    public static void sendHint(Context context, boolean isArrive, String title, String content, String change) {
         Intent intent = new Intent(context, AlarmActivity.class);
         intent.putExtra("arrive", isArrive);
         intent.putExtra("title", title);
@@ -37,7 +37,7 @@ public class NotificationUtils extends ContextWrapper {
         context.startActivity(intent);
     }
 
-    public static NotificationObject createNotificationObject(Context context, Map<Integer, String> lineDirection,StationInfo currentStation, StationInfo nextStation) {
+    public static NotificationObject createNotificationObject(Context context, Map<Integer, String> lineDirection, StationInfo currentStation, StationInfo nextStation) {
         if (currentStation == null) {
             return null;
         }
@@ -68,6 +68,7 @@ public class NotificationUtils extends ContextWrapper {
             // Sets whether notification posted to this channel should vibrate.
             androidChannel.enableVibration(true);
             // Sets the notification light color for notifications posted to this channel
+            androidChannel.setLockscreenVisibility(Notification.VISIBILITY_SECRET);//设置在锁屏界面上显示这条通知
             androidChannel.setLightColor(Color.GREEN);
             // Sets whether notifications posted to this channel appear on the lockscreen or not
             androidChannel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
@@ -89,6 +90,7 @@ public class NotificationUtils extends ContextWrapper {
                 .setContentTitle(title)
                 .setContentText(body)
                 .setSmallIcon(android.R.drawable.stat_notify_more)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_HIGH);// 设置该通知优先级
     }
 }

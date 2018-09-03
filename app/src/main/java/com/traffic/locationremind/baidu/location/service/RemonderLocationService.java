@@ -142,14 +142,15 @@ public class RemonderLocationService extends Service {
 
                 if (list != null && list.size() > 0) {
 
-                    StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);//list.get(n);
-                    /*if (number > 2) {
+                    StationInfo nerstStationInfo = list.get(n);//PathSerachUtil.getNerastNextStation(location, list);//
+                    if (number > 2) {
                         number = 0;
                         if (n < list.size()) {
                             n++;
                         }
-                    }*/
+                    }
                     if(isBacrground){
+
                         locationService.getLocationClient().requestLocation();
                     }
                     number++;

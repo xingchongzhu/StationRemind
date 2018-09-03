@@ -53,7 +53,7 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
     @Override
     protected void onPostExecute(List<List<Integer>> list) {
         super.onPostExecute(list);
-        stopRun = false;
+        stopRun = true;
         stack.clear();
         stack = null;
         list.clear();
@@ -140,8 +140,10 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
             if (cNode == eNode) {
                 showAndSavePath();
                 return true;
-            }
-            else {
+            } else {
+                if(cNode.getRelationNodes().size() <= i){
+                    return false;
+                }
                 nNode = cNode.getRelationNodes().get(i);
                 while (nNode != null) {
                     if (pNode != null && (nNode == sNode || nNode == pNode || isNodeInStack(nNode))) {

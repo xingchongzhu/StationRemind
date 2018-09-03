@@ -350,7 +350,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         Message message =myHandler.obtainMessage();
         message.what =0;
         myHandler.sendMessageDelayed(message,100);
-        if(!AsyncTaskManager.getInstance().isSearch() && lastLinesLast== null || lastLinesLast.size() <= 0){
+        if(!AsyncTaskManager.getInstance().isSearch() && (lastLinesLast== null || lastLinesLast.size() <= 0)){
             Toast.makeText(activity,activity.getResources().getString(R.string.search_result_empty),Toast.LENGTH_LONG).show();
         }
     }

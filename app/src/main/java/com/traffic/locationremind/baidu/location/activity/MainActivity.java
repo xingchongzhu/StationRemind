@@ -140,7 +140,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
-       useForground();
+        useForground();
     }
 
     @Override
@@ -177,32 +177,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     }
 
-    NotificationUtils mNotificationUtils;
-    Notification notification;
+
     public void useForground(){
-        //设置后台定位
-        //android8.0及以上使用NotificationUtils
-        if (Build.VERSION.SDK_INT >= 26) {
-            mNotificationUtils = new NotificationUtils(this);
-            Notification.Builder builder2 = mNotificationUtils.getAndroidChannelNotification("适配android 8限制后台定位功能", "正在后台定位");
-            notification = builder2.build();
-        } else {
-            //获取一个Notification构造器
-            Notification.Builder builder = new Notification.Builder(MainActivity.this);
-            Intent nfIntent = new Intent(MainActivity.this, MainActivity.class);
+        NotificationUtil mNotificationUtils = new NotificationUtil(this);
 
-            builder.setContentIntent(PendingIntent.
-                    getActivity(MainActivity.this, 0, nfIntent, 0)) // 设置PendingIntent
-                    .setContentTitle("") // 设置下拉列表里的标题
-                    .setSmallIcon(R.mipmap.notification_icon) // 设置状态栏内的小图标
-                    .setContentText("正在后台定位") // 设置上下文内容
-                    .setWhen(System.currentTimeMillis()); // 设置该通知发生的时间
-
-            notification = builder.build(); // 获取构建好的Notification
-        }
-        notification.defaults = Notification.DEFAULT_SOUND; //设置为默认的声音
         LocationService locationService = ((LocationApplication) getApplication()).locationService;
-        locationService.getLocationClient().enableLocInForeground(1001,notification);
+        locationService.getLocationClient().enableLocInForeground(1001,mNotificationUtils.arrivedNotification(this,1));
     }
 
 
@@ -228,6 +208,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.edit_button:
+
                 showSerachView();
                 break;
             case R.id.search_back:
@@ -450,6 +431,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             return true;
         }
         if (getRemindState()) {
+
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);

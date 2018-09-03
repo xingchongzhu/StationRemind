@@ -140,9 +140,9 @@ public class NotificationUtil {
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
 		//if (!map.containsKey(notificationId)) {
 
-		String name = "my_package_channel";//渠道名字
-		String id = "my_package_channel_1"; // 渠道ID
-		String description = "my_package_first_channel"; // 渠道解释说明
+		String name = "my_android_pm";//渠道名字
+		String id = "my_package_channel_2"; // 渠道ID
+		String description = "my_package_first_channel2"; // 渠道解释说明
 		PendingIntent pendingIntent;//非紧急意图，可设置可不设置
 		//判断是否是8.0上设备
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
