@@ -140,7 +140,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         Intent bindIntent = new Intent(this, RemonderLocationService.class);
         bindService(bindIntent, connection, BIND_AUTO_CREATE);
-        useForground();
+
     }
 
     @Override
@@ -431,7 +431,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             return true;
         }
         if (getRemindState()) {
-
+            useForground();
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);

@@ -149,10 +149,10 @@ public class RemonderLocationService extends Service {
                             n++;
                         }
                     }
-                    if(isBacrground){
+                    /*if(isBacrground){
 
                         locationService.getLocationClient().requestLocation();
-                    }
+                    }*/
                     number++;
                     if (nerstStationInfo != null) {
                         currentStation = nerstStationInfo;
