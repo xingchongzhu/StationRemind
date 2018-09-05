@@ -67,10 +67,13 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
                 n++;
             }
 
-            String str = startStation + data.getValue().get(0).getCname() + "  " + endstation + data.getValue().get(data.getValue().size() - 1).getCname();
+            String str = "";
 
             if(data.getKey().size() >1 ) {
                 holder.setText(R.id.change_numner, String.format(lineChange, data.getKey().size() - 1 + ""));
+            }
+            if(data.getValue().size() > 0) {
+                str = startStation + data.getValue().get(0).getCname() + "  " + endstation + data.getValue().get(data.getValue().size() - 1).getCname();
             }
             holder.setText(R.id.change_lineid, change.toString())
                     .setText(R.id.station_number, String.format(staionsCNumber, data.getValue().size() + "") + "")

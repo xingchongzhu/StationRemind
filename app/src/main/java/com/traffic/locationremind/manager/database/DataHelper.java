@@ -57,6 +57,8 @@ public class DataHelper {
         cityDbHelper.imporCityDatabase(R.raw.nanchang,DBHelper.NANCHANG_DB_NAME);
         cityDbHelper.imporCityDatabase(R.raw.dongguan,DBHelper.DONGGUANG_DB_NAME);
         cityDbHelper.imporCityDatabase(R.raw.fuzhou,DBHelper.FUZHOU_DB_NAME);
+        cityDbHelper.imporCityDatabase(R.raw.guiyang,DBHelper.GUIYANG_DB_NAME);
+        cityDbHelper.imporCityDatabase(R.raw.xiamen,DBHelper.XIAMEN_DB_NAME);
         cityDb = cityDbHelper.getWritableDatabase();
         cityDb.execSQL("CREATE TABLE IF NOT EXISTS "+DBHelper.TB_RECENT_CITY+" (id integer primary key autoincrement, name varchar(40), date INTEGER)");
     }
