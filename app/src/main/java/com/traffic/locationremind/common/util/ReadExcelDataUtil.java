@@ -76,7 +76,7 @@ public class ReadExcelDataUtil extends AsyncTask<Application, String, Boolean> {
 		}
         Log.d(TAG,"load data.....");
         InputStream in = null;
-		in =  params[0].getResources().openRawResource(R.raw.subway);
+		//in =  params[0].getResources().openRawResource(R.raw.subway);
 		if(in != null){
 			int rowSize = 0;
 			String str = "";

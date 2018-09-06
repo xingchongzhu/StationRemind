@@ -11,6 +11,7 @@ import com.traffic.locationremind.common.util.FileUtil;
 import com.traffic.locationremind.common.util.GrfAllEdge;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
+import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
@@ -170,7 +171,7 @@ public class DataManager{
 
             mDataHelper.setCityHelper((Context) params[0],currentCityNo.getPingying());
 			Map<Integer,LineInfo> list= mDataHelper.getLineList(LineInfo.LINEID, "ASC");
-			Log.d("zxc","currentCityNo.getPingying() = "+currentCityNo.getPingying()+" list = "+list);
+
 			for (Map.Entry<Integer,LineInfo> entry : list.entrySet()) {
 				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
 				List<StationInfo> canTransferlist = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());
@@ -178,6 +179,7 @@ public class DataManager{
 				if(entry.getKey() > maxLineid){
 					maxLineid = entry.getKey();
 				}
+				//mergeExistInfor(entry);
 			}
 			maxLineid+= 1;//找出路线最大编号加一
 			mLineInfoList = list;
@@ -197,6 +199,34 @@ public class DataManager{
 		protected void onPostExecute(Map<Integer,LineInfo> list) {
 			super.onPostExecute(list);
 			notificationUpdata();
+		}
+	}
+
+	private void mergeExistInfor(Map.Entry<Integer,LineInfo> entry){
+		StringBuffer stringBuffer = new StringBuffer();
+		String string="";
+		ExitInfo preExitInfo = null;
+		for(StationInfo stationInfo:entry.getValue().getStationInfoList()){
+			List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname());
+			stringBuffer.delete(0,stringBuffer.length());
+			string="";
+			for(ExitInfo exitInfo:existInfoList){
+				String str = exitInfo.getCname()+exitInfo.getExitname();
+				if(string.equals(str)){
+					stringBuffer.append(exitInfo.getAddr()+",");
+					preExitInfo = exitInfo;
+				}else{
+					if(stringBuffer.length() >0 && preExitInfo != null){
+						stringBuffer.replace(stringBuffer.length()-1, stringBuffer.length(), "");
+						preExitInfo.setAddr(stringBuffer.toString());
+						mDataManager.getDataHelper().updateExitInfor(preExitInfo);
+					}
+					stringBuffer.delete(0,stringBuffer.length());
+					stringBuffer.append(exitInfo.getAddr()+",");
+					string = str;
+					preExitInfo = exitInfo;
+				}
+			}
 		}
 	}
 
@@ -231,7 +261,6 @@ public class DataManager{
 			for (int j = 0; j < nodeRalation[i].length; j++) {
 				str.append(nodeRalation[i][j]+" ->");
 			}
-			Log.d("zxc001"," i = "+i+" | "+str.toString());
 		}
 
     }

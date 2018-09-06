@@ -121,7 +121,6 @@ public class GrfAllEdge {
             }
             Log.d(TAG, str.toString());
         }
-        Log.d("zxc001", "----------------- matrix -----------------");
     }
 
     // 设置[i][i]位置处的元素值为0，0表示图中的定点i未被访问，1表示图中的定点i已被访问

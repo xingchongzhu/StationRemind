@@ -285,7 +285,6 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 //Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Log.d("zxc1", "onSearch ");
             Log.d(TAG, "onSearch start = " + start + " end = " + end + " startStation.getCname() = " + startStation.getCname() + " endStation.getCname() = " + endStation.getCname());
             if (mSearchLoadingDialog == null) {
                 mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
@@ -307,7 +306,6 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
 
     @Override
     public void setLineNumber(int number) {
-        Log.d("zxc1", "setLineNumber number = " + number);
         finishTaskNum = number;
     }
 

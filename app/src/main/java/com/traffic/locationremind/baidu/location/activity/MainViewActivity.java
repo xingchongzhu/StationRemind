@@ -164,7 +164,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             hintText.setVisibility(View.GONE);
         } else {
             // 设置背景gif图片资源
-            gif.setMovieResource(R.raw.two);
+            //gif.setMovieResource(R.raw.two);
             gif.setVisibility(View.VISIBLE);
             hintText.setVisibility(View.VISIBLE);
             setViewVisible(View.GONE);

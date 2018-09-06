@@ -39,7 +39,6 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
     //在doInBackground方法中进行异步任务的处理.
     @Override
     protected List<List<Integer>> doInBackground(String... params) {
-        Log.d("zxc01","origin = "+origin+" goal = "+goal);
         return serach(origin, goal, nodeRalation);
     }
 
@@ -114,7 +113,6 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
                 return;
             }
         }
-        Log.d("zxc01", "showAndSavePath str = " + str.toString());
         sers.add(list); /* 转储 */
         publishProgress(list);
     }
@@ -175,7 +173,6 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
     }
 
     public List<List<Integer>> serach(int origin, int goal, int[][] nodeRalation) {
-        Log.d("zxc01", "findpath start = " + origin + " end = " + goal);
         /* 定义节点数组 */
         Node[] node = new Node[nodeRalation.length];
 

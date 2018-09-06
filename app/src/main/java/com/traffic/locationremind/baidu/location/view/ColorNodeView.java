@@ -22,6 +22,7 @@ public class ColorNodeView extends TextView {
 
     public void setColorId(int color){
         this.color = color;
+        invalidate();
     }
 
     public ColorNodeView(Context context){

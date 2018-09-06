@@ -19,6 +19,8 @@ import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
 import com.traffic.locationremind.baidu.location.adapter.ColorLineAdapter;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
 import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
+import com.traffic.locationremind.common.util.CharSort;
+import com.traffic.locationremind.common.util.MapComparator;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -106,6 +108,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private void showDialog(final StationInfo stationInfo) {
         Log.d(TAG, "showDialog stationInfo.getCname() = " + stationInfo.getCname());
         List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname());
+        Collections.sort(existInfoList, new MapComparator());
         String existInfostr = "";
         if (existInfoList != null) {
             final int existInfoList_size = existInfoList.size();// Moved  existInfoList.size() call out of the loop to local variable existInfoList_size

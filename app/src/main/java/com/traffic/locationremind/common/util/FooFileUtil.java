@@ -72,14 +72,12 @@ public class FooFileUtil {
             	file.createNewFile();
            }else{
         	   if(ReadTxtFile(strFilePath, strcontent)){
-        		   Log.d("zxc", "strcontent = "+strcontent+" this string has save");
         		   return;
         	   }
            }
            RandomAccessFile raf = new RandomAccessFile(file, "rw");
            raf.seek(file.length());
            raf.write(strContent.getBytes());
-           Log.d("zxc", "strcontent = "+strcontent+" save to miss.txt file");
            raf.close();
       } catch (Exception e) {
            Log.e("TestFile", "Error on write File.");

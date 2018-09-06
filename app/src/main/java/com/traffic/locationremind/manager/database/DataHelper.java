@@ -500,13 +500,19 @@ public class DataHelper {
         return lineList;
     }
 
+    public void updateExitInfor(ExitInfo exitInfo){
+        List<ExitInfo> ExitInfoList;
+        db.delete(SqliteHelper.TB_EXIT_INFO,ExitInfo.CNAME + " = ? and " +ExitInfo.EXITNAME+ " = ?",
+                new String[]{exitInfo.getCname(),exitInfo.getExitname()});
+        insetExitInfo(exitInfo);
+        Log.d("zxc","cname = "+exitInfo.getCname()+" exitname = "+exitInfo.getExitname());
+    }
+
     public boolean insetExitInfo(ExitInfo exitInfo) {
         ContentValues values = new ContentValues();
-
         values.put(ExitInfo.CNAME, exitInfo.getCname());
         values.put(ExitInfo.EXITNAME, exitInfo.getExitname());
         values.put(ExitInfo.ADDR, exitInfo.getAddr());
-        //values.put(CityInfo.CITYNO, exitInfo.getCityNo());
         long rowid = db.insert(SqliteHelper.TB_EXIT_INFO, null, values);
         Log.d(TAG, "insetExitInfo rowid = " + rowid);
         if (rowid > 0)

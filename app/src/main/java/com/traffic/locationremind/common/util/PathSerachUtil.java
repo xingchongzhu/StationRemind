@@ -465,7 +465,6 @@ public class PathSerachUtil {
                 }
             }
         }
-        Log.d("zxc", "getNerastNextStation min = " + min);
         if (MINDIS < min) {
             return null;
         }
@@ -489,7 +488,6 @@ public class PathSerachUtil {
                 }
             }
         }
-        Log.d("zxc", "getNerastNextStation min = " + min);
         if (MINDIS < min) {
             return null;
         }
