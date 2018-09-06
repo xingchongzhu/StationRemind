@@ -347,6 +347,9 @@ public class PathSerachUtil {
     public static List<StationInfo> getTwoLineCommonStation(Map<Integer, LineInfo> mLineInfoList, int line1, int line2) {
         List<StationInfo> stationlist = new ArrayList<>();
         LineInfo lineInfo1 = PathSerachUtil.getLineInfoByLineid(mLineInfoList, line1);
+        if(lineInfo1 == null){
+            return stationlist;
+        }
         for (StationInfo stationInfo : lineInfo1.getStationInfoList()) {
             if (stationInfo.canTransfer()) {
                 int lined = PathSerachUtil.isSameLine(stationInfo, line2);
@@ -635,7 +638,7 @@ public class PathSerachUtil {
             String lineList[] = stationInfo.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
             int size = lineList.length;
             for (int i = 0; i < size; i++) {
-                int line = CommonFuction.convertToInt(lineList[i], -1);
+                int line = CommonFuction.convertToInt(lineList[i], 0);
                 if (!listStr.containsKey(line) && line != stationInfo.lineid) {
                     listStr.put(line, line);
                     str.append(lineList[i] + "  ");

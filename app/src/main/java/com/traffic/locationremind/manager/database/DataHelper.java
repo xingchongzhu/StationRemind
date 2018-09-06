@@ -59,6 +59,8 @@ public class DataHelper {
         cityDbHelper.imporCityDatabase(R.raw.fuzhou,DBHelper.FUZHOU_DB_NAME);
         cityDbHelper.imporCityDatabase(R.raw.guiyang,DBHelper.GUIYANG_DB_NAME);
         cityDbHelper.imporCityDatabase(R.raw.xiamen,DBHelper.XIAMEN_DB_NAME);
+        cityDbHelper.imporCityDatabase(R.raw.taibei,DBHelper.TAIBEI_DB_NAME);
+        cityDbHelper.imporCityDatabase(R.raw.gaoxiong,DBHelper.GAOXIONG_DB_NAME);
         cityDb = cityDbHelper.getWritableDatabase();
         cityDb.execSQL("CREATE TABLE IF NOT EXISTS "+DBHelper.TB_RECENT_CITY+" (id integer primary key autoincrement, name varchar(40), date INTEGER)");
     }
@@ -329,8 +331,8 @@ public class DataHelper {
     public Map<String,CityInfo> getAllCityInfo() {
 
         Map<String,CityInfo> cityList;
-        Cursor cursor = cityDb.query(SqliteHelper.TB_CITY_INFO, null, null
-                , null, null, null,
+        Cursor cursor = cityDb.query(SqliteHelper.TB_CITY_INFO, null, "exist=?"
+                , new String[]{"" + 1}, null, null,
                 null);
 
         Log.e(TAG, "QueryCityByCityNo");
@@ -344,8 +346,8 @@ public class DataHelper {
     public List<CityInfo> getAllCityInfoList() {
 
         List<CityInfo> cityList;
-        Cursor cursor = cityDb.query(SqliteHelper.TB_CITY_INFO, null, null
-                , null, null, null,
+        Cursor cursor = cityDb.query(SqliteHelper.TB_CITY_INFO, null, "exist=?"
+                , new String[]{"" + 1}, null, null,
                 null);
 
         Log.e(TAG, "QueryCityByCityNo");

@@ -244,12 +244,15 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 		SQLiteDatabase db = helper.getCitySQLiteDatabase();
 		Cursor cursor = db.rawQuery(
 					"select * from city where name like \"%" + keyword
-							+ "%\" or pinyin like \"%" + keyword + "%\"", null);
+							+ "%\" or pinyin like \"%" + keyword + "%\""+" and exist=1", null);
 		CityInfo city;
 		Log.e("info", "length = " + cursor.getCount());
 		while (cursor.moveToNext()) {
-			city = new CityInfo(cursor.getString(1), cursor.getString(2));
-			city_result.add(city);
+			if(cursor.getInt(3) == 1) {
+				city = new CityInfo(cursor.getString(1), cursor.getString(2));
+				city_result.add(city);
+			}
+
 		}
 		cursor.close();
 		db.close();

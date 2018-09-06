@@ -47,6 +47,8 @@ public class DBHelper extends SQLiteOpenHelper {
 	public static String FUZHOU_DB_NAME = "fuzhou.db";
 	public static String GUIYANG_DB_NAME = "guiyang.db";
 	public static String XIAMEN_DB_NAME = "xiamen.db";
+	public static String TAIBEI_DB_NAME = "taibei.db";
+	public static String GAOXIONG_DB_NAME = "gaoxiong.db";
 
 	private final Context myContext;
 
