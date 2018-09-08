@@ -66,9 +66,11 @@ public class FullMapView extends ImageView {
         if(bm == null){
             return;
         }
-        bm = rotatePicture(bm);
+        //bm = rotatePicture(bm);
         imgWidth = bm.getWidth();
         imgHeight = bm.getHeight();
+        maxScale = 5f;
+        currentScale = 1f;
         setImageBitmap(bm);
         minScale = getMinScale();
         matrix.setScale(minScale, minScale);

@@ -18,12 +18,18 @@ import android.view.WindowManager;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.view.FullMapView;
+import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.FileUtil;
+import com.traffic.locationremind.manager.bean.CityInfo;
+import com.traffic.locationremind.manager.database.DataManager;
 
 public class FullMapFragment extends Fragment {
     private static final String TAG = "FullMapFragment";
     private View rootView;
     private FullMapView mFullMapView;
     private int screenWidth ,screenHeight;
+    private DataManager mDataManager;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,8 +53,20 @@ public class FullMapFragment extends Fragment {
 
     private void initView(View rootView){
         mFullMapView = (FullMapView)rootView.findViewById(R.id.map);
-        Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.shenzhen);
-        mFullMapView.setBitmap(bitmap2,screenWidth,screenHeight);
+        /*Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.shanghai);
+        mFullMapView.setBitmap(bitmap2,screenWidth,screenHeight);*/
+        mDataManager = ((MainActivity) getActivity()).getDataManager();
+        updateCity();
+    }
+
+    public void updateCity(){
+        String shpno = CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME);
+        CityInfo cityInfo = mDataManager.getCityInfoList().get(shpno);
+        if(cityInfo != null){
+            int id = FileUtil.getResIconId(getContext(),cityInfo.getPingying());
+            Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), id);
+            mFullMapView.setBitmap(bitmap2,screenWidth,screenHeight);
+        }
     }
 
     @Override

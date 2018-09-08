@@ -169,18 +169,6 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
 		locationService.registerListener(mListener);
 	}
 
-	public void InsertCity(String name) {
-		SQLiteDatabase db = helper.getCitySQLiteDatabase();
-		Cursor cursor = db.rawQuery("select * from recentcity where name = '"
-				+ name + "'", null);
-		if (cursor.getCount() > 0) { //
-			db.delete("recentcity", "name = ?", new String[] { name });
-		}
-		db.execSQL("insert into recentcity(name, date) values('" + name + "', "
-				+ System.currentTimeMillis() + ")");
-	}
-
-
 	private void cityInit() {
 		CityInfo city = new CityInfo(getResources().getString(R.string.location), "0"); // 当前定位城市
 		allCity_lists.add(city);

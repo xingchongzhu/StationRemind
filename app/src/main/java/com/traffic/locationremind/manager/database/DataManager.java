@@ -6,20 +6,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
-import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.common.util.FileUtil;
-import com.traffic.locationremind.common.util.GrfAllEdge;
-import com.traffic.locationremind.common.util.PathSerachUtil;
+import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataManager{
 
@@ -153,7 +147,7 @@ public class DataManager{
 			}else{
 				return null;
 			}
-			//获取传进来的参数
+			//merageAllCity((Context) params[0]);
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
 			maxLineid = 0;
 			if (!TextUtils.isEmpty(shpno)) {
@@ -190,6 +184,7 @@ public class DataManager{
 				allLineNodes[i] = i;
 			}
             initGrf(allLineCane,maxLineid);
+			//getEmityString();
 			//GrfAllEdge.createGraph(allLineNodes, allLineCane);
 			return list;
 		}
@@ -202,21 +197,65 @@ public class DataManager{
 		}
 	}
 
-	private void mergeExistInfor(Map.Entry<Integer,LineInfo> entry){
+	public void getEmityString(){
+		Map<String,String> stringBuffer = new HashMap<>();
+		List<StationInfo> lists = mDataHelper.QueryAllByStationLineNo();
+		for(StationInfo stationInfo:lists) {
+			List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname());
+			if(existInfoList.size() <= 0){
+				stringBuffer.put(stationInfo.getCname(),stationInfo.getCname()+"  "+stationInfo.getLineid());
+			}
+		}
+
+		StringBuffer str = new StringBuffer();
+		for(Map.Entry<String,String> entry:stringBuffer.entrySet()){
+			str.append(entry.getValue()+" -> ");
+		}
+		Log.d("zxc002",str.toString());
+		str.delete(0,str.length());
+		stringBuffer.clear();
+		lists.clear();
+	}
+
+	public void merageAllCity(Context context){
+		List<CityInfo> cityInfoList = mDataHelper.getAllCityInfoList();
+		for(CityInfo cityInfo:cityInfoList){
+			mDataHelper.setCityHelper(context,cityInfo.getPingying());
+			List<StationInfo> lists = mDataHelper.QueryAllByStationLineNo();
+            Log.d("zxc","city "+cityInfo.getCityName()+" lists.size = "+lists.size());
+			mergeExistInfor(lists);
+			lists.clear();
+			lists = null;
+		}
+	}
+
+	private void mergeExistInfor(List<StationInfo> lists){
 		StringBuffer stringBuffer = new StringBuffer();
-		String string="";
+		String string = "";
 		ExitInfo preExitInfo = null;
-		for(StationInfo stationInfo:entry.getValue().getStationInfoList()){
+		int n = 0;
+		int size = 0;
+		for(StationInfo stationInfo:lists){
 			List<ExitInfo> existInfoList = mDataManager.getDataHelper().QueryByExitInfoCname(stationInfo.getCname());
 			stringBuffer.delete(0,stringBuffer.length());
-			string="";
+			string = "";
+			Collections.sort(existInfoList, new MapComparator());
+			n = 0;
+			size = existInfoList.size();
 			for(ExitInfo exitInfo:existInfoList){
+				n++;
 				String str = exitInfo.getCname()+exitInfo.getExitname();
-				if(string.equals(str)){
+				if(size == n){
+					if(stringBuffer.length() > 1 && preExitInfo != null){
+						stringBuffer.replace(stringBuffer.length()-1, stringBuffer.length(), "");
+						preExitInfo.setAddr(stringBuffer.toString());
+						mDataManager.getDataHelper().updateExitInfor(preExitInfo);
+					}
+				}else if(string.equals(str)){
 					stringBuffer.append(exitInfo.getAddr()+",");
 					preExitInfo = exitInfo;
 				}else{
-					if(stringBuffer.length() >0 && preExitInfo != null){
+					if(stringBuffer.length() > 1 && preExitInfo != null){
 						stringBuffer.replace(stringBuffer.length()-1, stringBuffer.length(), "");
 						preExitInfo.setAddr(stringBuffer.toString());
 						mDataManager.getDataHelper().updateExitInfor(preExitInfo);
@@ -226,6 +265,7 @@ public class DataManager{
 					string = str;
 					preExitInfo = exitInfo;
 				}
+
 			}
 		}
 	}

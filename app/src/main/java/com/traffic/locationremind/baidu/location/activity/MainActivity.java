@@ -27,6 +27,7 @@ import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
+import com.traffic.locationremind.baidu.location.fragment.FullMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.LineMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.listener.ActivityListener;
@@ -177,15 +178,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     }
 
-
     public void useForground(){
         NotificationUtil mNotificationUtils = new NotificationUtil(this);
 
         LocationService locationService = ((LocationApplication) getApplication()).locationService;
         locationService.getLocationClient().enableLocInForeground(1001,mNotificationUtils.arrivedNotification(this,1));
     }
-
-
 
     @Override
     protected void onStop() {
@@ -380,6 +378,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.CITYNAME,currentCity);
         mDataManager.loadData(MainActivity.this);
         hasLocation = true;
+        FullMapFragment fullMapFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
+        fullMapFragment.updateCity();
+
     }
 
     public BDLocation getBDLocation() {

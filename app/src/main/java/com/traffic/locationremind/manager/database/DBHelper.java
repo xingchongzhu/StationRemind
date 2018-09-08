@@ -98,7 +98,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				file.createNewFile();
 			}
 			//加载需要导入的数据库
-			InputStream is = myContext.getResources().openRawResource(R.raw.metroinfo);
+			InputStream is = myContext.getResources().openRawResource(R.raw.cities);
 			FileOutputStream fos = new FileOutputStream(file);
 			byte[] buffere=new byte[is.available()];
 			is.read(buffere);

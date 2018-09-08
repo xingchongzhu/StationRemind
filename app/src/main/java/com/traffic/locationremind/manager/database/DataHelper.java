@@ -26,41 +26,24 @@ public class DataHelper {
     private DBHelper cityDbHelper;
     private DBHelper dbHelper;
 
+    private static final int[] dbRawId = {R.raw.cities,R.raw.shenzhen,R.raw.beijing,R.raw.guangzhou,R.raw.shanghai,R.raw.nanjing,R.raw.tianjin,
+            R.raw.chongqing,R.raw.chengdu,R.raw.shenyang,R.raw.xian,R.raw.wuhan,R.raw.hangzhou,R.raw.changchun,R.raw.kunming,R.raw.dalian,
+            R.raw.suzhou,R.raw.haerbin,R.raw.zhengzhou,R.raw.changsha,R.raw.ningbo,R.raw.wuxi,R.raw.qingdao,R.raw.nanning,R.raw.hefei,
+            R.raw.shijiazhuang,R.raw.nanchang,R.raw.dongguan,R.raw.fuzhou,R.raw.guiyang,R.raw.xiamen,R.raw.taibei,R.raw.gaoxiong};
+
+    private static final String[] dbName = {DBHelper.CITY_DB_NAME,DBHelper.SHENZHEN_DB_NAME,DBHelper.BEIJING_DB_NAME,DBHelper.GUANGZHOU_DB_NAME,
+            DBHelper.SHANGHAI_DB_NAME,DBHelper.NANJING_DB_NAME,DBHelper.TIANJIN_DB_NAME,DBHelper.CHONGQING_DB_NAME,DBHelper.CHENGDU_DB_NAME,
+            DBHelper.SHENYANG_DB_NAME,DBHelper.XIAN_DB_NAME,DBHelper.WUHAN_DB_NAME,DBHelper.HANGZHOU_DB_NAME,DBHelper.CHANGCHUN_DB_NAME,
+            DBHelper.KUNMING_DB_NAME,DBHelper.DALIAN_DB_NAME,DBHelper.SUZHOU_DB_NAME,DBHelper.HAERBIN_DB_NAME, DBHelper.ZHENGZHOU_DB_NAME,
+            DBHelper.CHANGSHA_DB_NAME,DBHelper.NINGBO_DB_NAME,DBHelper.WUXI_DB_NAME,DBHelper.QINGDAO_DB_NAME, DBHelper.NANNING_DB_NAME,
+            DBHelper.HEFEI_DB_NAME,DBHelper.SHIJIAZHUANG_DB_NAME,DBHelper.NANCHANG_DB_NAME,DBHelper.DONGGUANG_DB_NAME, DBHelper.FUZHOU_DB_NAME,
+            DBHelper.GUIYANG_DB_NAME,DBHelper.XIAMEN_DB_NAME,DBHelper.TAIBEI_DB_NAME,DBHelper.GAOXIONG_DB_NAME};
+
     public DataHelper(Context context) {
         cityDbHelper = new DBHelper(context);
-        cityDbHelper.imporCityDatabase(R.raw.cities,DBHelper.CITY_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.shenzhen,DBHelper.SHENZHEN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.beijing,DBHelper.BEIJING_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.guangzhou,DBHelper.GUANGZHOU_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.shanghai,DBHelper.SHANGHAI_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.nanjing,DBHelper.NANJING_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.tianjin,DBHelper.TIANJIN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.chongqing,DBHelper.CHONGQING_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.chengdu,DBHelper.CHENGDU_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.shenyang,DBHelper.SHENYANG_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.xian,DBHelper.XIAN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.wuhan,DBHelper.WUHAN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.hangzhou,DBHelper.HANGZHOU_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.changchun,DBHelper.CHANGCHUN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.kunming,DBHelper.KUNMING_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.dalian,DBHelper.DALIAN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.suzhou,DBHelper.SUZHOU_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.haerbin,DBHelper.HAERBIN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.zhengzhou,DBHelper.ZHENGZHOU_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.changsha,DBHelper.CHANGSHA_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.ningbo,DBHelper.NINGBO_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.wuxi,DBHelper.WUXI_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.qingdao,DBHelper.QINGDAO_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.nanning,DBHelper.NANNING_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.hefei,DBHelper.HEFEI_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.shijiazhuang,DBHelper.SHIJIAZHUANG_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.nanchang,DBHelper.NANCHANG_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.dongguan,DBHelper.DONGGUANG_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.fuzhou,DBHelper.FUZHOU_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.guiyang,DBHelper.GUIYANG_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.xiamen,DBHelper.XIAMEN_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.taibei,DBHelper.TAIBEI_DB_NAME);
-        cityDbHelper.imporCityDatabase(R.raw.gaoxiong,DBHelper.GAOXIONG_DB_NAME);
+        for(int i = 0;i < dbRawId.length;i++){
+            cityDbHelper.imporCityDatabase(dbRawId[i],dbName[i]);
+        }
         cityDb = cityDbHelper.getWritableDatabase();
         cityDb.execSQL("CREATE TABLE IF NOT EXISTS "+DBHelper.TB_RECENT_CITY+" (id integer primary key autoincrement, name varchar(40), date INTEGER)");
     }
@@ -78,6 +61,9 @@ public class DataHelper {
             db.close();
             dbHelper.close();
             db = null;
+        }
+        if(cityDb != null){
+            cityDb.close();
         }
     }
 
@@ -116,7 +102,7 @@ public class DataHelper {
 
         }
 
-        Log.e(TAG, "convertCursorToList");
+        //Log.e(TAG, "convertCursorToList");
         return lineList;
 
     }
@@ -136,7 +122,7 @@ public class DataHelper {
             lineList.add(lineInfo);
         }
 
-        Log.e(TAG, "convertCursorToList");
+        //Log.e(TAG, "convertCursorToList");
         return lineList;
 
     }
@@ -179,7 +165,7 @@ public class DataHelper {
             }
 
         }
-        Log.e(TAG, "convertCursorToList");
+        //Log.e(TAG, "convertCursorToList");
         return stationInfoList;
     }
 
@@ -204,7 +190,7 @@ public class DataHelper {
             stationInfoList.add(stationInfo);
 
         }
-        Log.e(TAG, "convertCursorToList");
+        //Log.e(TAG, "convertCursorToList");
         return stationInfoList;
 
     }
@@ -234,11 +220,8 @@ public class DataHelper {
             exitInfo.setCname(cursor.getString(0));
             exitInfo.setExitname(cursor.getString(1));
             exitInfo.setAddr(cursor.getString(2));
-            //exitInfo.setCityNo(cursor.getString(3));
             exitInfoList.add(exitInfo);
         }
-
-        Log.e(TAG, "convertCursorToList");
         return exitInfoList;
 
     }
@@ -255,7 +238,7 @@ public class DataHelper {
             cityInfoList.add(cityInfo);
         }
 
-        Log.e(TAG, "convertCursorToList");
+        //Log.e(TAG, "convertCursorToList");
         return cityInfoList;
 
     }
@@ -312,7 +295,7 @@ public class DataHelper {
                 , new String[]{cityName}, null, null,
                 null);
 
-        Log.e(TAG, "QueryCityByCityNo");
+        //Log.e(TAG, "QueryCityByCityNo");
 
         cityList = convertCursorToCityInfoList(cursor);
         if (cursor != null)
@@ -446,7 +429,22 @@ public class DataHelper {
         Cursor cursor = db.query(SqliteHelper.TB_STATION, null, StationInfo.LINEID + " =?", new String[]{"" + lineNo}, null,
                 null, StationInfo.PM + " ASC");
 
-        Log.e(TAG, "QueryByStationLineNo");
+        //Log.e(TAG, "QueryByStationLineNo");
+
+        StationInfoList = convertCursorToStationList(cursor);
+        if (cursor != null)
+            cursor.close();
+        return StationInfoList;
+    }
+
+    public  List<StationInfo> QueryAllByStationLineNo() {
+
+        List<StationInfo> StationInfoList;
+
+        Cursor cursor = db.query(SqliteHelper.TB_STATION, null, null, null, null,
+                null, StationInfo.PM + " ASC");
+
+        //Log.e(TAG, "QueryByStationLineNo");
 
         StationInfoList = convertCursorToStationList(cursor);
         if (cursor != null)
@@ -462,7 +460,7 @@ public class DataHelper {
                         + " and " +StationInfo.TRANSFER+" != ?", new String[]{"" + lineNo,"0"}, null,
                 null, StationInfo.PM + " ASC");
 
-        Log.e(TAG, "QueryByStationLineNo");
+        //Log.e(TAG, "QueryByStationLineNo");
 
         StationInfoList = convertCursorToStationList(cursor);
         if (cursor != null)
@@ -477,7 +475,7 @@ public class DataHelper {
         Cursor cursor = db.query(SqliteHelper.TB_STATION, null, StationInfo.TRANSFER + " !=?", new String[]{"0"}, null,
                 null, StationInfo.PM + " ASC");
 
-        Log.e(TAG, "QueryByStationLineNo");
+        //Log.e(TAG, "QueryByStationLineNo");
 
         StationInfoList = convertCursorToStationMap(cursor);
         if (cursor != null)
@@ -501,11 +499,10 @@ public class DataHelper {
     }
 
     public void updateExitInfor(ExitInfo exitInfo){
-        List<ExitInfo> ExitInfoList;
-        db.delete(SqliteHelper.TB_EXIT_INFO,ExitInfo.CNAME + " = ? and " +ExitInfo.EXITNAME+ " = ?",
+        long rowid =  db.delete(SqliteHelper.TB_EXIT_INFO,ExitInfo.CNAME + " = ? and " +ExitInfo.EXITNAME+ " = ?",
                 new String[]{exitInfo.getCname(),exitInfo.getExitname()});
         insetExitInfo(exitInfo);
-        Log.d("zxc","cname = "+exitInfo.getCname()+" exitname = "+exitInfo.getExitname());
+        Log.d("zxc","cname = "+exitInfo.getCname()+" exitname = "+exitInfo.getExitname()+" rowid = "+rowid);
     }
 
     public boolean insetExitInfo(ExitInfo exitInfo) {
@@ -514,7 +511,7 @@ public class DataHelper {
         values.put(ExitInfo.EXITNAME, exitInfo.getExitname());
         values.put(ExitInfo.ADDR, exitInfo.getAddr());
         long rowid = db.insert(SqliteHelper.TB_EXIT_INFO, null, values);
-        Log.d(TAG, "insetExitInfo rowid = " + rowid);
+        Log.d("zxc", "insetExitInfo rowid = " + rowid);
         if (rowid > 0)
             return true;
         return false;
@@ -524,10 +521,7 @@ public class DataHelper {
 
         List<ExitInfo> ExitInfoList;
         Cursor cursor = db.query(SqliteHelper.TB_EXIT_INFO, null, ExitInfo.CNAME + " = ?"
-                , new String[]{Cname}, null, null,
-                ExitInfo.CNAME);
-
-        Log.e(TAG, "QueryByExitInfoCname");
+                , new String[]{Cname},  null, null,ExitInfo.CNAME);
 
         ExitInfoList = convertCursorToExitInfoList(cursor);
         if (cursor != null)

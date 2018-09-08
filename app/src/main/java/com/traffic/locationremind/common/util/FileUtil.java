@@ -20,4 +20,11 @@ public class FileUtil {
         }
         return true;
     }
+
+
+    //关键点通过下面方式获取id，drawable资源
+    public static int getResIconId(Context context, String iconName){
+        return context.getResources().getIdentifier(iconName, "drawable", context.getPackageName());
+    }
+
 }
