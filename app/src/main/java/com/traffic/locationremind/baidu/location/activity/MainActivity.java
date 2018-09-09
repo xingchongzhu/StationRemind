@@ -381,6 +381,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         FullMapFragment fullMapFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
         fullMapFragment.updateCity();
 
+        //WebViewActivity.startActivity(MainActivity.this, "title", url);
     }
 
     public BDLocation getBDLocation() {

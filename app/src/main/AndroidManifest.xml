@@ -51,6 +51,13 @@
 
         </activity>
 
+        <activity android:name="com.traffic.locationremind.baidu.location.activity.WebMainActivity"
+                  android:launchMode="singleTask"
+                  android:windowSoftInputMode="adjustPan"
+                  android:hardwareAccelerated="true"
+                  android:screenOrientation="portrait">
+        </activity>
+
         <activity android:name="com.traffic.locationremind.baidu.location.activity.MainActivity"
                   android:launchMode="singleTask"
                   android:persistent="true"
@@ -61,6 +68,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
 
        <!-- <activity android:name="com.traffic.locationremind.baidu.location.activity.ForegroundActivity"

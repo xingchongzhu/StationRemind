@@ -77,4 +77,38 @@
     <string name="hot_city">Hot city</string>
     <string name="nearst">Nearst</string>
     <string name="background_location">Background Location</string>
+
+
+    <!--城市-->
+    <string name="beijing">131</string>
+    <string name="shanghai">289</string>
+    <string name="guangzhou">257</string>
+    <string name="shenzhen">340</string>
+    <string name="xianggang">2912</string>
+    <string name="chengdu">75</string>
+    <string name="changchun">53</string>
+    <string name="chongqing">132</string>
+    <string name="dalian">167</string>
+    <string name="foshang">138</string>
+    <string name="hangzhou">179</string>
+    <string name="kunming">104</string>
+    <string name="nanjing">315</string>
+    <string name="shenyang">58</string>
+    <string name="suzhou">224</string>
+    <string name="tianjin">332</string>
+    <string name="wuhan">218</string>
+    <string name="xian">233</string>
+    <string name="haerbin">48</string>
+    <string name="zhengzhou">268</string>
+    <string name="changsha">158</string>
+    <string name="ningbo">180</string>
+    <string name="wuxi">317</string>
+    <string name="taibei">9002</string>
+    <string name="gaoxiong">9019</string>
+    <string name="qingdao">236</string>
+    <string name="nanchang">163</string>
+    <string name="fuzhou">300</string>
+    <string name="dongguan">119</string>
+    <string name="nanning">261</string>
+    <!--城市-->
 </resources>

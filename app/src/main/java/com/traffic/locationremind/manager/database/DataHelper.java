@@ -231,10 +231,9 @@ public class DataHelper {
         if (cursor == null)
             return cityInfoList;
         while (cursor.moveToNext()) {
-            CityInfo cityInfo = new CityInfo();
-            cityInfo.setCityNo(cursor.getInt(0)+"");
-            cityInfo.setCityName(cursor.getString(1));
+            CityInfo cityInfo = new CityInfo();            cityInfo.setCityName(cursor.getString(1));
             cityInfo.setPingying(cursor.getString(2));
+            cityInfo.setCityNo(cursor.getString(4));
             cityInfoList.add(cityInfo);
         }
 
@@ -250,9 +249,9 @@ public class DataHelper {
         while (cursor.moveToNext()) {
             if(!cityInfoList.containsKey(cursor.getString(0))){
                 CityInfo cityInfo = new CityInfo();
-                cityInfo.setCityNo(cursor.getInt(0)+"");
                 cityInfo.setCityName(cursor.getString(1));
                 cityInfo.setPingying(cursor.getString(2));
+                cityInfo.setCityNo(cursor.getString(4));
                 cityInfoList.put(cursor.getString(1),cityInfo);
             }
         }
@@ -291,12 +290,9 @@ public class DataHelper {
     public List<CityInfo> QueryCityByCityNo(String cityName) {
 
         List<CityInfo> cityList;
-        Cursor cursor = cityDb.query(SqliteHelper.TB_CITY_INFO, null, CityInfo.CITYNAME + " =?"
+        Cursor cursor = cityDb.query(SqliteHelper.TB_CITY_INFO, null,  "name =?"
                 , new String[]{cityName}, null, null,
                 null);
-
-        //Log.e(TAG, "QueryCityByCityNo");
-
         cityList = convertCursorToCityInfoList(cursor);
         if (cursor != null)
             cursor.close();

@@ -173,7 +173,6 @@ public class DataManager{
 				if(entry.getKey() > maxLineid){
 					maxLineid = entry.getKey();
 				}
-				//mergeExistInfor(entry);
 			}
 			maxLineid+= 1;//找出路线最大编号加一
 			mLineInfoList = list;
