@@ -133,16 +133,14 @@ $("head title").html($("select :selected").text() + "地铁线路图")
 var BMapSub = {}
 BMapSub._rd = {};
 var timeStamp = (Math.random() * 100000).toFixed(0);
+var urlTest = "https://api.map.baidu.com/api?type=subway&v=1.0&ak=yZSTYLk9UUvs0ZqXqBbtTp8ViKk5vxLM";
 var checkUrl = "https://api.map.baidu.com/?qt=subways&c=" + cityCode + "&format=json&ak=yZSTYLk9UUvs0ZqXqBbtTp8ViKk5vxLM&v=3.0&from=jsapi&callback=BMapSub._rd._cbk" + timeStamp
 
 $.getScript(checkUrl)
-//$.getJSON('js/'+cityCode+'.txt', function(json){
-//    subwayPainter(json.subways.l)
-//});
+
 BMapSub._rd["_cbk" + timeStamp] = function(json) {
     subwayPainter(json.subways.l)
 }
-
 var eventsHandler = {
     haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
     init: function(options) {

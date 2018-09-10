@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.*;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.bean.CityInfo;
@@ -32,6 +34,26 @@ public class DataManager{
     private Integer allLineNodes[];
 
 	private int maxLineid = 0;
+	GeoCoder mSearch ;
+	OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
+		public void onGetGeoCodeResult(GeoCodeResult result) {
+			if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+				Log.d("zxc003","1111result.error");
+			}else{
+				Log.d("zxc003","longitude  "+result.getLocation().longitude+","+result.getLocation().latitude+" getAddress = "+result.getAddress());
+			}
+			//获取地理编码结果
+		}
+
+		@Override
+		public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
+			if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+				Log.d("zxc003","222result.error");
+			}else{
+				Log.d("zxc003","22222  "+result.toString());
+			}
+		}
+	};
 
 	private static DataManager mDataManager;
 
@@ -63,6 +85,7 @@ public class DataManager{
 		if(mLoadDataListener != null)
 			mLoadDataListener.clear();
 		mDataManager = null;
+		mSearch.destroy();
 	}
 
 	public CityInfo getCurrentCityNo(){
@@ -87,6 +110,10 @@ public class DataManager{
 		if(lineColor != null)
 			lineColor.clear();
 		new MyAsyncTask().execute(context);
+		if(mSearch == null) {
+			mSearch = GeoCoder.newInstance();
+			mSearch.setOnGetGeoCodeResultListener(listener);
+		}
 	}
 
 	public void addLoadDataListener(LoadDataListener loadDataListener) {
@@ -149,6 +176,7 @@ public class DataManager{
 			}
 			//merageAllCity((Context) params[0]);
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
+
 			maxLineid = 0;
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
@@ -173,6 +201,7 @@ public class DataManager{
 				if(entry.getKey() > maxLineid){
 					maxLineid = entry.getKey();
 				}
+
 			}
 			maxLineid+= 1;//找出路线最大编号加一
 			mLineInfoList = list;
@@ -184,6 +213,7 @@ public class DataManager{
 			}
             initGrf(allLineCane,maxLineid);
 			//getEmityString();
+            //getAddr((Context) params[0],shpno);
 			//GrfAllEdge.createGraph(allLineNodes, allLineCane);
 			return list;
 		}
@@ -196,6 +226,15 @@ public class DataManager{
 		}
 	}
 
+	public void getAddr(Context context,String city){
+		List<StationInfo> lists = mDataHelper.QueryAllByStationLineNo();
+		for(StationInfo stationInfo:lists) {
+			mSearch.geocode(new GeoCodeOption()
+					.city(city)
+					.address(city+stationInfo.getCname()+"地铁站"));
+			//FileUtil.getGeoPointBystr(context,city+stationInfo.getCname()+"地铁站");
+		}
+	}
 	public void getEmityString(){
 		Map<String,String> stringBuffer = new HashMap<>();
 		List<StationInfo> lists = mDataHelper.QueryAllByStationLineNo();

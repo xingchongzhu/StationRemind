@@ -58,9 +58,9 @@ function subwayPainter(l) {
     var repeatStr = "" //uid字符串判断重复点
     for (var i = 0; i < l.length; i++) {
         var { l_xmlattr, p } = l[i]
-        if (!l_xmlattr.uid) { //暂未开通
-            break;
-        }
+//        if (!l_xmlattr.uid) { //暂未开通
+//            break;
+//        }
         for (var j = 0; j < p.length; j++) {
             var { x, y, rx, ry, lb, ex, rc, st, uid } = p[j].p_xmlattr
             if (st) {

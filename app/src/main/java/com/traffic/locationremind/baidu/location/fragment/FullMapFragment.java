@@ -16,9 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.view.WindowManager;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
+import android.webkit.*;
 import android.widget.Toast;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
@@ -65,7 +63,7 @@ public class FullMapFragment extends Fragment {
         //mFullMapView = (FullMapView)rootView.findViewById(R.id.map);
         mDataManager = ((MainActivity) getActivity()).getDataManager();
         webView = (WebView) rootView.findViewById(R.id.web_wv);
-        updateCity();
+        initData();
     }
 
     public class JsInterface {
@@ -74,9 +72,28 @@ public class FullMapFragment extends Fragment {
             webView.post(new Runnable() {
                 @Override
                 public void run() {
-                    webView.loadUrl("javascript log(" + "'" + msg + "'" + ")");
+                    Log.d("zxc", "JsInterface");
+                    //webView.loadUrl("javascript:callJS(" + "'" + msg + "'" + ")");
                 }
             });
+        }
+    }
+
+    public void initData(){
+        String shpno = CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME);
+        List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);
+        if(cityList != null && cityList.size() > 0){
+            int id = FileUtil.getResIconId(getContext(),cityList.get(0).getPingying());
+            //Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), id);
+            //mFullMapView.setBitmap(bitmap2,screenWidth,screenHeight);
+            WebSettings webSettings = webView.getSettings();
+            // 将JavaScript设置为可用，这一句话是必须的，不然所做一切都是徒劳的
+            webSettings.setJavaScriptEnabled(true);
+            // 给webview添加JavaScript接口
+            webView.addJavascriptInterface(new JsInterface(), "index");
+            String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo();
+            webView.loadUrl(url);
+            webView.setWebChromeClient(new MyWebChromeClient());
         }
     }
 
@@ -84,20 +101,19 @@ public class FullMapFragment extends Fragment {
         String shpno = CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME);
         List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);
         if(cityList != null && cityList.size() > 0){
-            int id = FileUtil.getResIconId(getContext(),cityList.get(0).getPingying());
-            //Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), id);
-            //mFullMapView.setBitmap(bitmap2,screenWidth,screenHeight);
-            // 获取webview控件
-            // 获取WebView的设置
-            WebSettings webSettings = webView.getSettings();
-            // 将JavaScript设置为可用，这一句话是必须的，不然所做一切都是徒劳的
-            webSettings.setJavaScriptEnabled(true);
-            // 给webview添加JavaScript接口
-            webView.addJavascriptInterface(new JsInterface(), "control");
-            // 通过webview加载html页面 /shanghai.html?cityCode=289
-            //String url = URL+cityList.get(0).getCityNo();
             String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo();
+            //webView.loadUrl("javascript:callJS(" + "'" + cityList.get(0).getCityNo() + "'" + ")");
+            //webView.loadUrl("javascript:wave()");
             webView.loadUrl(url);
+        }
+    }
+
+    final class MyWebChromeClient extends WebChromeClient {
+        @Override
+        public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
+            Log.d("zxc", message);
+            result.confirm();
+            return true;
         }
     }
 

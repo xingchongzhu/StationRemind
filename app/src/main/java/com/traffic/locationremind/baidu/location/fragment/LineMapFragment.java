@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.*;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
@@ -241,7 +244,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                 return;
             }
             String string = list.get(index).linename + " (" + list.get(index).getForwad() + "," + list.get(index).getReverse() + ")\n" + list.get(index).getLineinfo();
-
             currentLineInfoText.setText(string);
             currentLineInfoText.setBackgroundColor(list.get(index).colorid);
         }
@@ -252,9 +254,12 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
         }
-
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
     @Override
     public void onClick(View v) {
 
