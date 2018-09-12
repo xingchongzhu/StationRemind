@@ -38,9 +38,8 @@ public class DataManager{
 	OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
 		public void onGetGeoCodeResult(GeoCodeResult result) {
 			if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-				Log.d("zxc003","1111result.error");
 			}else{
-				Log.d("zxc003","longitude  "+result.getLocation().longitude+","+result.getLocation().latitude+" getAddress = "+result.getAddress());
+				Log.d(TAG,"longitude  "+result.getLocation().longitude+","+result.getLocation().latitude+" getAddress = "+result.getAddress());
 			}
 			//获取地理编码结果
 		}
@@ -48,9 +47,8 @@ public class DataManager{
 		@Override
 		public void onGetReverseGeoCodeResult(ReverseGeoCodeResult result) {
 			if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
-				Log.d("zxc003","222result.error");
 			}else{
-				Log.d("zxc003","22222  "+result.toString());
+				Log.d(TAG,"22222  "+result.toString());
 			}
 		}
 	};
@@ -111,8 +109,8 @@ public class DataManager{
 			lineColor.clear();
 		new MyAsyncTask().execute(context);
 		if(mSearch == null) {
-			mSearch = GeoCoder.newInstance();
-			mSearch.setOnGetGeoCodeResultListener(listener);
+			//mSearch = GeoCoder.newInstance();
+			//mSearch.setOnGetGeoCodeResultListener(listener);
 		}
 	}
 

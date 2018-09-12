@@ -14,8 +14,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.baidu.mapapi.SDKInitializer;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.busline.BusLineResult;
+import com.baidu.mapapi.search.busline.BusLineSearch;
+import com.baidu.mapapi.search.busline.BusLineSearchOption;
+import com.baidu.mapapi.search.busline.OnGetBusLineSearchResultListener;
+import com.baidu.mapapi.search.core.PoiInfo;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.*;
+import com.baidu.mapapi.search.poi.*;
+import com.baidu.mapapi.search.route.*;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
@@ -23,16 +32,19 @@ import com.traffic.locationremind.baidu.location.adapter.ColorLineAdapter;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
 import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
 import com.traffic.locationremind.common.util.CharSort;
+import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.MapComparator;
 import com.traffic.locationremind.common.util.ReadExcelDataUtil;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
+import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.manager.database.DataManager;
 
 import java.util.*;
 
-public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWriteFinishListener, View.OnClickListener {
+public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWriteFinishListener, View.OnClickListener
+             , OnGetBusLineSearchResultListener,OnGetPoiSearchResultListener,OnGetRoutePlanResultListener {
 
     private final static String TAG = "LineMapFragment";
 
@@ -49,6 +61,13 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     StationInfo start,end;
     private SettingReminderDialog mSettingReminderDialog;
     private int currentIndex = 0;
+
+    private PoiSearch mSearch = null; // 搜索模块，也可去掉地图模块独立使用
+    private BusLineSearch mBusLineSearch = null;
+    private List<String> busLineIDList = new ArrayList<>();
+    private int busLineIndex = 0;
+
+    RoutePlanSearch mRoutePlanSearch;
 
     private Handler handler = new Handler() {
 
@@ -105,6 +124,14 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                 setCurrentLine(position);
             }
         });
+        SDKInitializer.initialize(getContext().getApplicationContext());
+        mSearch = PoiSearch.newInstance();
+        mSearch.setOnGetPoiSearchResultListener(this);
+        mBusLineSearch = BusLineSearch.newInstance();
+        mBusLineSearch.setOnGetBusLineSearchResultListener(this);
+
+        mRoutePlanSearch = RoutePlanSearch.newInstance();
+        mRoutePlanSearch.setOnGetRoutePlanResultListener(this);
 
     }
 
@@ -142,7 +169,20 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                             String endText = end==null?LineMapFragment.this.getActivity().getResources().getString(R.string.current_location):
                                     end.getCname();
                             ((MainActivity)LineMapFragment.this.getActivity()).searchStation(startText,endText);
+
+                            /*LatLng startLat =new LatLng(CommonFuction.convertToDouble(start.getLat(), 0),
+                                    CommonFuction.convertToDouble(start.getLot(), 0));
+                            LatLng endLat =new LatLng(CommonFuction.convertToDouble(end.getLat(), 0),
+                                    CommonFuction.convertToDouble(end.getLot(), 0));
+
+                            PlanNode stNode = PlanNode.withCityNameAndPlaceName(mDataManager.getCurrentCityNo().getCityName(), start.getCname()+"地铁站");
+                            PlanNode enNode = PlanNode.withCityNameAndPlaceName(mDataManager.getCurrentCityNo().getCityName(), end.getCname()+"地铁站");
+
+                            PlanNode stNode = PlanNode.withLocation(startLat);
+                            PlanNode enNode = PlanNode.withLocation(endLat);
                             Log.d(TAG,"startText = "+startText+" endText = "+endText);
+                            mRoutePlanSearch.transitSearch(
+                                    new TransitRoutePlanOption().city(mDataManager.getCurrentCityNo().getCityName()).from(stNode).to(enNode));*/
                             start = null;
                             end = null;
                             break;
@@ -232,8 +272,80 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
     }
 
-    private void setCurrentLine(int index) {
+    public void searchNextBusline(View v) {
+        if (busLineIndex >= busLineIDList.size()) {
+            busLineIndex = 0;
+        }
+        if (busLineIndex >= 0 && busLineIndex < busLineIDList.size()
+                && busLineIDList.size() > 0) {
+            mBusLineSearch.searchBusLine((new BusLineSearchOption()
+                    .city(mDataManager.getCurrentCityNo().getCityName()).uid(busLineIDList.get(busLineIndex))));
+            busLineIndex++;
+        }
 
+    }
+
+    @Override
+    public void onGetPoiResult(PoiResult result) {
+
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+            Log.e(TAG,"onGetPoiResult 抱歉，未找到结果");
+            return;
+        }
+        busLineIDList.clear();
+        for (PoiInfo poi : result.getAllPoi()) {
+            busLineIDList.add(poi.uid);//size=2，两个方向
+        }
+        searchNextBusline(null);
+    }
+
+    @Override
+    public void onGetBusLineResult(BusLineResult result) {
+        if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
+            Log.e(TAG,"onGetBusLineResult 抱歉，未找到结果 result = "+result.error);
+            return;
+        }
+        Log.d(TAG,"onGetBusLineResult result.getBusLineName() = "+result.getBusLineName()+" direction "+result.getLineDirection()+ " time = "+result.getStartTime()+" | "+result.getEndTime());
+        for(BusLineResult.BusStation station:result.getStations()){
+            mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
+            Log.d(TAG,"getTitle = "+station.getTitle()+" longitude = "+station.getLocation().longitude+" latitude = "+station.getLocation().latitude);
+        }
+
+        /*for(BusLineResult.BusStep steps:result.getSteps()){
+            //mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
+            Log.d(TAG,"getName = "+steps.getName()+"      "+steps.getWayPoints().toString());
+        }*/
+
+
+    }
+
+    /**
+     * V5.2.0版本之后，还方法废弃，使用{@link #onGetPoiDetailResult(PoiDetailSearchResult)}
+     * 代替
+     */
+    @Override
+    public void onGetPoiDetailResult(PoiDetailResult result) {
+
+    }
+
+    @Override
+    public void onGetPoiDetailResult(PoiDetailSearchResult result) {
+
+    }
+
+    @Override
+    public void onGetPoiIndoorResult(PoiIndoorResult poiIndoorResult) {
+
+    }
+
+    private void searchInCity(String lineName){
+        busLineIDList.clear();
+        busLineIndex = 0;
+        Log.d(TAG,"searchInCity city "+mDataManager.getCurrentCityNo().getCityName()+" linename = "+lineName);
+        mSearch.searchInCity((new PoiCitySearchOption()).city(mDataManager.getCurrentCityNo().getCityName()).keyword(lineName));
+    }
+
+    private void setCurrentLine(int index) {
         currentIndex = index;
         if (currentLineInfoText != null) {
             if (index >= list.size()) {
@@ -254,18 +366,68 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
         }
+        String lineName = list.get(index).linename.split("/")[0];
+        if(lineName.contains("号线")){
+            lineName = "地铁"+lineName;
+        }
+        searchInCity(lineName);
     }
 
     @Override
     public void onDestroy() {
+        mSearch.destroy();
+        mBusLineSearch.destroy();
         super.onDestroy();
     }
+
     @Override
     public void onClick(View v) {
 
     }
 
     public void dbWriteFinishNotif() {
+
+    }
+
+    @Override
+    public void onGetWalkingRouteResult(WalkingRouteResult var1){
+
+    }
+
+    @Override
+    public void onGetTransitRouteResult(TransitRouteResult result){
+        if (result == null) {
+            Log.d(TAG, "onGetTransitRouteResult result is empty");
+            return;
+        }
+        Log.d(TAG, "onGetTransitRouteResult 公交换乘方案数：" + result.getRouteLines());
+        if(result.getRouteLines() != null) {
+            for (TransitRouteLine transitRouteLine : result.getRouteLines()) {
+                Log.d(TAG, " title = " + transitRouteLine.getTitle());
+                for (TransitRouteLine.TransitStep step : transitRouteLine.getAllStep()) {
+                    Log.d(TAG, " name = " + step.getName() + " title " + step.getEntrance().getTitle());
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onGetMassTransitRouteResult(MassTransitRouteResult var1){
+
+    }
+
+    @Override
+    public void onGetDrivingRouteResult(DrivingRouteResult var1){
+
+    }
+
+    @Override
+    public void onGetIndoorRouteResult(IndoorRouteResult var1){
+
+    }
+
+    @Override
+    public void onGetBikingRouteResult(BikingRouteResult var1){
 
     }
 }

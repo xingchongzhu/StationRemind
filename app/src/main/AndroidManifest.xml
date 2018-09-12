@@ -71,18 +71,6 @@
 
         </activity>
 
-       <!-- <activity android:name="com.traffic.locationremind.baidu.location.activity.ForegroundActivity"
-                  android:launchMode="singleTask"
-                  android:persistent="true"
-                  android:windowSoftInputMode="adjustPan"
-                  android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>-->
-
         <service android:name="com.traffic.locationremind.baidu.location.service.RemonderLocationService"
                  android:persistent="true"/>
 

@@ -448,6 +448,20 @@ public class DataHelper {
         return StationInfoList;
     }
 
+    public void updateStation(String name, String lot,String lat) {
+        ContentValues values = new ContentValues();
+        values.put(StationInfo.LOT, lot);
+        values.put(StationInfo.LAT, lat);
+        db.update(SqliteHelper.TB_STATION, values, StationInfo.CNAME+" = ?", new String[] {name});
+    }
+
+    public void updateLatLotStationEmpty() {
+        ContentValues values = new ContentValues();
+        values.put(StationInfo.LOT, 0);
+        values.put(StationInfo.LAT, 0);
+        db.update(SqliteHelper.TB_STATION, values, null,null);
+    }
+
     public List<StationInfo> QueryByStationLineNoCanTransfer(int lineNo, String cityNo) {
 
         List<StationInfo> StationInfoList;

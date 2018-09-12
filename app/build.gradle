@@ -5,13 +5,13 @@ android {
         debugkey {
             keyAlias 'mysigned'
             keyPassword 'yezi82231'
-            storeFile file('G:\\Project\\StationRemind-master\\keystore\\debugkey.jks')
+            storeFile file('/home/zhuxingchong/WorkSpace/myProject/StationRemind/keystore/debugkey.jks')
             storePassword 'yezi82231'
         }
         releasekey {
             keyAlias 'releasekey'
             keyPassword 'yezi82231'
-            storeFile file('G:\\Project\\StationRemind-master\\keystore\\releasekey.jks')
+            storeFile file('/home/zhuxingchong/WorkSpace/myProject/StationRemind/keystore/releasekey.jks')
             storePassword 'yezi82231'
         }
     }
@@ -57,5 +57,6 @@ dependencies {
     implementation files('libs/pinyin4android1.0.jar')
     implementation files('libs/pinyin4j-2.5.0.jar')
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+
 }
 

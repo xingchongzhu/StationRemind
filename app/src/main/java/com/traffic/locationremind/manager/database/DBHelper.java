@@ -8,10 +8,18 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.manager.bean.ExitInfo;
+import com.traffic.locationremind.manager.bean.LineInfo;
+import com.traffic.locationremind.manager.bean.StationInfo;
 
 public class DBHelper extends SQLiteOpenHelper {
 	private static final int DB_VERSION = 3;
 	private static String DB_PATH = "/data/data/com.traffic.location.remind/databases/";
+	public static final String TB_LINE = "line";
+	public static final String TB_STATION = "station";
+	public static final String TB_EXIT_INFO = "exitinfo";
+	public static final String TB_CITY_INFO = "city";
+	public static final String TB_ADD_EXTRA_INFO = "addinfo";
 
 	private static String DB_NAME = "metroinfo.db";
 	private static String ASSETS_NAME = "metroinfo.db";
@@ -62,7 +70,33 @@ public class DBHelper extends SQLiteOpenHelper {
 	}
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		//Log.d("info", "create table");
+
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_LINE + "("
+				+ LineInfo.LINEID + " integer primary key autoincrement ,"
+				+ LineInfo.LINENAME + " varchar,"
+				+ LineInfo.LINEINFO + " varchar,"
+				+ LineInfo.RGBCOOLOR + " varchar,"
+				+ LineInfo.FORWARD + " varchar,"
+				+ LineInfo.REVERSE + " varchar"
+				+ ")");
+
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_STATION + "("
+				+ StationInfo.LINEID + " int,"
+				+ StationInfo.PM + " int,"
+				+ StationInfo.CNAME + " varchar,"
+				+ StationInfo.PNAME + " varchar,"
+				+ StationInfo.ANAME + " varchar,"
+				+ StationInfo.LOT + " varchar,"
+				+ StationInfo.LAT + " varchar,"
+				+ StationInfo.STATIONINFO + " varchar,"
+				+ StationInfo.TRANSFER + " varchar default 0"
+				+ ")");
+
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_EXIT_INFO + "("
+				+ ExitInfo.CNAME + " varchar,"
+				+ ExitInfo.EXITNAME + " varchar,"
+				+ ExitInfo.ADDR + " varchar"
+				+ ")");
 	}
 
 	@Override

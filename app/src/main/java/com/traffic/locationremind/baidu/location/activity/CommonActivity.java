@@ -48,9 +48,9 @@ public class CommonActivity extends Activity {
             }
             if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
                 permissions.add(Manifest.permission.READ_PHONE_STATE);
-            }else{
-                SDKInitializer.initialize(getApplicationContext());
             }
+            SDKInitializer.initialize(getApplicationContext());
+
             if (permissions.size() > 0) {
                 requestPermissions(permissions.toArray(new String[permissions.size()]), SDK_PERMISSION_REQUEST);
                 return false;
