@@ -66,6 +66,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private BusLineSearch mBusLineSearch = null;
     private List<String> busLineIDList = new ArrayList<>();
     private int busLineIndex = 0;
+    private String currentLineName = "";
 
     RoutePlanSearch mRoutePlanSearch;
 
@@ -239,7 +240,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                 lineMap.setLayoutParams(linearParams);
             }
         }
-
     }
 
     private void setCurrentLineByLineid(int lineid) {
@@ -248,13 +248,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             return;
         }
         if (currentLineInfoText != null) {
-            /*if (lineid >= list.size()) {
-                currentLineInfoText.setBackgroundColor(Color.WHITE);
-                currentLineInfoText.setTextColor(Color.WHITE);
-                currentLineInfoText.setText("");
-                sceneMapAdapter.setData(null);
-                return;
-            }*/
             String string = lineInfo.linename + " (" +
                     lineInfo.getForwad() + "," +
                     lineInfo.getReverse() + ")\n" + lineInfo.getLineinfo();
@@ -269,7 +262,11 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
         }
-
+        currentLineName = lineInfo.linename.split("/")[0];
+        if(currentLineName.contains("号线")){
+            currentLineName = currentLineName+"地铁";
+        }
+        searchInCity(currentLineName);
     }
 
     public void searchNextBusline(View v) {
@@ -303,6 +300,10 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     public void onGetBusLineResult(BusLineResult result) {
         if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
             Log.e(TAG,"onGetBusLineResult 抱歉，未找到结果 result = "+result.error);
+            if(currentLineName.contains("号线") && currentLineName.contains("地铁")){
+                currentLineName.replace("地铁","");
+                searchInCity("地铁" + currentLineName);
+            }
             return;
         }
         Log.d(TAG,"onGetBusLineResult result.getBusLineName() = "+result.getBusLineName()+" direction "+result.getLineDirection()+ " time = "+result.getStartTime()+" | "+result.getEndTime());
@@ -315,8 +316,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             //mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
             Log.d(TAG,"getName = "+steps.getName()+"      "+steps.getWayPoints().toString());
         }*/
-
-
     }
 
     /**
@@ -366,11 +365,11 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
         }
-        String lineName = list.get(index).linename.split("/")[0];
-        if(lineName.contains("号线")){
-            lineName = "地铁"+lineName;
+        currentLineName = list.get(index).linename.split("/")[0];
+        if(currentLineName.contains("号线")){
+            currentLineName = currentLineName+"地铁";
         }
-        searchInCity(lineName);
+        searchInCity(currentLineName);
     }
 
     @Override

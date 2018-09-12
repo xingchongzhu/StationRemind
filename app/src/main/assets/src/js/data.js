@@ -145,7 +145,7 @@ var eventsHandler = {
     haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
     init: function(options) {
         var instance = options.instance,
-            initialScale = 1,
+            initialScale = 2,
             pannedX = 0,
             pannedY = 0
         this.hammer = Hammer(options.svgElement, {

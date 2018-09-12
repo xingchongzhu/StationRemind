@@ -84,6 +84,23 @@ public class DataHelper {
         return allResourceList;
     }
 
+    public ArrayList<LineInfo> getLineLists( String sortType, String asc) {
+        if (db == null) {
+            return null;
+        }
+        ArrayList<LineInfo> allResourceList;
+        Cursor cursor = db.query(SqliteHelper.TB_LINE, null, null, null, null,
+                null, sortType + " " + asc);
+        allResourceList = convertCursorToLineList(cursor);
+        if (allResourceList != null)
+            Log.d(TAG, TAG + " length " + allResourceList.size()
+                    + " cursorcount = " + cursor.getCount() + " orderby = "
+                    + sortType + asc);
+        if (cursor != null)
+            cursor.close();
+        return allResourceList;
+    }
+
     public Map<Integer,LineInfo> convertCursorToLineMap(Cursor cursor) {
         Map<Integer,LineInfo> lineList = new HashMap<Integer,LineInfo>();
         if (cursor == null)
