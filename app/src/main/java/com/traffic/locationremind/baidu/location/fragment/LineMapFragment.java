@@ -296,6 +296,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         searchNextBusline(null);
     }
 
+    List<String> needUpdate = new ArrayList<>();
     @Override
     public void onGetBusLineResult(BusLineResult result) {
         if (result == null || result.error != SearchResult.ERRORNO.NO_ERROR) {
@@ -307,9 +308,37 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             return;
         }
         Log.d(TAG,"onGetBusLineResult result.getBusLineName() = "+result.getBusLineName()+" direction "+result.getLineDirection()+ " time = "+result.getStartTime()+" | "+result.getEndTime());
-        for(BusLineResult.BusStation station:result.getStations()){
-            mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
-            Log.d(TAG,"getTitle = "+station.getTitle()+" longitude = "+station.getLocation().longitude+" latitude = "+station.getLocation().latitude);
+        needUpdate.clear();
+        if(mDataManager.getCurrentCityNo() != null && mDataManager.getCurrentCityNo().getCityName().equals("香港")) {
+            int n = 1;
+           /* for(BusLineResult.BusStation station:result.getStations()){
+                StationInfo stationInfo = new StationInfo();
+                stationInfo.setCname(station.getTitle());
+                stationInfo.setLineid(list.get(currentIndex).lineid);
+                stationInfo.setPm(n++);
+                stationInfo.setLat(""+station.getLocation().latitude);
+                stationInfo.setLot(""+station.getLocation().longitude);
+                stationInfo.setStationInfo("——/——|——/——");
+                stationInfo.setTransfer("0");
+                boolean updateResult = mDataManager.getDataHelper().insetStationInfo(stationInfo);
+                *//*if(!updateResult){
+                    needUpdate.add(station.getTitle());
+                }*//*
+                Log.d(TAG,"getTitle = "+station.getTitle()+" updateResult = "+updateResult+" longitude = "+station.getLocation().longitude+" latitude = "+station.getLocation().latitude);
+            }*/
+        }else{
+            for(BusLineResult.BusStation station:result.getStations()){
+                /*int updateResult = mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
+                if(updateResult <= 0){
+                    needUpdate.add(station.getTitle());
+                }*/
+                Log.d(TAG,"getTitle = "+station.getTitle()+" longitude = "+station.getLocation().longitude+" latitude = "+station.getLocation().latitude);
+            }
+        }
+
+        Log.d(TAG,"-----------------needupdate------------------");
+        for(String string:needUpdate){
+            Log.d(TAG,string);
         }
 
         /*for(BusLineResult.BusStep steps:result.getSteps()){
@@ -366,10 +395,13 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
         }
         currentLineName = list.get(index).linename.split("/")[0];
+
         if(currentLineName.contains("号线")){
             currentLineName = currentLineName+"地铁";
         }
         searchInCity(currentLineName);
+
+
     }
 
     @Override

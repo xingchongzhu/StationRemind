@@ -29,7 +29,7 @@ public class DataHelper {
     private static final int[] dbRawId = {R.raw.cities,R.raw.shenzhen,R.raw.beijing,R.raw.guangzhou,R.raw.shanghai,R.raw.nanjing,R.raw.tianjin,
             R.raw.chongqing,R.raw.chengdu,R.raw.shenyang,R.raw.xian,R.raw.wuhan,R.raw.hangzhou,R.raw.changchun,R.raw.kunming,R.raw.dalian,
             R.raw.suzhou,R.raw.haerbin,R.raw.zhengzhou,R.raw.changsha,R.raw.ningbo,R.raw.wuxi,R.raw.qingdao,R.raw.nanning,R.raw.hefei,
-            R.raw.shijiazhuang,R.raw.nanchang,R.raw.dongguan,R.raw.fuzhou,R.raw.guiyang,R.raw.xiamen,R.raw.taibei,R.raw.gaoxiong};
+            R.raw.shijiazhuang,R.raw.nanchang,R.raw.dongguan,R.raw.fuzhou,R.raw.guiyang,R.raw.xiamen,R.raw.taibei,R.raw.gaoxiong,R.raw.xianggang};
 
     private static final String[] dbName = {DBHelper.CITY_DB_NAME,DBHelper.SHENZHEN_DB_NAME,DBHelper.BEIJING_DB_NAME,DBHelper.GUANGZHOU_DB_NAME,
             DBHelper.SHANGHAI_DB_NAME,DBHelper.NANJING_DB_NAME,DBHelper.TIANJIN_DB_NAME,DBHelper.CHONGQING_DB_NAME,DBHelper.CHENGDU_DB_NAME,
@@ -37,7 +37,7 @@ public class DataHelper {
             DBHelper.KUNMING_DB_NAME,DBHelper.DALIAN_DB_NAME,DBHelper.SUZHOU_DB_NAME,DBHelper.HAERBIN_DB_NAME, DBHelper.ZHENGZHOU_DB_NAME,
             DBHelper.CHANGSHA_DB_NAME,DBHelper.NINGBO_DB_NAME,DBHelper.WUXI_DB_NAME,DBHelper.QINGDAO_DB_NAME, DBHelper.NANNING_DB_NAME,
             DBHelper.HEFEI_DB_NAME,DBHelper.SHIJIAZHUANG_DB_NAME,DBHelper.NANCHANG_DB_NAME,DBHelper.DONGGUANG_DB_NAME, DBHelper.FUZHOU_DB_NAME,
-            DBHelper.GUIYANG_DB_NAME,DBHelper.XIAMEN_DB_NAME,DBHelper.TAIBEI_DB_NAME,DBHelper.GAOXIONG_DB_NAME};
+            DBHelper.GUIYANG_DB_NAME,DBHelper.XIAMEN_DB_NAME,DBHelper.TAIBEI_DB_NAME,DBHelper.GAOXIONG_DB_NAME,DBHelper.XIANGGANG_DB_NAME};
 
     public DataHelper(Context context) {
         cityDbHelper = new DBHelper(context);
@@ -465,11 +465,11 @@ public class DataHelper {
         return StationInfoList;
     }
 
-    public void updateStation(String name, String lot,String lat) {
+    public int updateStation(String name, String lot,String lat) {
         ContentValues values = new ContentValues();
         values.put(StationInfo.LOT, lot);
         values.put(StationInfo.LAT, lat);
-        db.update(SqliteHelper.TB_STATION, values, StationInfo.CNAME+" = ?", new String[] {name});
+        return db.update(SqliteHelper.TB_STATION, values, StationInfo.CNAME+" = ?", new String[] {name});
     }
 
     public void updateLatLotStationEmpty() {
