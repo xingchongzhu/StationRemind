@@ -187,8 +187,8 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
             if (!sceneMap.getFullScree()) {
                 sceneMap.setFullScree(true);
                 sceneMap.setInitScale();
-                Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.shenzhen);
-                sceneMap.setBitmap(bitmap2);
+                //Bitmap bitmap2 = BitmapFactory.decodeResource(getResources(), R.drawable.shenzhen);
+                //sceneMap.setBitmap(bitmap2);
             }
         } else if (v.getId() == R.id.button_location) {
             if (mRemonderLocationService != null) {

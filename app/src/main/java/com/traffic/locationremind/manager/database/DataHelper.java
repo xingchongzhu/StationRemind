@@ -472,6 +472,13 @@ public class DataHelper {
         return db.update(SqliteHelper.TB_STATION, values, StationInfo.CNAME+" = ?", new String[] {name});
     }
 
+    public int updateLineInfo(int lineid, String forward,String reverse) {
+        ContentValues values = new ContentValues();
+        values.put(LineInfo.FORWARD, forward);
+        values.put(LineInfo.REVERSE, reverse);
+        return db.update(SqliteHelper.TB_LINE, values, LineInfo.LINEID+" = ?", new String[] {""+lineid});
+    }
+
     public void updateLatLotStationEmpty() {
         ContentValues values = new ContentValues();
         values.put(StationInfo.LOT, 0);

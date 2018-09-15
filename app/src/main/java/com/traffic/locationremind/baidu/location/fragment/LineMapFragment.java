@@ -328,11 +328,13 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             }*/
         }else{
             for(BusLineResult.BusStation station:result.getStations()){
-                /*int updateResult = mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
+                int updateResult = mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
                 if(updateResult <= 0){
                     needUpdate.add(station.getTitle());
-                }*/
-                Log.d(TAG,"getTitle = "+station.getTitle()+" longitude = "+station.getLocation().longitude+" latitude = "+station.getLocation().latitude);
+                }
+
+                Log.d(TAG,"getTitle = "+station.getTitle()+" longitude = "+station.getLocation().longitude+" latitude = "+station.getLocation().latitude+
+                        station.getUid());
             }
         }
 
@@ -340,11 +342,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         for(String string:needUpdate){
             Log.d(TAG,string);
         }
-
-        /*for(BusLineResult.BusStep steps:result.getSteps()){
-            //mDataManager.getDataHelper().updateStation(station.getTitle(),""+station.getLocation().longitude,""+station.getLocation().latitude);
-            Log.d(TAG,"getName = "+steps.getName()+"      "+steps.getWayPoints().toString());
-        }*/
     }
 
     /**
@@ -400,8 +397,12 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             currentLineName = currentLineName+"地铁";
         }
         searchInCity(currentLineName);
-
-
+        if(sceneMapAdapter.getLineInfo() != null && sceneMapAdapter.getLineInfo().size() > 1) {
+            int result = mDataManager.getDataHelper().updateLineInfo(list.get(index).lineid,
+                    sceneMapAdapter.getLineInfo().get(0).getCname(),
+                    sceneMapAdapter.getLineInfo().get(sceneMapAdapter.getLineInfo().size() - 1).getCname());
+            Log.d(TAG,"update currentLineName = "+currentLineName+" result = "+result);
+        }
     }
 
     @Override

@@ -14,6 +14,8 @@ import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
+import java.util.List;
+
 /**
  * @function listviewadapter
  * @auther: Created by yinglan
@@ -36,6 +38,10 @@ public class AllLineAdapter extends BaseAdapter {
     public void setData(LineInfo data) {
         this.data = data;
         notifyDataSetChanged();
+    }
+
+    public List<StationInfo> getLineInfo(){
+        return data.getStationInfoList();
     }
 
     @Override
