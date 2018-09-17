@@ -238,9 +238,18 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     @Override
-    public void openRemindFragment(List<StationInfo> list) {
+    public void openRemindFragment(final List<StationInfo> list) {
+        List<Integer> tempList = new ArrayList<>();
+        StringBuffer str = new StringBuffer();
+        for (StationInfo stationInfo : list) {
+            tempList.add(stationInfo.lineid);
+        }
         mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+        str.delete(0,str.length());
+        for (int i = 0 ;i < tempList.size();i++) {
+            list.get(i).lineid = tempList.get(i);
+        }
         remindFragment.setData(list);
         hideSerachView();
         hideSetRemindView();

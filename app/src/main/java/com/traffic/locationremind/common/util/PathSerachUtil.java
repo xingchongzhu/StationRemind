@@ -245,7 +245,6 @@ public class PathSerachUtil {
             addChild(root, stationInfoList);
 
             //多叉树查找所有路径
-            //Log.d("zxc", "----- list = " + list);
             IteratorNodeTool tool = new IteratorNodeTool();
             Stack<Node> pathstack = new Stack();
             tool.iteratorNode(root, pathstack);
@@ -261,6 +260,19 @@ public class PathSerachUtil {
                         min = ll;
                     }
                 }
+                /*int preLineid = 0;
+                int lineidIndex = 0;
+                for(int j = 0; j < min.size();j++){
+                    if(preLineid != 0 && min.get(j).lineid != preLineid){
+                        if(lineidIndex+1 <list.size() && list.get(lineidIndex+1) == min.get(j).lineid){
+                            min.get(j).lineid = list.get(lineidIndex+1);
+                        }else{
+                            min.get(j).lineid = preLineid;
+                        }
+                    }
+                    preLineid = min.get(j).lineid;
+                }*/
+
                 currentAllStationList.put(list, min);
             }
         }
@@ -295,14 +307,13 @@ public class PathSerachUtil {
                     }
                 }
                 PathSerachUtil.findLinedStation(lineInfo, stationInfo, endInfo, oneLineMap);
-
             }
             /*Node start = (Node)list.get(i);
             StationInfo stationInfo = (StationInfo) start.getNodeEntity();
             buf.append(stationInfo.lineid+"  "+stationInfo.getCname()+" ->");*/
         }
-        //Log.d("zxc",buf.toString());
-        //Log.d("zxc","----------end--------------");
+        /*Log.d("zxc",buf.toString());
+        Log.d("zxc","----------end--------------");*/
         return oneLineMap;
     }
 

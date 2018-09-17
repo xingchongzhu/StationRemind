@@ -78,6 +78,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 return;
             }
             mCardAdapter.setData(lastLinesLast);
+
         }
     }
 
@@ -137,6 +138,11 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                     LineObject lineObject = new LineObject();
                     lineObject.lineidList = mCardAdapter.getItem(position).getKey();
                     lineObject.stationList = mCardAdapter.getItem(position).getValue();
+                    StringBuffer str = new StringBuffer();
+                    for (StationInfo stationInfo : lineObject.stationList) {
+                        str.append(""+stationInfo.lineid+" "+stationInfo.getCname()+" ->");
+                    }
+                    Log.d("zxc",TAG+" "+str.toString());
                     mRemindSetViewListener.openSetWindow(lineObject);
                 }
             }
@@ -297,6 +303,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             mCardAdapter.setData(null);
             searchTaskNum = 0;
             finishTaskNum = 0;
+            autoCompleteAdapter.clearData();
             PathSerachUtil.getReminderLines(this, myHandler, startStation, endStation,
                     activity.getBDLocation(), mDataManager);
         }

@@ -228,13 +228,13 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     }
 
     public void setStartCurrentLocation(){
+        /*if(endInput != null){
+            endInput.setText("");
+        }
         if(startInput != null) {
             startInput.setText(getResources().getString(R.string.current_location));
             startInput.setSelection(startInput.getText().toString().length());
-        }
-        if(endInput != null){
-            endInput.setText("");
-        }
+        }*/
 
         if(city_select != null)
             city_select.setText( CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME));
@@ -352,6 +352,8 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
             case R.id.change:
                 String str = startInput.getText().toString();
                 String str1 = endInput.getText().toString();
+                startInput.setText("");
+                endInput.setText("");
                 startInput.setText(str1);
                 endInput.setText(str);
                 startInput.setSelection(startInput.getText().toString().length());

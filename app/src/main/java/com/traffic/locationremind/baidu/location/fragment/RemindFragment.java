@@ -98,10 +98,14 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     public void setData(List<StationInfo> list) {
         isRemind = true;
 
-        this.list = list;
         for (StationInfo stationInfo : list) {
             stationInfo.colorId = mDataManager.getLineInfoList().get(stationInfo.lineid).colorid;
         }
+        /*StringBuffer str = new StringBuffer();
+        for (StationInfo stationInfo : list) {
+            str.append(""+stationInfo.lineid+" "+stationInfo.getCname()+" ->");
+        }
+        Log.d("zxc",TAG+" "+str.toString());*/
         createLine(list);
         if(getMainActivity() != null) {
             getMainActivity().setRemindState(true);
@@ -117,7 +121,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         if(getMainActivity() != null) {
             getMainActivity().setRemindState(false);
         }
-        this.list = list;
         for (StationInfo stationInfo : list) {
             stationInfo.colorId = mDataManager.getLineInfoList().get(stationInfo.lineid).colorid;
         }
