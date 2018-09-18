@@ -235,6 +235,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mShowAction.setDuration(500);
         view.startAnimation(mShowAction);//开始动画
         searchView.setStartCurrentLocation();
+        mSearchManager.clearResult();
     }
 
     @Override

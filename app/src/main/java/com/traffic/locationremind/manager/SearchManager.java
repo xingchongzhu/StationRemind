@@ -205,15 +205,19 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
      * 获取自动补全data 和adapter
      */
     private void getAutoCompleteData(Context context, String text) {
+        Log.d(TAG, "getAutoCompleteData text = "+text);
+        if (TextUtils.isEmpty(text)){
+            return;
+        }
         if (autoCompleteData == null) {
             //初始化
             autoCompleteData = new ArrayList<>();
         } else {
             // 根据text 获取auto data
             autoCompleteData.clear();
-
             for (Map.Entry<String, StationInfo> entry : allstations.entrySet()) {
-                if (!TextUtils.isEmpty(text) && entry.getKey().contains(text.trim())) {
+                if (!TextUtils.isEmpty(text) && (entry.getKey().contains(text.trim())) ||
+                        entry.getValue().getPname().toLowerCase().contains(text.trim().toLowerCase())) {
                     Log.d(TAG, "getAutoCompleteData serach result = " + entry.getValue().getCname());
                     autoCompleteData.add(entry.getValue());
                 }
@@ -249,7 +253,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             getDbData();
         }
         synchronized (lock) {
-            searchView.hideSoftInput();
+
             String currentCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.CITYNAME);
             String locationCity = CommonFuction.getSharedPreferencesValue(activity, CityInfo.LOCATIONNAME);
             if (mSearchLoadingDialog != null) {
@@ -260,7 +264,6 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 return;
 
             String current = context.getResources().getString(R.string.current_location);
-
             if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity) ||
                     (prestartStation != null && preendStation != null && prestartStation.getCname().equals(start) &&
                             preendStation.getCname().equals(end))) {
@@ -291,6 +294,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 //Toast.makeText(context, "请输入有效终点站名", Toast.LENGTH_SHORT).show();
                 return;
             }
+            searchView.hideSoftInput();
             Log.d(TAG, "onSearch start = " + start + " end = " + end + " startStation.getCname() = " + startStation.getCname() + " endStation.getCname() = " + endStation.getCname());
             if (mSearchLoadingDialog == null) {
                 mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
@@ -344,9 +348,13 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         }
     }
 
+    public void clearResult(){
+        lastLinesLast.clear();
+        mCardAdapter.setData(lastLinesLast);
+    }
+
     @Override
     public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines) {
-        //Log.d("zxc1","updateResult lastLinesLast = "+lastLinesLast);
         if (mSearchLoadingDialog != null) {
             mSearchLoadingDialog.cancel();
         }

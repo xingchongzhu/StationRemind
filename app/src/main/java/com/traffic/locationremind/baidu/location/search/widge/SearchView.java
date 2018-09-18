@@ -228,13 +228,14 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
     }
 
     public void setStartCurrentLocation(){
-        /*if(endInput != null){
+        if(endInput != null){
             endInput.setText("");
         }
         if(startInput != null) {
+            startInput.setText("");
             startInput.setText(getResources().getString(R.string.current_location));
             startInput.setSelection(startInput.getText().toString().length());
-        }*/
+        }
 
         if(city_select != null)
             city_select.setText( CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME));

@@ -184,6 +184,7 @@
                         android:layout_height="wrap_content"
                         android:background="@drawable/radius_btn"
                         android:padding="5dp"
+                        android:visibility="gone"
                         android:orientation="horizontal">
                     <EditText
                             android:paddingRight="20dp"
