@@ -54,14 +54,14 @@ public class NotificationUtil {
 		map = new HashMap<Integer, Notification>();
 	}
 
-	public Notification showNotification(Context context,int notificationId, NotificationObject mNotificationObject) {
+	public Notification   showNotification(Context context,int notificationId, NotificationObject mNotificationObject) {
 		//notification();
 
 		// 判断对应id的Notification是否已经显示， 以免同一个Notification出现多次
 		if (!map.containsKey(notificationId)) {
 
-			String name = "my_package_channel";//渠道名字
-			String id = "my_package_channel_1"; // 渠道ID
+			String name = "reminding";//渠道名字
+			String id = "com.traffic.location.remind"; // 渠道ID
 			String description = "my_package_first_channel"; // 渠道解释说明
 			//PendingIntent pendingIntent;//非紧急意图，可设置可不设置
 			//判断是否是8.0上设备
@@ -95,7 +95,7 @@ public class NotificationUtil {
 			notification.setColor(Color.parseColor("#880000FF"));
 			notification.setContentText(context.getString(R.string.line_background_hint));
 			// 设置通知的特性: 通知被点击后，自动消失
-			//notification.setAutoCancel(true);
+			notification.setAutoCancel(true);
 			//notification.flags = Notification.FLAG_AUTO_CANCEL;
 			// 设置点击通知栏操作
 			Intent in = new Intent(context, MainActivity.class);// 点击跳转到指定页面
@@ -222,7 +222,7 @@ public class NotificationUtil {
 			notification.setSmallIcon(R.mipmap.notification_icon);
 			notification.setColor(Color.parseColor("#880000FF"));
 			// 设置通知的特性: 通知被点击后，自动消失
-			notification.setAutoCancel(true);
+			notification.setAutoCancel(false);
 			//notification.flags = Notification.FLAG_AUTO_CANCEL;
 			// 设置点击通知栏操作
 			Intent in = new Intent(context, MainActivity.class);// 点击跳转到指定页面

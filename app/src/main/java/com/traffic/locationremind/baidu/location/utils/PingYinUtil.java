@@ -1,4 +1,4 @@
-package com.traffic.locationremind.pinying;
+package com.traffic.locationremind.baidu.location.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

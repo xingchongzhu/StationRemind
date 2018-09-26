@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface LocationChangerListener {
     void loactionStation(BDLocation location);
+    void stopRemind();
 }

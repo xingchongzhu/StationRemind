@@ -1,6 +1,7 @@
 package com.traffic.locationremind.baidu.location.search.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.search.util.CommonAdapter;
 import com.traffic.locationremind.baidu.location.search.util.ViewHolder;
@@ -37,7 +38,18 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
 
     public void setData(List<Map.Entry<List<Integer>,List<StationInfo>>> data) {
         synchronized (object) {
+            Log.d("zxc", "-------------------------------------------");
             this.mData = data;
+            if(data != null) {
+                StringBuffer str = new StringBuffer();
+                for (Map.Entry<List<Integer>, List<StationInfo>> entry : data) {
+                    for (StationInfo stationInfo : entry.getValue()) {
+                        str.append("" + stationInfo.lineid + " " + stationInfo.getCname() + " ->");
+                    }
+                    Log.d("zxc", entry.getKey() + "---- " + str.toString());
+                }
+
+            }
             notifyDataSetChanged();
         }
     }

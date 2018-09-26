@@ -30,6 +30,7 @@ public class NotificationUtils extends ContextWrapper {
 
     public static void sendHint(Context context, boolean isArrive, String title, String content, String change) {
         Intent intent = new Intent(context, AlarmActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("arrive", isArrive);
         intent.putExtra("title", title);
         intent.putExtra("content", content);

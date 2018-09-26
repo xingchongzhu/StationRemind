@@ -214,6 +214,7 @@ public class PathSerachUtil {
         }
         //取出一条路线
         int n = 0;
+        //Log.d("zxc002","--------------------------------------------------------------------");
         for (List<Integer> list : transferLine) {
             StationInfo startStation = null, endStation = null;
             final int size = list.size();
@@ -249,10 +250,10 @@ public class PathSerachUtil {
             Stack<Node> pathstack = new Stack();
             tool.iteratorNode(root, pathstack);
             List<List<StationInfo>> all = new ArrayList<>();
+            //Log.d("zxc002","----------start--------------- list = "+list);
             for (List<StationInfo> entry : tool.pathMap) {
-                all.add(getLineStation(entry, mLineInfoList));
+                all.add(getLineStation(list,entry, mLineInfoList));
             }
-            StringBuffer buffer = new StringBuffer();
             if (all != null && all.size() > 0) {
                 List<StationInfo> min = all.get(0);
                 for (List<StationInfo> ll : all) {
@@ -260,30 +261,48 @@ public class PathSerachUtil {
                         min = ll;
                     }
                 }
-                /*int preLineid = 0;
-                int lineidIndex = 0;
-                for(int j = 0; j < min.size();j++){
-                    if(preLineid != 0 && min.get(j).lineid != preLineid){
-                        if(lineidIndex+1 <list.size() && list.get(lineidIndex+1) == min.get(j).lineid){
-                            min.get(j).lineid = list.get(lineidIndex+1);
-                        }else{
-                            min.get(j).lineid = preLineid;
-                        }
-                    }
-                    preLineid = min.get(j).lineid;
-                }*/
-
-                currentAllStationList.put(list, min);
+                Map<Integer,Integer> map = new HashMap<>();
+                for(StationInfo stationInfo:min){
+                    map.put(stationInfo.lineid,stationInfo.lineid);
+                }
+                Log.d("zxc002", "list " + list + "  " + map.size());
+                if(map.size() == list.size()) {
+                    currentAllStationList.put(list, min);
+                }
+                map.clear();
+                map = null;
+                all.clear();
+                all = null;
             }
         }
         return currentAllStationList;
     }
 
-    public static List<StationInfo> getLineStation(List list, Map<Integer, LineInfo> mLineInfoList) {
+    public static List<StationInfo> getLineStation(List<Integer> tranfers,List list, Map<Integer, LineInfo> mLineInfoList) {
         List<StationInfo> oneLineMap = new ArrayList<>();
         int size = list.size();
-        //Log.d("zxc","----------start---------------");
         StringBuffer buf = new StringBuffer();
+        //Log.d("zxc","----------start---------------");
+
+        if(tranfers.size() < (list.size() -1)) {
+            int i = 0;
+            int lastLineid = 0 ;
+            for (i = 0; i < tranfers.size(); i++) {
+                Node start = (Node) list.get(i + 1);
+                StationInfo stationInfo = (StationInfo) start.getNodeEntity();
+                stationInfo.lineid = tranfers.get(i);
+                lastLineid = stationInfo.lineid;
+            }
+            for(;i<list.size();i++){
+                Node start = (Node) list.get(i);
+                StationInfo stationInfo = (StationInfo) start.getNodeEntity();
+                stationInfo.lineid = lastLineid;
+            }
+        }else if(tranfers.size() > (list.size() -1)){
+
+
+        }
+
         for (int i = 0; i < size; i++) {
             if (i + 1 < size) {
                 Node start = (Node) list.get(i);
@@ -308,12 +327,12 @@ public class PathSerachUtil {
                 }
                 PathSerachUtil.findLinedStation(lineInfo, stationInfo, endInfo, oneLineMap);
             }
-            /*Node start = (Node)list.get(i);
-            StationInfo stationInfo = (StationInfo) start.getNodeEntity();
-            buf.append(stationInfo.lineid+"  "+stationInfo.getCname()+" ->");*/
+            //Node start = (Node)list.get(i);
+           // StationInfo stationInfo = (StationInfo) start.getNodeEntity();
+            //buf.append(stationInfo.lineid+"  "+stationInfo.getCname()+" ->");
         }
-        /*Log.d("zxc",buf.toString());
-        Log.d("zxc","----------end--------------");*/
+        //Log.d("zxc002",buf.toString());
+        //Log.d("zxc002","----------end--------------");
         return oneLineMap;
     }
 
@@ -455,7 +474,7 @@ public class PathSerachUtil {
         return nerstStationInfo;
     }
 
-    private static final int MINDIS = 800;
+    public static final int MINDIS = 800;
 
     public static StationInfo getNerastNextStation(BDLocation location, Map<Integer, LineInfo> mLineInfoList) {
         double min = Double.MAX_VALUE;
@@ -499,9 +518,9 @@ public class PathSerachUtil {
                 }
             }
         }
-        if (MINDIS < min) {
+        /*if (MINDIS < min) {
             return null;
-        }
+        }*/
         return nerstStationInfo;
     }
 

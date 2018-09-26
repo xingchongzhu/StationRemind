@@ -217,7 +217,8 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             autoCompleteData.clear();
             for (Map.Entry<String, StationInfo> entry : allstations.entrySet()) {
                 if (!TextUtils.isEmpty(text) && (entry.getKey().contains(text.trim())) ||
-                        entry.getValue().getPname().toLowerCase().contains(text.trim().toLowerCase())) {
+                        entry.getValue().getPname().toLowerCase().contains(text.trim().toLowerCase()) ||
+                        entry.getValue().getAname().toLowerCase().contains(text.trim().toLowerCase())) {
                     Log.d(TAG, "getAutoCompleteData serach result = " + entry.getValue().getCname());
                     autoCompleteData.add(entry.getValue());
                 }

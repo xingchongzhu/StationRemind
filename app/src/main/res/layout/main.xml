@@ -73,7 +73,7 @@
         android:textSize="16sp"
         android:visibility="gone" />
 
-    <com.traffic.locationremind.pinying.MyLetterListView
+    <com.traffic.locationremind.baidu.location.view.MyLetterListView
         android:id="@+id/MyLetterListView01"
         android:layout_width="25dip"
         android:layout_height="fill_parent"

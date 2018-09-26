@@ -1,8 +1,10 @@
 package com.traffic.locationremind.baidu.location.service;
 
 import android.app.*;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,6 +14,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.*;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import android.widget.Toast;
@@ -58,7 +61,7 @@ public class RemonderLocationService extends Service {
     private boolean isReminder = false;
     private boolean locationServiceHasStart = false;
     List<StationInfo> list, tempChangeStationList;
-    StationInfo nextStation, currentStation;
+    StationInfo nextStation, currentStation,preStation;
     private Map<Integer, String> lineDirection;
     private List<StationInfo> needChangeStationList;
 
@@ -93,9 +96,6 @@ public class RemonderLocationService extends Service {
         //startForeground(NotificationUtil.arriveNotificationId,mNotificationUtil.arrivedNotification(getApplicationContext(),NotificationUtil.arriveNotificationId));
         //创建PowerManager对象
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        //保持cpu一直运行，不管屏幕是否黑屏
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RemonderLocationService");
-        wakeLock.acquire();
     }
 
     public void setLocationChangerListener(LocationChangerListener locationChangerListener) {
@@ -133,9 +133,9 @@ public class RemonderLocationService extends Service {
                     return;
                 }
                 currentLocation = location;
-                if (isReminder && callback != null) {
+                /*if (isReminder && callback != null) {
                     callback.loactionStation(location);
-                }
+                }*/
                 if (mLocationChangerListener != null) {
                     mLocationChangerListener.loactionStation(location);
                 }
@@ -143,12 +143,12 @@ public class RemonderLocationService extends Service {
                 if (list != null && list.size() > 0) {
 
                     StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);//list.get(n);
-                    /*if (number > 2) {
+                    if (number > 2) {
                         number = 0;
                         if (n < list.size()) {
                             n++;
                         }
-                    }*/
+                    }
                     /*if(isBacrground){
 
                         locationService.getLocationClient().requestLocation();
@@ -170,27 +170,37 @@ public class RemonderLocationService extends Service {
 
                         Log.d(TAG, "loactionStation getCname = " + currentStation.getCname() + " isRemind = " + isReminder);
                         if (isReminder) {
-                            for (StationInfo stationInfo : tempChangeStationList) {
-                                if (list.get(list.size() - 1).getCname().equals(stationInfo.getCname()) &&
-                                        stationInfo.getCname().equals(currentStation.getCname())) {
-                                    Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
-                                    tempChangeStationList.remove(stationInfo);
-                                    isReminder = false;
-                                    cancleNotification();
-                                    NotificationUtils.sendHint(getApplicationContext(), true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station), "");
-                                    break;
-                                } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
-                                    tempChangeStationList.remove(stationInfo);
-                                    String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
-                                            DataManager.getInstance(getApplicationContext()).getLineInfoList().get(currentStation.lineid).linename;
-                                    NotificationUtils.sendHint(getApplicationContext(), false, getResources().getString(R.string.change), str,
-                                            lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
-                                    Log.d(TAG, "change stationInfo.getCname()" + stationInfo.getCname());
-                                    break;
+                            double longitude = CommonFuction.convertToDouble(currentStation.getLot(), 0);
+                            double latitude = CommonFuction.convertToDouble(currentStation.getLat(), 0);
+                            double dis = CommonFuction.getDistanceLat(longitude, latitude, location.getLongitude(), location.getLatitude());
+                            if(dis < PathSerachUtil.MINDIS) {
+                                for (StationInfo stationInfo : tempChangeStationList) {
+                                    if (list.get(list.size() - 1).getCname().equals(stationInfo.getCname()) &&
+                                            stationInfo.getCname().equals(currentStation.getCname())) {
+                                        Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
+                                        tempChangeStationList.remove(stationInfo);
+                                        isReminder = false;
+                                        cancleNotification();
+                                        NotificationUtils.sendHint(getApplicationContext(), true, getResources().getString(R.string.arrive), getResources().getString(R.string.hint_arrive_end_station), "");
+                                        if (mLocationChangerListener != null) {
+                                            mLocationChangerListener.stopRemind();
+                                        }
+                                        break;
+                                    } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
+                                        tempChangeStationList.remove(stationInfo);
+                                        String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
+                                                DataManager.getInstance(getApplicationContext()).getLineInfoList().get(currentStation.lineid).linename;
+                                        NotificationUtils.sendHint(getApplicationContext(), false, getResources().getString(R.string.change), str,
+                                                lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
+                                        Log.d(TAG, "change stationInfo.getCname()" + stationInfo.getCname());
+                                        break;
+                                    }
                                 }
                             }
-                            updataNotification(NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation));
+                            if(preStation != currentStation)
+                                updataNotification(NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation));
                         }
+                        preStation = currentStation;
                     }
 
                 }
@@ -215,14 +225,18 @@ public class RemonderLocationService extends Service {
     }
 
     public void setNotification(NotificationObject mNotificationObject) {
+        //保持cpu一直运行，不管屏幕是否黑屏
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RemonderLocationService");
+        wakeLock.acquire();
         Notification mNotification = mNotificationUtil.showNotification(getApplicationContext(),
                 NotificationUtil.notificationId, mNotificationObject);
-        startForeground(NotificationUtil.notificationId,mNotification);
-        //locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId,mNotificationUtil.showNotification(getApplicationContext(),
-        //        NotificationUtil.notificationId, mNotificationObject));
+        //startForeground(NotificationUtil.notificationId,mNotification);
+        locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId,mNotification);
     }
 
     public void updataNotification(NotificationObject mNotificationObject) {
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "RemonderLocationService");
+        wakeLock.acquire();
         locationService.getLocationClient().enableLocInForeground(NotificationUtil.notificationId,
                mNotificationUtil.updateProgress(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject));
         //mNotificationUtil.updateProgress(getApplicationContext(), NotificationUtil.notificationId, mNotificationObject);
@@ -242,7 +256,7 @@ public class RemonderLocationService extends Service {
             tempChangeStationList = new ArrayList<>(needChangeStationList);
         }
         if (isReminder) {
-            NotificationObject mNotificationObject = NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation);
+            //NotificationObject mNotificationObject = NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation);
             //setNotification(mNotificationObject);
         } else {
             cancleNotification();
@@ -255,15 +269,26 @@ public class RemonderLocationService extends Service {
 
     public void setCancleReminder() {
         isReminder = false;
+        if(wakeLock != null) {
+            wakeLock.release();
+            wakeLock = null;
+        }
         stopForeground(true);
         if (mNotificationUtil != null)
             mNotificationUtil.cancel(NotificationUtil.notificationId);
+        locationService.getLocationClient().disableLocInForeground(true);// 关闭前台定位，同时移除通知栏
     }
 
     public void cancleNotification() {
         stopForeground(true);
-        if (mNotificationUtil != null)
+        if(wakeLock != null) {
+            wakeLock.release();
+            wakeLock = null;
+        }
+        if (mNotificationUtil != null) {
             mNotificationUtil.cancel(NotificationUtil.notificationId);
+        }
+        locationService.getLocationClient().disableLocInForeground(true);// 关闭前台定位，同时移除通知栏
     }
 
     /**
@@ -293,18 +318,27 @@ public class RemonderLocationService extends Service {
             locationService.stop(); // 停止定位服务
         }
         setCancleReminder();
-
-        wakeLock.release();
+        if(wakeLock != null)
+            wakeLock.release();
         Log.d(TAG, "onDestroy ");
     }
 
     public void setStationInfoList(List<StationInfo> list, List<StationInfo> needChangeStationList, Map<Integer, String> lineDirection) {
+        if(this.list != null)
+            this.list.clear();
         this.list = list;
+        if(tempChangeStationList != null)
+            tempChangeStationList.clear();
         tempChangeStationList = new ArrayList<>(needChangeStationList);
+        if(tempChangeStationList.size() > 1) {
+            currentStation = tempChangeStationList.get(0);
+            nextStation = tempChangeStationList.get(1);
+        }
         this.lineDirection = lineDirection;
     }
 
     public void setDirection(Map<Integer, String> lineDirection) {
         this.lineDirection = lineDirection;
     }
+
 }

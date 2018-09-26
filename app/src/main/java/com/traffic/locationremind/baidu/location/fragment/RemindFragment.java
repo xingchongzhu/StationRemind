@@ -1,12 +1,17 @@
 package com.traffic.locationremind.baidu.location.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -42,6 +47,7 @@ import java.util.Map;
 public class RemindFragment extends Fragment implements LocationChangerListener, View.OnClickListener, ActivityListener {
 
     private String TAG = "RemindFragment";
+    public static final String STOP_LOCATION_ACTION = "com.traffic.location.remind.action.stop.remind";
     private LinearLayout linearlayout;
     private HorizontalScrollView horizontalScrollView;
     private List<StationInfo> list = null;
@@ -89,6 +95,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 parent.removeView(rootView);
             }
         } else {
+            registerLoginBroadcast();
             rootView = inflater.inflate(R.layout.remind_layout, container, false);
             initView(rootView);// 控件初始化
         }
@@ -107,7 +114,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         }
         Log.d("zxc",TAG+" "+str.toString());*/
         createLine(list);
-        if(getMainActivity() != null) {
+        if (getMainActivity() != null) {
             getMainActivity().setRemindState(true);
         }
     }
@@ -118,7 +125,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     public void initdata(List<StationInfo> list) {
         isRemind = false;
-        if(getMainActivity() != null) {
+        if (getMainActivity() != null) {
             getMainActivity().setRemindState(false);
         }
         for (StationInfo stationInfo : list) {
@@ -127,9 +134,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         createLine(list);
     }
 
-    private MainActivity getMainActivity(){
-        return (MainActivity)getActivity();
+    private MainActivity getMainActivity() {
+        return (MainActivity) getActivity();
     }
+
     public void upadaData() {
         list = null;
         if (linearlayout != null)
@@ -139,7 +147,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         if (mScrollFavoriteManager != null)
             mScrollFavoriteManager.closeScrollView();
         cancleRemind();
-        if(getMainActivity() != null) {
+        if (getMainActivity() != null) {
             getMainActivity().setRemindState(false);
         }
 
@@ -240,8 +248,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 tempChangeStationList = new ArrayList<>(needChangeStationList);
             }
         });
-        if(getMainActivity() != null) {
-            getMainActivity().setRemindList(list,needChangeStationList,lineDirection);
+        if (getMainActivity() != null) {
+            getMainActivity().setRemindList(list, needChangeStationList, lineDirection);
         }
     }
 
@@ -344,7 +352,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             case R.id.cancle_remind_btn:
                 if (isRemind) {
                     isRemind = false;
-                    if(getMainActivity() != null) {
+                    if (getMainActivity() != null) {
                         getMainActivity().setRemindState(false);
                     }
                     if (cancle_remind_btn != null) {
@@ -355,7 +363,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 } else {
                     tempChangeStationList = new ArrayList<>(needChangeStationList);
                     isRemind = true;
-                    if(getMainActivity() != null) {
+                    if (getMainActivity() != null) {
                         getMainActivity().setRemindState(true);
                     }
                     cancle_remind_btn.setTextColor(getResources().getColor(R.color.blue));
@@ -412,10 +420,23 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         return mBDLocation;
     }
 
+    @Override
+    public void stopRemind(){
+        isRemind = false;
+        if (getMainActivity() != null) {
+            getMainActivity().setRemindState(false);
+        }
+        if (cancle_remind_btn != null) {
+            cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
+            cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
+            setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+        }
+        getActivity().finish();
+    }
 
     @Override
     public void loactionStation(BDLocation location) {
-        if(getMainActivity() != null) {
+        if (getMainActivity() != null) {
             MainActivity activity = getMainActivity();
         }
         mBDLocation = location;
@@ -451,7 +472,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     String direction = lineDirection.get(lineNodeView.getStationInfo().lineid) + getResources().getString(R.string.direction);
                     current_info_text.setText(surplusNum + "   " + currenStr + "   " + line + "   " + direction);
                     currentStation = lineNodeView.getStationInfo();
-                    if(currentStation != null && nextStation != null && currentStation.getCname().equals(nextStation.getCname())){
+                    if (currentStation != null && nextStation != null && currentStation.getCname().equals(nextStation.getCname())) {
                         horizontalScrollView.scrollTo(lineNodeWidth * n, horizontalScrollView.getScrollY());
                     }
                     if (n + 1 < list.size() - 1) {
@@ -474,7 +495,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                                 String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
                                         DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid).linename;
                                 //sendHint(false, getResources().getString(R.string.change), str,
-                                 //       lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
+                                //       lineDirection.get(stationInfo.lineid) + getResources().getString(R.string.direction));
                                 Log.d(TAG, "change stationInfo.getCname()" + stationInfo.getCname());
                                 break;
                             }
@@ -497,6 +518,12 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     public void onPause() {
         super.onPause();
         this.isPause = true;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unRegisterLoginBroadcast();
     }
 
     public void cancleRemind() {
@@ -529,30 +556,25 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         return true;
     }
 
-    public void cancleNotification() {
-        if (mNotificationUtil != null)
-            mNotificationUtil.cancel(NotificationUtil.notificationId);
-        if (cancle_remind_btn != null) {
-            cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
-            cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
-            setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+    //广播接收器
+    private StopLocaionBroadcast mReceiver = new StopLocaionBroadcast();
+
+    //注册广播方法
+    private void registerLoginBroadcast(){
+        IntentFilter intentFilter = new IntentFilter(STOP_LOCATION_ACTION);
+        LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(mReceiver,intentFilter);
+    }
+
+    //取消注册
+    private void unRegisterLoginBroadcast(){
+        LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(mReceiver);
+    }
+
+    //1. 自定义广播接收者
+    public class StopLocaionBroadcast extends BroadcastReceiver {
+        public void onReceive(Context context, Intent intent) {
+            stopRemind();
         }
-    }
-
-    public void setNotification(NotificationObject mNotificationObject) {
-        mNotificationUtil.showNotification(getActivity(), NotificationUtil.notificationId, mNotificationObject);
-    }
-
-    public void updataNotification(NotificationObject mNotificationObject) {
-        mNotificationUtil.updateProgress(getActivity(), NotificationUtil.notificationId, mNotificationObject);
-    }
-
-    public void arriveNotification() {
-        mNotificationUtil.arrivedNotification(getActivity(), NotificationUtil.arriveNotificationId);
-    }
-
-    public void changeNotification(String str) {
-        mNotificationUtil.changeNotification(getActivity(), NotificationUtil.changeNotificationId, str);
     }
 
 }

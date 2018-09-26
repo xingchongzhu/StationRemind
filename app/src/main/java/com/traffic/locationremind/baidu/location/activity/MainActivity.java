@@ -1,19 +1,12 @@
 package com.traffic.locationremind.baidu.location.activity;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.*;
@@ -39,7 +32,6 @@ import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationC
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
-import com.traffic.locationremind.baidu.location.utils.NotificationUtils;
 import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.RemindSetViewManager;
@@ -48,7 +40,6 @@ import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 import com.traffic.locationremind.manager.SearchManager;
-import com.traffic.locationremind.pinying.LocationCityActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -347,6 +338,13 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                             locationChangerListener.loactionStation(location);
                         }
                     }
+
+                    @Override
+                    public void stopRemind(){
+                        for (LocationChangerListener locationChangerListener : locationChangerListenerList) {
+                            locationChangerListener.stopRemind();
+                        }
+                    }
                 });
             }
         }
@@ -443,7 +441,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             return true;
         }
         if (getRemindState()) {
-            useForground();
+            //useForground();
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);

@@ -26,6 +26,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.graphics.ColorUtils;
 import android.support.v4.view.animation.PathInterpolatorCompat;
 import android.util.Log;
@@ -34,8 +35,10 @@ import android.view.accessibility.AccessibilityManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.notification.AnimatorUtils;
 import com.traffic.locationremind.baidu.location.activity.BaseActivity;
+import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
 import com.traffic.locationremind.baidu.location.view.CircleView;
 import com.traffic.locationremind.baidu.location.utils.TimerKlaxon;
 
@@ -425,7 +428,17 @@ public class AlarmActivity extends BaseActivity
                 getString(R.string.alarm_alert_off_text) /* accessibilityText */,
                 Color.WHITE, mCurrentHourColor).start();
         TimerKlaxon.stop(this);
-        setResult(MainActivity.SHUTDOWNACTIVITY);
+        //setResult(MainActivity.SHUTDOWNACTIVITY);
+        sendBroadcast();
+    }
+
+    /**
+     * 发送我们的局部广播
+     */
+    private void sendBroadcast(){
+        LocalBroadcastManager.getInstance(this).sendBroadcast(
+                new Intent(RemindFragment.STOP_LOCATION_ACTION)
+        );
     }
 
 

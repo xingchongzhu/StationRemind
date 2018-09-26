@@ -1,6 +1,5 @@
-package com.traffic.locationremind.pinying;
+package com.traffic.locationremind.baidu.location.activity;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -35,16 +33,14 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.baidu.location.*;
 import com.traffic.location.remind.R;
-import com.traffic.locationremind.baidu.location.activity.AppCommonActivity;
-import com.traffic.locationremind.baidu.location.activity.LocationApplication;
-import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
+import com.traffic.locationremind.baidu.location.view.MyLetterListView;
+import com.traffic.locationremind.baidu.location.utils.PingYinUtil;
 
 public class LocationCityActivity extends AppCommonActivity implements OnScrollListener {
     private BaseAdapter adapter;

@@ -1,4 +1,4 @@
-package com.traffic.locationremind.pinying;
+package com.traffic.locationremind.baidu.location.view;
 
 import android.content.Context;
 import android.graphics.Canvas;

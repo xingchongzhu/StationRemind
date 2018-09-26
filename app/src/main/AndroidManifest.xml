@@ -44,7 +44,7 @@
                   android:screenOrientation="portrait">
 
         </activity>
-        <activity android:name="com.traffic.locationremind.pinying.LocationCityActivity"
+        <activity android:name="com.traffic.locationremind.baidu.location.activity.LocationCityActivity"
                   android:launchMode="singleTask"
                   android:windowSoftInputMode="adjustPan"
                   android:screenOrientation="portrait">
