@@ -15,7 +15,7 @@ import java.util.Stack;
  * @author lei
  */
 public class IteratorNodeTool {
-    String TAG = "zxc";
+    String TAG = "IteratorNodeTool";
     public List<List<StationInfo>> pathMap = new ArrayList();//记录所有从根节点到叶子结点的路径
 
     private void print(List lst) {

@@ -70,6 +70,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     private TextView cancle_remind_btn;
 
     private RelativeLayout remind_root;
+    private LineObject lineObject;
 
     private NotificationUtil mNotificationUtil;
     private StationInfo currentStation, nextStation;
@@ -84,6 +85,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     //起点，当前站，换乘点，终点
     private List<StationInfo> needChangeStationList = new ArrayList<>();
     private List<StationInfo> tempChangeStationList = new ArrayList<>();
+    private List<StationInfo>  transferList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -102,17 +104,14 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         return rootView;
     }
 
-    public void setData(List<StationInfo> list) {
+    public void setData(LineObject lineObject) {
+        this.lineObject = lineObject;
         isRemind = true;
-
+        list = lineObject.stationList;
+        transferList = CommonFuction.getTransFerList(lineObject);
         for (StationInfo stationInfo : list) {
             stationInfo.colorId = mDataManager.getLineInfoList().get(stationInfo.lineid).colorid;
         }
-        /*StringBuffer str = new StringBuffer();
-        for (StationInfo stationInfo : list) {
-            str.append(""+stationInfo.lineid+" "+stationInfo.getCname()+" ->");
-        }
-        Log.d("zxc",TAG+" "+str.toString());*/
         createLine(list);
         if (getMainActivity() != null) {
             getMainActivity().setRemindState(true);
@@ -123,8 +122,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         return mDataManager;
     }
 
-    public void initdata(List<StationInfo> list) {
+    public void initdata(LineObject lineObject) {
+        this.lineObject = lineObject;
         isRemind = false;
+        list = lineObject.stationList;
+        transferList = CommonFuction.getTransFerList(lineObject);
         if (getMainActivity() != null) {
             getMainActivity().setRemindState(false);
         }
@@ -173,7 +175,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             return;
         }
 
-        this.list = list;
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -182,6 +183,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 linearlayout.removeAllViews();
                 Map<Integer, LineInfo> lineInfoMap = new HashMap<>();
                 StationInfo preStationInfo = null;
+                StringBuffer str = new StringBuffer();
+                for(StationInfo stationInfo:transferList){
+                    str.append(stationInfo.getCname()+" ->");
+                }
+                Log.d("","createLine "+str.toString());
                 for (int i = 0; i < list.size(); i++) {
                     StationInfo stationInfo = list.get(i);
                     //创建textview
@@ -201,30 +207,26 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     } else {
                         nextStation = list.get(1);
                     }
-                    //换乘点
-                    if (preStationInfo != null && preStationInfo.lineid != stationInfo.lineid) {
+
+                    if(CommonFuction.containTransfer(transferList,stationInfo)){
                         needChangeStationList.add(stationInfo);
-                        int size = (int) getResources().getDimension(R.dimen.transfer_bitmap_size);
-                        Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_route_map_pin_dottransfer), size, size);
-                        textView.setTransFerBitmap(bitmap);
-                    } else if (preStationInfo != null && preStationInfo.lineid == stationInfo.lineid) {
+                        if(i != list.size() - 1) {
+                            int size = (int) getResources().getDimension(R.dimen.transfer_bitmap_size);
+                            Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_route_map_pin_dottransfer), size, size);
+                            textView.setTransFerBitmap(bitmap);
+                        }
+                    }else if (preStationInfo != null){
                         if (preStationInfo.pm < stationInfo.pm) {
                             lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
                         } else {
                             lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getForwad());
                         }
                     }
-                    //终点
-                    if (i == list.size() - 1) {
-                        int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
-                        Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_main_map_pin_end), size, size);
-                        textView.setStartBitMap(bitmap);
-                        needChangeStationList.add(stationInfo);
-                    }
-                    preStationInfo = stationInfo;
                     int lineid = list.get(i).lineid;
                     lineInfoMap.put(lineid, mDataManager.getLineInfoList().get(lineid));
+                    preStationInfo = stationInfo;
                 }
+
                 String start = list.get(0).getCname() + " -> " + list.get(list.size() - 1).getCname();
                 start_and_end.setText(start);
 
@@ -254,7 +256,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     }
 
     public void updateColloctionView() {
-        String lineStr = CommonFuction.convertStationToString(list);
+        String lineStr = CommonFuction.convertStationToString(lineObject);
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity, CommonFuction.FAVOURITE);
         if (allFavoriteLine.contains(lineStr)) {
             collection_btn.setTextColor(getResources().getColor(R.color.blue));
@@ -316,7 +318,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor_select));
             List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(), mDataManager);
             if (lineObjects.size() > 0) {
-                initdata(lineObjects.get(0).stationList);
+                initdata(lineObjects.get(0));
             }
         }
     }
@@ -375,7 +377,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     }
 
     public void saveFavourite() {
-        String lineStr = CommonFuction.convertStationToString(list);
+        String lineStr = CommonFuction.convertStationToString(lineObject);
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity, CommonFuction.FAVOURITE);
         Log.d(TAG, "lineStr = " + lineStr + " allFavoriteLine = " + allFavoriteLine);
         if (allFavoriteLine.contains(lineStr)) {

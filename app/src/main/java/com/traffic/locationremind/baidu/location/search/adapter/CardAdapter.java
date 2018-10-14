@@ -3,6 +3,7 @@ package com.traffic.locationremind.baidu.location.search.adapter;
 import android.content.Context;
 import android.util.Log;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.util.CommonAdapter;
 import com.traffic.locationremind.baidu.location.search.util.ViewHolder;
 import com.traffic.locationremind.common.util.CommonFuction;
@@ -16,7 +17,7 @@ import java.util.Map;
  * Created by yetwish on 2015-05-11
  */
 
-public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<StationInfo>>> {
+public class CardAdapter extends CommonAdapter<LineObject> {
 
 
     //String lineTail = "";
@@ -26,7 +27,7 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
     String endstation = "";
     DataManager dataManager;
     Object object = new Object();
-    public CardAdapter(Context context, List<Map.Entry<List<Integer>,List<StationInfo>>> data, int layoutId) {
+    public CardAdapter(Context context, List<LineObject> data, int layoutId) {
         super(context, data, layoutId);
         dataManager = DataManager.getInstance(context);
         //lineTail = context.getResources().getString(R.string.line_tail);
@@ -36,17 +37,17 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
         endstation =context.getResources().getString(R.string.end_station);
     }
 
-    public void setData(List<Map.Entry<List<Integer>,List<StationInfo>>> data) {
+    public void setData(List<LineObject> data) {
         synchronized (object) {
-            Log.d("zxc", "-------------------------------------------");
+            //Log.d("zxc", "-------------------------------------------");
             this.mData = data;
             if(data != null) {
                 StringBuffer str = new StringBuffer();
-                for (Map.Entry<List<Integer>, List<StationInfo>> entry : data) {
-                    for (StationInfo stationInfo : entry.getValue()) {
+                for (LineObject entry : data) {
+                    for (StationInfo stationInfo : entry.stationList) {
                         str.append("" + stationInfo.lineid + " " + stationInfo.getCname() + " ->");
                     }
-                    Log.d("zxc", entry.getKey() + "---- " + str.toString());
+                    //Log.d("zxc", entry.getKey() + "---- " + str.toString());
                 }
 
             }
@@ -55,7 +56,7 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
     }
 
     @Override
-    public Map.Entry<List<Integer>,List<StationInfo>> getItem(int i) {
+    public LineObject getItem(int i) {
         return super.getItem(i);
     }
 
@@ -65,12 +66,12 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
             if (mData.size() <= 0) {
                 return;
             }
-            Map.Entry<List<Integer>, List<StationInfo>> data = mData.get(position);
+            LineObject data = mData.get(position);
             StringBuffer change = new StringBuffer();
             int n = 0;
-            for (Integer i : data.getKey()) {
+            for (Integer i : data.lineidList) {
                 if(dataManager.getLineInfoList().get(i) != null) {
-                    if (n < data.getKey().size() - 1) {
+                    if (n < data.lineidList.size() - 1) {
                         change.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0] + "->");
                     } else {
                         change.append(CommonFuction.getLineNo(dataManager.getLineInfoList().get(i).linename)[0]);
@@ -81,14 +82,14 @@ public class CardAdapter extends CommonAdapter<Map.Entry<List<Integer>,List<Stat
 
             String str = "";
 
-            if(data.getKey().size() >1 ) {
-                holder.setText(R.id.change_numner, String.format(lineChange, data.getKey().size() - 1 + ""));
+            if(data.lineidList.size() >1 ) {
+                holder.setText(R.id.change_numner, String.format(lineChange, data.lineidList.size() - 1 + ""));
             }
-            if(data.getValue().size() > 0) {
-                str = startStation + data.getValue().get(0).getCname() + "  " + endstation + data.getValue().get(data.getValue().size() - 1).getCname();
+            if(data.stationList.size() > 0) {
+                str = startStation + data.stationList.get(0).getCname() + "  " + endstation + data.stationList.get(data.stationList.size() - 1).getCname();
             }
             holder.setText(R.id.change_lineid, change.toString())
-                    .setText(R.id.station_number, String.format(staionsCNumber, data.getValue().size() + "") + "")
+                    .setText(R.id.station_number, String.format(staionsCNumber, data.stationList.size() + "") + "")
                     .setText(R.id.station_start_end, str);
         }
     }

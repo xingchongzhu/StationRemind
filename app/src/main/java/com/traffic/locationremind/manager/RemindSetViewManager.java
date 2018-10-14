@@ -44,6 +44,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
     private Activity activity;
     private DataManager dataManager;
     private ViewGroup serachLayoutRoot;
+    private LineObject lastLines;
     public RemindSetViewManager(){
 
     }
@@ -80,7 +81,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
             @Override
             public void onClick(View v) {
                 if(mGoToFragmentListener != null){
-                    mGoToFragmentListener.openRemindFragment(mSelectlineMap.getDataList());
+                    mGoToFragmentListener.openRemindFragment(lastLines);
                 }
             }
         });
@@ -144,6 +145,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
     @Override
     public void openSetWindow(LineObject lastLines){
         if(lastLines != null){
+            this.lastLines = lastLines;
             //mRemindLineAdapter.setData(lastLines);
             start.setText(lastLines.stationList.get(0).getCname());
             end.setText(lastLines.stationList.get(lastLines.stationList.size()-1).getCname());
@@ -158,9 +160,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
             }
             changeNumber.setText(str.toString());
             set_remind_layout.setVisibility(View.VISIBLE);
-            mSelectlineMap.setStationList(lastLines.stationList);
+            mSelectlineMap.setStationList(lastLines);
             mSelectlineMap.setLineInfoList(dataManager.getLineInfoList());
-            String lineStr = CommonFuction.convertStationToString(lastLines.stationList);
+            String lineStr = CommonFuction.convertStationToString(lastLines);
             String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
             if(allFavoriteLine.contains(lineStr)){
                 setCompoundDrawables(activity.getResources().getDrawable(R.drawable.saveas_fav_btn));

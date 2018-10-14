@@ -21,6 +21,7 @@ import android.widget.*;
 
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.object.MarkObject.MarkClickListener;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
@@ -80,7 +81,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
 
     private List<StationInfo> mStationInfoList ;//地图站台信息
     StationInfo startStationInfo, currentStationInfo, endStationInfo,nerstStationInfo;
-    List<Map.Entry<List<Integer>,List<StationInfo>>> lastLinesLast;//最终查询得到路线
+    List<LineObject> lastLinesLast;//最终查询得到路线
     private Map<Integer, Map<Integer,Integer>> allLineCane = new HashMap<Integer, Map<Integer,Integer>>();//用于初始化路线矩阵
     private int maxLineid = 0;
 
@@ -719,7 +720,8 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         if(start != null || end != null){
             //找出所有路径
             Log.d(TAG,"getReminderLines find all line = "+transferLine.size()+" start = "+start.getCname()+" end = "+end.getCname());
-            lastLinesLast = PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mLineInfoList,transferLine,start,end));//查询最终线路
+            //lastLinesLast = PathSerachUtil.getLastRecomendLines(PathSerachUtil.getAllLineStation(mLineInfoList,transferLine,start,end));//查询最终线路
+            lastLinesLast = PathSerachUtil.getAllLineStation(mLineInfoList,transferLine,start,end);//查询最终线路
             Message msg = new Message();
             msg.what = STARTLOCATION;
             mHandler.sendMessage(msg);

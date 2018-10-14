@@ -162,7 +162,7 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         endInput.setText(text);
     }
 
-    public void setSelectStation(int position) {
+    public void  setSelectStation(int position) {
         String text = ((StationInfo) lvTips.getAdapter().getItem(position)).getCname();
         isComplete = true;
         if (startInput.hasFocus()) {
@@ -178,14 +178,17 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         }
 
         hideSoftInput();
-        if (mListener != null) {
-            if(CommonFuction.saveNewKeyToRecentSerach(getContext(), text)){
-                mListener.notificationRecentSerachChange(getContext());
-            }
-        }
+        /*if (mListener != null) {
+            saveRecentSearch(text);
+        }*/
         notifyStartSearching(null);
     }
 
+    public void saveRecentSearch(String text){
+        if(CommonFuction.saveNewKeyToRecentSerach(getContext(), text)){
+            mListener.notificationRecentSerachChange(getContext());
+        }
+    }
     public void setRecentSelectStation(String text) {
         isComplete = true;
         if (startInput.hasFocus()) {

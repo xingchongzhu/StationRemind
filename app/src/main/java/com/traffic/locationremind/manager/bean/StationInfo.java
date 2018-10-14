@@ -2,6 +2,11 @@ package com.traffic.locationremind.manager.bean;
 
 
 import android.text.TextUtils;
+import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.GrfAllEdge;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StationInfo {
 
@@ -138,7 +143,44 @@ public class StationInfo {
         return transfer;
     }
 
+    public boolean containLineid(int lineid){
+        String lines[] = transfer.split(CommonFuction.TRANSFER_SPLIT);
+        if(this.lineid == lineid){
+            return true;
+        }
+        for(int i = 0;i < lines.length;i++){
+            int startid= CommonFuction.convertToInt(lines[i],-1);
+            if(startid == lineid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public  List<Integer> getTransferLineid(){
+        String lines[] = transfer.split(CommonFuction.TRANSFER_SPLIT);
+        List<Integer> list = new ArrayList<>();
+        for(int i = 0;i < lines.length;i++){
+            int startid= CommonFuction.convertToInt(lines[i],-1);
+            if(startid >= 0) {
+                list.add(startid);
+            }
+        }
+        if(list.size() <= 0){
+            list.add(lineid);
+        }
+        return list;
+    }
+
     public boolean canTransfer(){
+        boolean result = false;
+        String lines[] = transfer.split(CommonFuction.TRANSFER_SPLIT);
+        for(int i = 0;i < lines.length;i++){
+            int startid= CommonFuction.convertToInt(lines[i],-1);
+            if(startid != -1 || startid != 0){
+                result = true;
+            }
+        }
         if(TextUtils.isEmpty(transfer) || transfer.equals("0")){
             return false;
         }

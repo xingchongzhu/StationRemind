@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.view.SelectlineMap;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
@@ -67,7 +68,7 @@ public class RemindLineAdapter extends BaseAdapter {
 
         }
 
-        viewholder.textView.setStationList(data.getValue());
+        viewholder.textView.setStationList(new LineObject(data.getValue(),data.getKey()));
 
         return convertView;
     }

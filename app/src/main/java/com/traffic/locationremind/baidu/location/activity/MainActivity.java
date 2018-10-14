@@ -27,6 +27,7 @@ import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationController;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
@@ -230,19 +231,19 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
     @Override
-    public void openRemindFragment(final List<StationInfo> list) {
-        List<Integer> tempList = new ArrayList<>();
-        StringBuffer str = new StringBuffer();
-        for (StationInfo stationInfo : list) {
+    public void openRemindFragment(final LineObject lineObject) {
+        //List<Integer> tempList = new ArrayList<>();
+        //StringBuffer str = new StringBuffer();
+        /*for (StationInfo stationInfo : lineObject.stationList) {
             tempList.add(stationInfo.lineid);
-        }
+        }*/
         mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
-        str.delete(0,str.length());
-        for (int i = 0 ;i < tempList.size();i++) {
+        //str.delete(0,str.length());
+        /*for (int i = 0 ;i < tempList.size();i++) {
             list.get(i).lineid = tempList.get(i);
-        }
-        remindFragment.setData(list);
+        }*/
+        remindFragment.setData(lineObject);
         hideSerachView();
         hideSetRemindView();
     }

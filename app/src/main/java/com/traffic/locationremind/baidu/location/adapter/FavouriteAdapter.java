@@ -86,7 +86,7 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
                 .setOnClickListener(R.id.delete, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String lineStr = CommonFuction.convertStationToString(mData.get(position).stationList);
+                        String lineStr = CommonFuction.convertStationToString(mData.get(position));
                         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(fragment.getActivity(),CommonFuction.FAVOURITE);
                         Log.d(TAG,"lineStr = "+lineStr+" allFavoriteLine = "+allFavoriteLine);
                         if(allFavoriteLine.contains(lineStr)){
@@ -108,7 +108,7 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
                 .setOnClickListener(R.id.set_remind, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        fragment.setData(mData.get(position).stationList);
+                        fragment.setData(new LineObject(mData.get(position).stationList,mData.get(position).lineidList));
                     }
                 });
     }

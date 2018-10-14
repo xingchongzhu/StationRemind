@@ -48,7 +48,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
     CardAdapter mCardAdapter = null;
     int searchTaskNum = 0;
     int finishTaskNum = 0;
-    List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<>();
+    List<LineObject> lastLinesLast = new ArrayList<>();
 
     private MyHandler myHandler;
     private List<String> recentList = new ArrayList<>();
@@ -119,7 +119,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 searchView.setSelectStation(position);
             }
         });
-        mCardAdapter = new CardAdapter(activity, new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>(), R.layout.serach_result_item_layout);
+        mCardAdapter = new CardAdapter(activity, new ArrayList<LineObject>(), R.layout.serach_result_item_layout);
         serachResults.setAdapter(mCardAdapter);
         getRecendData(context);
         mGridViewAdapter = new GridViewAdapter(context, recentList);
@@ -135,15 +135,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 if (mRemindSetViewListener != null) {
-                    LineObject lineObject = new LineObject();
-                    lineObject.lineidList = mCardAdapter.getItem(position).getKey();
-                    lineObject.stationList = mCardAdapter.getItem(position).getValue();
-                    StringBuffer str = new StringBuffer();
-                    for (StationInfo stationInfo : lineObject.stationList) {
-                        str.append(""+stationInfo.lineid+" "+stationInfo.getCname()+" ->");
-                    }
-                    Log.d("zxc",TAG+" "+str.toString());
-                    mRemindSetViewListener.openSetWindow(lineObject);
+                    mRemindSetViewListener.openSetWindow(mCardAdapter.getItem(position));
                 }
             }
         });
@@ -205,16 +197,18 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
      * 获取自动补全data 和adapter
      */
     private void getAutoCompleteData(Context context, String text) {
-        Log.d(TAG, "getAutoCompleteData text = "+text);
+        //Log.d(TAG, "getAutoCompleteData text = "+text);
         if (TextUtils.isEmpty(text)){
             return;
         }
         if (autoCompleteData == null) {
             //初始化
             autoCompleteData = new ArrayList<>();
-        } else {
+        }
+        if(true){
             // 根据text 获取auto data
             autoCompleteData.clear();
+            Log.d(TAG, "getAutoCompleteData text = "+text);
             for (Map.Entry<String, StationInfo> entry : allstations.entrySet()) {
                 if (!TextUtils.isEmpty(text) && (entry.getKey().contains(text.trim())) ||
                         entry.getValue().getPname().toLowerCase().contains(text.trim().toLowerCase()) ||
@@ -301,6 +295,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
                 mSearchLoadingDialog.setContentView(R.layout.search_loading);
             }
+            searchView.saveRecentSearch(end);
             mSearchLoadingDialog.show();
             lastLinesLast.clear();
             allLines.clear();
@@ -340,7 +335,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
     }
 
     @Override
-    public void cancleDialog(List<Map.Entry<List<Integer>, List<StationInfo>>> lines) {
+    public void cancleDialog(List<LineObject> lines) {
         if (mSearchLoadingDialog != null) {
             mSearchLoadingDialog.cancel();
         }
@@ -355,7 +350,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
     }
 
     @Override
-    public void updateResult(List<Map.Entry<List<Integer>, List<StationInfo>>> lines) {
+    public void updateResult(List<LineObject> lines) {
         if (mSearchLoadingDialog != null) {
             mSearchLoadingDialog.cancel();
         }

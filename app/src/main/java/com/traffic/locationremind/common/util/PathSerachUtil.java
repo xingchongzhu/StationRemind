@@ -5,6 +5,7 @@ import com.baidu.location.BDLocation;
 import com.traffic.locationremind.baidu.location.item.IteratorNodeTool;
 import com.traffic.locationremind.baidu.location.item.Node;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.baidu.location.utils.SearchPath;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -74,12 +75,12 @@ public class PathSerachUtil {
         }
     }
 
-    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getRecomendLines(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+    public static List<LineObject> getRecomendLines(List<LineObject> lastLinesLast){
         if(lastLinesLast.size() <= 0){
             return lastLinesLast;
         }
         PathSerachUtil.sortStationNum(lastLinesLast);
-        Map.Entry<List<Integer>, List<StationInfo>> first = lastLinesLast.get(0);
+        LineObject first = lastLinesLast.get(0);
         //去除相同
         //换乘次数排序
         PathSerachUtil.sortChangeTime(lastLinesLast);
@@ -90,19 +91,19 @@ public class PathSerachUtil {
             return lastLinesLast;
         }
         //去除相同
-        List<Map.Entry<List<Integer>, List<StationInfo>>> add = new ArrayList<>();
+        List<LineObject> add = new ArrayList<>();
         Map<Integer,Integer> array = new HashMap();
-        for(Map.Entry<List<Integer>, List<StationInfo>>entry: lastLinesLast){
+        for(LineObject entry: lastLinesLast){
             boolean isEqual = false;
-            for(Map.Entry<List<Integer>, List<StationInfo>>listEntry: add){
-                if(entry.getKey().toString().equals(listEntry.getKey().toString()) &&
-                        entry.getValue().size() == listEntry.getValue().size()){
+            for(LineObject listEntry: add){
+                if(entry.lineidList.toString().equals(listEntry.lineidList.toString()) &&
+                        entry.lineidList.size() == listEntry.lineidList.size()){
                     isEqual = true;
                 }
             }
             if(!isEqual)
                 add.add(entry);
-            array.put(entry.getKey().size(),entry.getKey().size());
+            array.put(entry.lineidList.size(),entry.lineidList.size());
         }
         //换乘次数分类
         List<Integer> list = new ArrayList<>(array.keySet());
@@ -116,23 +117,23 @@ public class PathSerachUtil {
                 return 1;
             }
         });
-        List<Map.Entry<List<Integer>, List<StationInfo>>> needadd = new ArrayList<>();
-        List<Map.Entry<List<Integer>, List<StationInfo>>> templist = new ArrayList<>();
+        List<LineObject> needadd = new ArrayList<>();
+        List<LineObject> templist = new ArrayList<>();
         if(lastLinesLast != null)
             lastLinesLast.clear();
         for(Integer size:list){
             needadd.clear();
             templist.clear();
-            for(Map.Entry<List<Integer>, List<StationInfo>>entry: add){
-                if(size == entry.getKey().size()){
+            for(LineObject entry: add){
+                if(size == entry.lineidList.size()){
                     needadd.add(entry);
                 }
             }
             PathSerachUtil.sortStationNum(needadd);
             if(needadd.size() >0){
-                int number = needadd.get(0).getValue().size();
-                for(Map.Entry<List<Integer>, List<StationInfo>>entry: needadd){
-                    if(number == entry.getValue().size()){
+                int number = needadd.get(0).stationList.size();
+                for(LineObject entry: needadd){
+                    if(number == entry.stationList.size()){
                         templist.add(entry);
                     }
                 }
@@ -142,41 +143,30 @@ public class PathSerachUtil {
         needadd.clear();
         templist.clear();
         PathSerachUtil.sortChangeTime(lastLinesLast);
-        /*Map.Entry<List<Integer>, List<StationInfo>> minChange = null,minStaions= null;
-        for(Map.Entry<List<Integer>, List<StationInfo>> entry:lastLinesLast){
-            if(minChange == null){
-                minChange = entry;
-                minStaions = entry;
-                continue;
-            }
-            if(entry.getKey().size() < minChange.getKey().size()){
-                minChange = entry;
-            }
-            if(entry.getValue().size() < minChange.getValue().size()){
-                minStaions = entry;
-            }
-        }
-        for(Map.Entry<List<Integer>, List<StationInfo>> entry:lastLinesLast){
-            if(entry.getKey().size() > minStaions.getKey().size() &&
-                    entry.getValue().size() > minChange.getValue().size()){
-                continue;
-            }
-            needadd.add(entry);
-        }
-        lastLinesLast.clear();*/
         return lastLinesLast;
     }
-    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getLastRecomendLines(Map<List<Integer>, List<StationInfo>> currentAllStationList) {
-        List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>(currentAllStationList.entrySet());
-        currentAllStationList.clear();
-        return getRecomendLines(lastLinesLast);
+    public static List<LineObject> getLastRecomendLines(List<LineObject> currentAllStationList) {
+        //List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast = new ArrayList<Map.Entry<List<Integer>, List<StationInfo>>>(currentAllStationList.entrySet());
+        //currentAllStationList.clear();
+        return getRecomendLines(currentAllStationList);
     }
 
-    public static void sortChangeTime(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+    public static void sortChangeTime(List<LineObject> lastLinesLast){
         if(lastLinesLast.size() <2){
             return;
         }
-        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
+        Collections.sort(lastLinesLast, new Comparator<LineObject>() {
+            public int compare(LineObject o1,
+                               LineObject o2) {
+                if (o1.lineidList.size() < o2.lineidList.size()) {
+                    return -1;
+                } else if (o1.lineidList.size() == o2.lineidList.size()) {
+                    return 0;
+                }
+                return 1;
+            }
+        });
+        /*Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
             public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
                                Map.Entry<List<Integer>, List<StationInfo>> o2) {
                 if (o1.getKey().size() < o2.getKey().size()) {
@@ -186,15 +176,27 @@ public class PathSerachUtil {
                 }
                 return 1;
             }
-        });
+        });*/
     }
 
-    public static void sortStationNum(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLinesLast){
+    public static void sortStationNum(List<LineObject> lastLinesLast){
 
         if(lastLinesLast.size() < 2){
             return;
         }
-        Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
+
+        Collections.sort(lastLinesLast, new Comparator<LineObject>() {
+            public int compare(LineObject o1,
+                               LineObject o2) {
+                if (o1.stationList.size() < o2.stationList.size()) {
+                    return -1;
+                } else if (o1.stationList.size() == o2.stationList.size()) {
+                    return 0;
+                }
+                return 1;
+            }
+        });
+        /*Collections.sort(lastLinesLast, new Comparator<Map.Entry<List<Integer>, List<StationInfo>>>() {
             public int compare(Map.Entry<List<Integer>, List<StationInfo>> o1,
                                Map.Entry<List<Integer>, List<StationInfo>> o2) {
                 if (o1.getValue().size() < o2.getValue().size()) {
@@ -204,11 +206,11 @@ public class PathSerachUtil {
                 }
                 return 1;
             }
-        });
+        });*/
     }
-    public static Map<List<Integer>, List<StationInfo>> getAllLineStation(Map<Integer, LineInfo> mLineInfoList, List<List<Integer>> transferLine
+    public static List<LineObject> getAllLineStation(Map<Integer, LineInfo> mLineInfoList, List<List<Integer>> transferLine
             , StationInfo start, final StationInfo end) {
-        Map<List<Integer>, List<StationInfo>> currentAllStationList = new HashMap<>();//正在导航线路
+        List<LineObject> currentAllStationList = new ArrayList<>();//正在导航线路
         if(transferLine == null || transferLine.size() <=0){
             return currentAllStationList;
         }
@@ -249,25 +251,25 @@ public class PathSerachUtil {
             IteratorNodeTool tool = new IteratorNodeTool();
             Stack<Node> pathstack = new Stack();
             tool.iteratorNode(root, pathstack);
-            List<List<StationInfo>> all = new ArrayList<>();
+            List<LineObject> all = new ArrayList<>();
             //Log.d("zxc002","----------start--------------- list = "+list);
             for (List<StationInfo> entry : tool.pathMap) {
                 all.add(getLineStation(list,entry, mLineInfoList));
             }
             if (all != null && all.size() > 0) {
-                List<StationInfo> min = all.get(0);
-                for (List<StationInfo> ll : all) {
-                    if (min.size() > ll.size()) {
+                LineObject min = all.get(0);
+                for (LineObject ll : all) {
+                    if (min.stationList.size() > ll.stationList.size()) {
                         min = ll;
                     }
                 }
                 Map<Integer,Integer> map = new HashMap<>();
-                for(StationInfo stationInfo:min){
+                for(StationInfo stationInfo:min.stationList){
                     map.put(stationInfo.lineid,stationInfo.lineid);
                 }
                 Log.d("zxc002", "list " + list + "  " + map.size());
                 if(map.size() == list.size()) {
-                    currentAllStationList.put(list, min);
+                    currentAllStationList.add(min);
                 }
                 map.clear();
                 map = null;
@@ -278,8 +280,23 @@ public class PathSerachUtil {
         return currentAllStationList;
     }
 
-    public static List<StationInfo> getLineStation(List<Integer> tranfers,List list, Map<Integer, LineInfo> mLineInfoList) {
+    public static void addChild(Node node, List<StationInfo> stationInfoList) {
+        if (node.getChildNodes() == null) {
+            for (StationInfo stationInfo : stationInfoList) {
+                Node nextNode = new Node(stationInfo);
+                node.addChildNode(nextNode);
+            }
+        } else {
+            List<Node> stationInfos = node.getChildNodes();
+            for (Node node1 : stationInfos) {
+                addChild(node1, stationInfoList);
+            }
+        }
+    }
+
+    public static LineObject getLineStation(List<Integer> tranfers,List list, Map<Integer, LineInfo> mLineInfoList) {
         List<StationInfo> oneLineMap = new ArrayList<>();
+        List<StationInfo> transferList = new ArrayList<>();
         int size = list.size();
         StringBuffer buf = new StringBuffer();
         //Log.d("zxc","----------start---------------");
@@ -299,10 +316,12 @@ public class PathSerachUtil {
                 stationInfo.lineid = lastLineid;
             }
         }else if(tranfers.size() > (list.size() -1)){
-
-
         }
-
+        for (int i = 0; i < tranfers.size(); i++) {
+            Node start = (Node) list.get(i + 1);
+            StationInfo stationInfo = (StationInfo) start.getNodeEntity();
+            transferList.add(stationInfo);
+        }
         for (int i = 0; i < size; i++) {
             if (i + 1 < size) {
                 Node start = (Node) list.get(i);
@@ -327,27 +346,14 @@ public class PathSerachUtil {
                 }
                 PathSerachUtil.findLinedStation(lineInfo, stationInfo, endInfo, oneLineMap);
             }
-            //Node start = (Node)list.get(i);
-           // StationInfo stationInfo = (StationInfo) start.getNodeEntity();
-            //buf.append(stationInfo.lineid+"  "+stationInfo.getCname()+" ->");
+            /*Node start = (Node)list.get(i);
+            StationInfo stationInfo = (StationInfo) start.getNodeEntity();
+            buf.append(stationInfo.lineid+"  "+stationInfo.getCname()+" ->");*/
         }
+
         //Log.d("zxc002",buf.toString());
         //Log.d("zxc002","----------end--------------");
-        return oneLineMap;
-    }
-
-    public static void addChild(Node node, List<StationInfo> stationInfoList) {
-        if (node.getChildNodes() == null) {
-            for (StationInfo stationInfo : stationInfoList) {
-                Node nextNode = new Node(stationInfo);
-                node.addChildNode(nextNode);
-            }
-        } else {
-            List<Node> stationInfos = node.getChildNodes();
-            for (Node node1 : stationInfos) {
-                addChild(node1, stationInfoList);
-            }
-        }
+        return new LineObject(oneLineMap,tranfers,transferList);
     }
 
     public static StationInfo gitNearestStation(List<StationInfo> stationInfoList, StationInfo stationInfo) {
@@ -395,12 +401,12 @@ public class PathSerachUtil {
         return lineInfoList.get(lineid);
     }
 
-    public static String printAllRecomindLine(List<Map.Entry<List<Integer>, List<StationInfo>>> lastLines) {
+    public static String printAllRecomindLine(List<LineObject> lastLines) {
         StringBuffer str = new StringBuffer();
         Log.d(TAG, "------------------------devide-----------------------lastLines.size = " + lastLines.size());
-        for (Map.Entry<List<Integer>, List<StationInfo>> entry : lastLines) {
-            str.append(entry.getKey().toString() + ":");
-            for (StationInfo stationInfo : entry.getValue()) {
+        for (LineObject entry : lastLines) {
+            str.append(entry.lineidList.toString() + ":");
+            for (StationInfo stationInfo : entry.stationList) {
                 str.append(stationInfo.getCname() + "->");
             }
             str.append("\n");
@@ -622,7 +628,7 @@ public class PathSerachUtil {
         }
     }
 
-    public static List<Map.Entry<List<Integer>, List<StationInfo>>> getReuslt(List<List<Integer>> transferLine,
+    public static List<LineObject> getReuslt(List<List<Integer>> transferLine,
                                                                               final DataManager mDataManager, final StationInfo start, final StationInfo end) {
         Collections.sort(transferLine, new Comparator<List<Integer>>() {
             public int compare(List<Integer> p1, List<Integer> p2) {

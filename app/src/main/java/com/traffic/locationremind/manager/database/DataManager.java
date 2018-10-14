@@ -83,7 +83,9 @@ public class DataManager{
 		if(mLoadDataListener != null)
 			mLoadDataListener.clear();
 		mDataManager = null;
-		mSearch.destroy();
+		if(mSearch != null) {
+			mSearch.destroy();
+		}
 	}
 
 	public CityInfo getCurrentCityNo(){
@@ -258,7 +260,7 @@ public class DataManager{
 		for(CityInfo cityInfo:cityInfoList){
 			mDataHelper.setCityHelper(context,cityInfo.getPingying());
 			List<StationInfo> lists = mDataHelper.QueryAllByStationLineNo();
-            Log.d("zxc","city "+cityInfo.getCityName()+" lists.size = "+lists.size());
+            //Log.d("zxc","city "+cityInfo.getCityName()+" lists.size = "+lists.size());
 			mergeExistInfor(lists);
 			lists.clear();
 			lists = null;
