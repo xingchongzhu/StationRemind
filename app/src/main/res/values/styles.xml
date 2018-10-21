@@ -10,6 +10,13 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
+    <style name="Theme.MyAppTheme" parent="AppTheme">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">@drawable/launch_bg</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
     <style name="mystyle" parent="android:Animation">
 
         <!-- <item name="@android:windowEnterAnimation">@anim/dialog_enter</item> -->
