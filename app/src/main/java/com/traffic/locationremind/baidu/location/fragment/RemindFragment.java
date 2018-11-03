@@ -207,6 +207,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     } else {
                         nextStation = list.get(1);
                     }
+                    if(i == list.size() -1){
+                        int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
+                        Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_main_map_pin_end), size, size);
+                        textView.setStartBitMap(bitmap);
+                    }
 
                     if(CommonFuction.containTransfer(transferList,stationInfo)){
                         needChangeStationList.add(stationInfo);
@@ -215,7 +220,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                             Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_route_map_pin_dottransfer), size, size);
                             textView.setTransFerBitmap(bitmap);
                         }
-                    }else if (preStationInfo != null){
                         if (preStationInfo.pm < stationInfo.pm) {
                             lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
                         } else {

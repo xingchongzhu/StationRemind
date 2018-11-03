@@ -22,8 +22,8 @@ public class RemindLineColorView extends View {
 
     public static final int ROWMAXCOUNT = 3;// 一行最多点
     private static final int padding = 50;
-    private static final int rectSize = 50;
-    private static final int textSize = 50;
+    private  int rectSize = 50;
+    private  int textSize = 50;
     private Rect mBound = new Rect();
     private Paint mPaint;
 
@@ -57,6 +57,8 @@ public class RemindLineColorView extends View {
     private void init(Context context) {
         mPaint = new Paint();
         dataManager = DataManager.getInstance(context);
+        rectSize = (int)getContext().getResources().getDimension(R.dimen.rect_size);
+        textSize = (int)getContext().getResources().getDimension(R.dimen.rect_text);
     }
 
     @Override

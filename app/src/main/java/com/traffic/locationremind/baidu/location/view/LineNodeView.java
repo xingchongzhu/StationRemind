@@ -20,11 +20,11 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     private final static String TAG = "SelectlineMap";
     private final int width = 150;
     private  int iconSize = 60;
-    private final int paddingLine = 20;
-    private final int lineHeight = 20;
+    private int paddingLine = 20;
+    private int lineHeight = 20;
     private final int norrowHeight = 2;
-    private final int textSize = 50;
-    private final int offset = 10;
+    private int textSize = 50;
+    private int offset = 10;
     private Rect mBounds;
     // 定义画笔
     private Paint mPaint;
@@ -89,6 +89,10 @@ public class LineNodeView extends TextView implements View.OnClickListener {
         // 初始化画笔、Rect
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mBounds = new Rect();
+        textSize =  (int)getContext().getResources().getDimension(R.dimen.rect_text);
+        iconSize =  (int)getContext().getResources().getDimension(R.dimen.icon_size);
+        paddingLine = iconSize+10;
+        lineHeight =  (int)getContext().getResources().getDimension(R.dimen.line_height);
         // 本控件的点击事件
         setOnClickListener(this);
     }
@@ -103,7 +107,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // 绘制一个填充色为蓝色的矩形
-        int height = paddingLine;
+        int height = iconSize;
         if(start != null){
             Matrix matrix = new Matrix();
             matrix.setScale(1.0f, 1.0f);
@@ -115,8 +119,8 @@ public class LineNodeView extends TextView implements View.OnClickListener {
             matrix.postTranslate(getWidth()/2-bitmap.getWidth()/2,height);
             canvas.drawBitmap(bitmap,matrix,mPaint);
         }
-        height+= iconSize;
-        height+= 1.5*paddingLine;
+        height+= 1.1*iconSize;
+        //height+= paddingLine;
         mPaint.setColor(color);
         mPaint.setStrokeWidth(lineHeight);
         canvas.drawLine(0,height,getWidth(),height,mPaint);
@@ -138,7 +142,6 @@ public class LineNodeView extends TextView implements View.OnClickListener {
             canvas.drawLine(start,height+norrowHeight/2,end+5,height+norrowHeight/2,mPaint);
             canvas.drawLine(start+narroWidth/2,height+narroHeight,end+offset,height+norrowHeight/2,mPaint);;
         }
-
         height+= 4*lineHeight;
 
         mPaint.setColor(Color.BLACK);
@@ -148,13 +151,14 @@ public class LineNodeView extends TextView implements View.OnClickListener {
 
         char s[] = text.toCharArray();
         int size = s.length;
+       // height+= iconSize/2;
         for(int i = 0 ;i < size ; i ++){
             String ss = Character.toString(s[i]);
             mPaint.getTextBounds(ss, 0, ss.length(), mBounds);
             int textWidth = mBounds.width();
             int textHeight = mBounds.height();
             canvas.drawText(ss, getWidth()/2-textWidth/2, height, mPaint);
-            height+= paddingLine+textHeight;
+            height+= 1.5*textHeight;
         }
     }
 

@@ -65,4 +65,11 @@
     <dimen name="alarm_info_font_size">25dp</dimen>
     <dimen name="single_color_height">60dp</dimen>
     <dimen name="line_color_height">110dp</dimen>
+
+    <dimen name="normalTextSize">12sp</dimen>
+    <dimen name="hintTextSize">13sp</dimen>
+    <dimen name="rect_size">13dp</dimen>
+    <dimen name="rect_text">13sp</dimen>
+    <dimen name="icon_size">20dp</dimen>
+    <dimen name="line_height">8dp</dimen>
 </resources>

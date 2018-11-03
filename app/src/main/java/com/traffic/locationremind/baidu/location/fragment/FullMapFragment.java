@@ -17,10 +17,12 @@ import android.view.ViewGroup;
 
 import android.view.WindowManager;
 import android.webkit.*;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.activity.WebMainActivity;
+import com.traffic.locationremind.baidu.location.utils.Utils;
 import com.traffic.locationremind.baidu.location.view.FullMapView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.FileUtil;
@@ -35,6 +37,7 @@ public class FullMapFragment extends Fragment {
     //private FullMapView mFullMapView;
     private int screenWidth ,screenHeight;
     private DataManager mDataManager;
+    private TextView text;
     private WebView webView;
 //https://stavinli.github.io/the-subway-of-china/dest/index.html?cityCode=131
     private final String URL = "https://stavinli.github.io/the-subway-of-china/dest/index.html?cityCode=";
@@ -63,6 +66,7 @@ public class FullMapFragment extends Fragment {
         //mFullMapView = (FullMapView)rootView.findViewById(R.id.map);
         mDataManager = ((MainActivity) getActivity()).getDataManager();
         webView = (WebView) rootView.findViewById(R.id.web_wv);
+        text = (TextView) rootView.findViewById(R.id.text);
         initData();
     }
 
@@ -94,6 +98,9 @@ public class FullMapFragment extends Fragment {
             String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo();
             webView.loadUrl(url);
             webView.setWebChromeClient(new MyWebChromeClient());
+            if(Utils.isGpsOPen(getContext())){
+                text.setVisibility(View.GONE);
+            }
         }
     }
 

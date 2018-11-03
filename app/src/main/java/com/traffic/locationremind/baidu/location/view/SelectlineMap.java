@@ -109,6 +109,9 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //Log.d(TAG,"onMeasure heightMeasureSpec = "+heightMeasureSpec);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        normalTextSize = (int)getContext().getResources().getDimension(R.dimen.normalTextSize);
+        changetTextSize = normalTextSize;
+        hintTextSize = (int)getContext().getResources().getDimension(R.dimen.hintTextSize);
     }
 
     @Override

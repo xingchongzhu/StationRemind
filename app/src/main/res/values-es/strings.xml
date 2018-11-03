@@ -6,7 +6,7 @@
   <string name="stoplocation">finish location</string>
   <string name="loading">loading...</string>
   <string name="subway">metro</string>
-  <string name="select_city">switch city</string>
+  <string name="select_city">Switch City</string>
   <string name="full_subway">Global graph</string>
   <string name="scal_btn">Enlarge</string>
   <string name="full_subway_title">All routes</string>
@@ -40,7 +40,7 @@
   <string name="falvetor">Collection folder</string>
   <string name="cancle_remind">Cancel reminder</string>
   <string name="current_station">Current station:</string>
-  <string name="surples_station">remain % sstations</string>
+  <string name="surples_station">remain%sstations</string>
   <string name="changet_hint_tile">Transfer reminding</string>
   <string name="arrive_station_title">Arrival reminding</string>
   <string name="arrive">Arrive</string>
@@ -64,4 +64,52 @@
   <string name="alarm_alert_off_text" >Arrived take care. Get off.</string>
   <string name="stop_hint">End reminder again!</string>
   <string name="search_hint">Start|End</string>
+  <string name="search_result_empty">search result empty</string>
+  <string name="input_city_name_or_pingyin">input city name or pingying</string>
+  <string name="sorry_no_search_city">Sorry no search city</string>
+  <string name="location">Location</string>
+  <string name="hot">Hot</string>
+  <string name="all">All</string>
+  <string name="is_location">Locationing</string>
+  <string name="now_location_city">Current location</string>
+  <string name="not_location_city">Location fail,please select</string>
+  <string name="select_again">Select again</string>
+  <string name="hot_city">Hot city</string>
+  <string name="nearst">Nearst</string>
+  <string name="background_location">Background Location</string>
+  <string name="please_open_location">please open gps and connect network</string>
+  <string name="password_toggle_content_description">Toggle password visibility</string>
+
+  <!--城市-->
+ <!-- <string name="beijing">131</string>
+  <string name="shanghai">289</string>
+  <string name="guangzhou">257</string>
+  <string name="shenzhen">340</string>
+  <string name="xianggang">2912</string>
+  <string name="chengdu">75</string>
+  <string name="changchun">53</string>
+  <string name="chongqing">132</string>
+  <string name="dalian">167</string>
+  <string name="foshang">138</string>
+  <string name="hangzhou">179</string>
+  <string name="kunming">104</string>
+  <string name="nanjing">315</string>
+  <string name="shenyang">58</string>
+  <string name="suzhou">224</string>
+  <string name="tianjin">332</string>
+  <string name="wuhan">218</string>
+  <string name="xian">233</string>
+  <string name="haerbin">48</string>
+  <string name="zhengzhou">268</string>
+  <string name="changsha">158</string>
+  <string name="ningbo">180</string>
+  <string name="wuxi">317</string>
+  <string name="taibei">9002</string>
+  <string name="gaoxiong">9019</string>
+  <string name="qingdao">236</string>
+  <string name="nanchang">163</string>
+  <string name="fuzhou">300</string>
+  <string name="dongguan">119</string>
+  <string name="nanning">261</string>-->
+  <!--城市-->
 </resources>

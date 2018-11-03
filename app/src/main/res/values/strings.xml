@@ -77,10 +77,11 @@
     <string name="hot_city">Hot city</string>
     <string name="nearst">Nearst</string>
     <string name="background_location">Background Location</string>
+    <string name="please_open_location">please open gps and connect network</string>
 
-
+    <string name="password_toggle_content_description">Toggle password visibility</string>
     <!--城市-->
-    <string name="beijing">131</string>
+    <!--<string name="beijing">131</string>
     <string name="shanghai">289</string>
     <string name="guangzhou">257</string>
     <string name="shenzhen">340</string>
@@ -109,6 +110,6 @@
     <string name="nanchang">163</string>
     <string name="fuzhou">300</string>
     <string name="dongguan">119</string>
-    <string name="nanning">261</string>
+    <string name="nanning">261</string>-->
     <!--城市-->
 </resources>
