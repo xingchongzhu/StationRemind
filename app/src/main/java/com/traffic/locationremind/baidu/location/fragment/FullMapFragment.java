@@ -26,6 +26,7 @@ import com.traffic.locationremind.baidu.location.utils.Utils;
 import com.traffic.locationremind.baidu.location.view.FullMapView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.FileUtil;
+import com.traffic.locationremind.common.util.StreamUtils;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
@@ -94,8 +95,10 @@ public class FullMapFragment extends Fragment {
             // 将JavaScript设置为可用，这一句话是必须的，不然所做一切都是徒劳的
             webSettings.setJavaScriptEnabled(true);
             // 给webview添加JavaScript接口
-            webView.addJavascriptInterface(new JsInterface(), "index");
-            String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo();
+            String data = StreamUtils.get(getContext(),R.raw.json);
+            Log.d("zxc","initData data = "+data);
+            webView.addJavascriptInterface(new JsInterface(), "show");
+            String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo()+"?myjson="+data;
             webView.loadUrl(url);
             webView.setWebChromeClient(new MyWebChromeClient());
             if(Utils.isGpsOPen(getContext())){
