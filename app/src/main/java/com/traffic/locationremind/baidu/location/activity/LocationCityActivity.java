@@ -40,7 +40,7 @@ import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.baidu.location.view.MyLetterListView;
-import com.traffic.locationremind.baidu.location.utils.PingYinUtil;
+//import com.traffic.locationremind.baidu.location.utils.PingYinUtil;
 
 public class LocationCityActivity extends AppCommonActivity implements OnScrollListener {
     private BaseAdapter adapter;
@@ -718,8 +718,8 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
             if (firstVisibleItem < 4) {
                 text = name;
             } else {
-                text = PingYinUtil.converterToFirstSpell(pinyin)
-                        .substring(0, 1).toUpperCase();
+                //text =PingYinUtil.converterToFirstSpell(pinyin)
+                        //.substring(0, 1).toUpperCase();
             }
         }
     }

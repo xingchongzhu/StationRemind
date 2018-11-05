@@ -76,7 +76,7 @@
     <string name="select_again">重新选择</string>
     <string name="hot_city">热门城市</string>
     <string name="nearst">最近</string>
-    <string name="please_open_location">请开启gps定位和联网</string>
+    <string name="please_open_location">保持gps定位和网络连接</string>
     <string name="password_toggle_content_description">Toggle password visibility</string>
     <string name="background_location">后台定位</string>
 </resources>

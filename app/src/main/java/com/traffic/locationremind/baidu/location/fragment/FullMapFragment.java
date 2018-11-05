@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.traffic.locationremind.baidu.location.utils.Utils;
 import com.traffic.locationremind.baidu.location.view.FullMapView;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.FileUtil;
+import com.traffic.locationremind.common.util.IDef;
 import com.traffic.locationremind.common.util.StreamUtils;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataManager;
@@ -95,10 +97,12 @@ public class FullMapFragment extends Fragment {
             // 将JavaScript设置为可用，这一句话是必须的，不然所做一切都是徒劳的
             webSettings.setJavaScriptEnabled(true);
             // 给webview添加JavaScript接口
-            String data = StreamUtils.get(getContext(),R.raw.json);
-            Log.d("zxc","initData data = "+data);
+            //String data = StreamUtils.get(getContext(),R.raw.json);
+
             webView.addJavascriptInterface(new JsInterface(), "show");
-            String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo()+"?myjson="+data;
+            String cityName = cityList.get(0).getPingying()+".json";
+            Log.d("zxc","initData "+" cityName = "+cityName);
+            String url = "file:///android_asset/src/index.html?cityCode="+cityName;
             webView.loadUrl(url);
             webView.setWebChromeClient(new MyWebChromeClient());
             if(Utils.isGpsOPen(getContext())){
@@ -108,13 +112,21 @@ public class FullMapFragment extends Fragment {
     }
 
     public void updateCity(){
-        String shpno = CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME);
-        List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);
-        if(cityList != null && cityList.size() > 0){
-            String url = "file:///android_asset/src/index.html?cityCode="+cityList.get(0).getCityNo();
-            //webView.loadUrl("javascript:callJS(" + "'" + cityList.get(0).getCityNo() + "'" + ")");
-            //webView.loadUrl("javascript:wave()");
-            webView.loadUrl(url);
+        String shpno = "";
+        if(getContext() != null) {
+            shpno = CommonFuction.getSharedPreferencesValue(getContext(), CityInfo.CITYNAME);
+        }
+        if (TextUtils.isEmpty(shpno)) {
+            shpno = IDef.DEFAULTCITY;
+        }
+        if(mDataManager != null && mDataManager.getDataHelper() != null) {
+            List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);
+            if (cityList != null && cityList.size() > 0) {
+                String cityName = cityList.get(0).getPingying() + ".json";
+                Log.d("zxc", "updateCity " + " cityName = " + cityName);
+                String url = "file:///android_asset/src/index.html?cityCode=" + cityName;
+                webView.loadUrl(url);
+            }
         }
     }
 

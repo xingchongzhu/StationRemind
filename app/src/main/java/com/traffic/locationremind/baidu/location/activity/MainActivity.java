@@ -192,6 +192,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         if (CopyDBDataUtil.getInstance().hasWrite) {
             mDataManager.loadData(this);
         }
+        String shpno = CommonFuction.getSharedPreferencesValue(this, CityInfo.CITYNAME);
+
+        if (TextUtils.isEmpty(shpno)) {
+            shpno = IDef.DEFAULTCITY;
+        }
+        citySelect.setText(shpno);
     }
 
     @Override
@@ -291,6 +297,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
         RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         remindFragment.upadaData();
+
+        FullMapFragment fullFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
+        fullFragment.updateCity();
     }
 
     @Override

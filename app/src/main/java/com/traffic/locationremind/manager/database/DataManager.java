@@ -181,7 +181,7 @@ public class DataManager{
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
 			}else{
-				currentCityNo = cityInfoList.get("深圳");
+				currentCityNo = cityInfoList.get(IDef.DEFAULTCITY);
 			}
 
 			if (currentCityNo == null) {

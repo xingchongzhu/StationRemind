@@ -57,7 +57,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
 
-        final  int color = ThemeUtils.resolveColor(this, android.R.attr.windowBackground);
+        final  int color = getResources().getColor(R.color.clock_gray);//ThemeUtils.resolveColor(this, android.R.attr.windowBackground);
         adjustAppColor(color, false /* animate */);
         setStatusBar(getResources().getColor(R.color.clock_gray));
     }
@@ -100,7 +100,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         // Ensure the app window color is up-to-date.
-        final  int color = ThemeUtils.resolveColor(this, android.R.attr.windowBackground);
+        final  int color = getResources().getColor(R.color.clock_gray);//ThemeUtils.resolveColor(this, android.R.attr.windowBackground);
         adjustAppColor(color, false /* animate */);
     }
 

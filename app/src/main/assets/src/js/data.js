@@ -127,7 +127,10 @@ var imgSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ix
 //$("select").on("change", function() {
 //    window.location.href = window.location.href.split("?")[0] + "?cityCode=" + $(this).val()
 //})
-var cityCode = $.getUrlQuery("cityCode") || 131
+
+
+
+var cityCode = $.getUrlQuery("cityCode") || "beijing.json"
 //$("select").val(cityCode)
 $("head title").html($("select :selected").text() + "地铁线路图")
 var BMapSub = {}
@@ -136,7 +139,25 @@ var timeStamp = (Math.random() * 100000).toFixed(0);
 
 var checkUrl = "https://api.map.baidu.com/?qt=subways&c=" + cityCode + "&format=json&ak=yZSTYLk9UUvs0ZqXqBbtTp8ViKk5vxLM&v=3.0&from=jsapi&callback=BMapSub._rd._cbk" + timeStamp
 
-$.getScript(checkUrl)
+var temp_data = document.getElementById("city_data");
+if(temp_data){
+    document.body.removeChild(temp_data);
+}
+
+var script = document.createElement("script");
+script.setAttribute("type","text/javascript");
+script.id = "city_data";
+script.setAttribute("src","json/"+cityCode+"?callback=indexDemo");// 在这里引入了a.js
+document.body.appendChild(script);
+
+function indexDemo(result){
+  //回调函数名称(indexDemo)，需要与 src 中一致，而且要与文件地址中名一致。jsonp格式 名称({})
+  //不然无法获取到对应的文件
+  subwayPainter(result.subways.l)
+}
+
+
+//$.getScript(checkUrl)
 
 BMapSub._rd["_cbk" + timeStamp] = function(json) {
     subwayPainter(json.subways.l)

@@ -142,16 +142,12 @@ public class RemonderLocationService extends Service {
 
                 if (list != null && list.size() > 0) {
 
-                    StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);//list.get(n);
-                    if (number > 2) {
+                    StationInfo nerstStationInfo = PathSerachUtil.getNerastNextStation(location, list);//list.get(n)
+                    /*if (number > 100) {
                         number = 0;
                         if (n < list.size()) {
                             n++;
                         }
-                    }
-                    /*if(isBacrground){
-
-                        locationService.getLocationClient().requestLocation();
                     }*/
                     number++;
                     if (nerstStationInfo != null) {
@@ -168,7 +164,7 @@ public class RemonderLocationService extends Service {
                             nextStation = list.get(n + 1);
                         }
 
-                        Log.d(TAG, "loactionStation getCname = " + currentStation.getCname() + " isRemind = " + isReminder);
+                        Log.d(TAG, "loactionStation getCname = " + currentStation.getCname() + " isRemind = " + isReminder+" getCity = "+currentLocation.getCity());
                         if (isReminder) {
                             double longitude = CommonFuction.convertToDouble(currentStation.getLot(), 0);
                             double latitude = CommonFuction.convertToDouble(currentStation.getLat(), 0);
@@ -329,6 +325,7 @@ public class RemonderLocationService extends Service {
         this.list = list;
         if(tempChangeStationList != null)
             tempChangeStationList.clear();
+        this.needChangeStationList = needChangeStationList;
         tempChangeStationList = new ArrayList<>(needChangeStationList);
         if(tempChangeStationList.size() > 1) {
             currentStation = tempChangeStationList.get(0);

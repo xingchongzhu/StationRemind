@@ -42,4 +42,6 @@ public interface IDef {
 	public static final int Msg_Empty = 107;
 	public static final int Msg_Tick = 123;
 	public static final int Msg_Auto_Tick = 124;
+
+	public static final String DEFAULTCITY = "深圳";
 };
