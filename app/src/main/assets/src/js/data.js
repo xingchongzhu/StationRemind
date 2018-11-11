@@ -128,16 +128,8 @@ var imgSrc = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ix
 //    window.location.href = window.location.href.split("?")[0] + "?cityCode=" + $(this).val()
 //})
 
-
-
 var cityCode = $.getUrlQuery("cityCode") || "beijing.json"
-//$("select").val(cityCode)
 $("head title").html($("select :selected").text() + "地铁线路图")
-var BMapSub = {}
-BMapSub._rd = {};
-var timeStamp = (Math.random() * 100000).toFixed(0);
-
-var checkUrl = "https://api.map.baidu.com/?qt=subways&c=" + cityCode + "&format=json&ak=yZSTYLk9UUvs0ZqXqBbtTp8ViKk5vxLM&v=3.0&from=jsapi&callback=BMapSub._rd._cbk" + timeStamp
 
 var temp_data = document.getElementById("city_data");
 if(temp_data){
@@ -156,12 +148,18 @@ function indexDemo(result){
   subwayPainter(result.subways.l)
 }
 
+//var cityCode = $.getUrlQuery("cityCode") || 301
+//$("select").val(cityCode)
+//var timeStamp = (Math.random() * 100000).toFixed(0);
+//var BMapSub = {}
+//BMapSub._rd = {};
+//var checkUrl = "https://api.map.baidu.com/?qt=subways&c=" + cityCode + "&format=json&ak=yZSTYLk9UUvs0ZqXqBbtTp8ViKk5vxLM&v=3.0&from=jsapi&callback=BMapSub._rd._cbk" + timeStamp
 
 //$.getScript(checkUrl)
 
-BMapSub._rd["_cbk" + timeStamp] = function(json) {
-    subwayPainter(json.subways.l)
-}
+//BMapSub._rd["_cbk" + timeStamp] = function(json) {
+//    subwayPainter(json.subways.l)
+//}
 var eventsHandler = {
     haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
     init: function(options) {
