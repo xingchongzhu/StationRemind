@@ -78,6 +78,7 @@
     <string name="nearst">Nearst</string>
     <string name="background_location">Background Location</string>
     <string name="please_open_location">please keep gps and connect network</string>
+    <string name="hint_open_network_gps">please keep gps and connect network</string>
 
     <string name="password_toggle_content_description">Toggle password visibility</string>
     <!--城市-->

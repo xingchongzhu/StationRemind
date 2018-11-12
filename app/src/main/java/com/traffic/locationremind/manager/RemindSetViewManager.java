@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
@@ -18,6 +19,7 @@ import com.traffic.locationremind.baidu.location.object.MarkObject;
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.view.SelectlineMap;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.ToastUitl;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
@@ -53,7 +55,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
         this.mGoToFragmentListener = mGoToFragmentListener;
     }
 
-    public void initView(final Activity activity,DataManager dataManager) {
+    public void initView(final MainActivity activity, DataManager dataManager) {
         this.activity = activity;
         this.dataManager = dataManager;
         pageBottomTabLayout = (PageNavigationView) activity.findViewById(R.id.tab);
@@ -81,6 +83,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
             @Override
             public void onClick(View v) {
                 if(mGoToFragmentListener != null){
+                    if(!activity.getPersimmions()){
+                        ToastUitl.showText(activity,activity.getString(R.string.hint_open_network_gps));
+                    }
                     mGoToFragmentListener.openRemindFragment(lastLines);
                 }
             }

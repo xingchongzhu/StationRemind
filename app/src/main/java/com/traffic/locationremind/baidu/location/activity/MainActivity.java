@@ -1,8 +1,11 @@
 package com.traffic.locationremind.baidu.location.activity;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PersistableBundle;
@@ -17,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.baidu.location.BDLocation;
+import com.baidu.mapapi.SDKInitializer;
 import com.traffic.location.remind.R;
 
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
@@ -33,6 +37,7 @@ import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationC
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.baidu.location.view.CustomViewPager;
 import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.RemindSetViewManager;
@@ -108,9 +113,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 .build();
 
         root = (ViewGroup) findViewById(R.id.root);
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewPager);
+        CustomViewPager viewPager = (CustomViewPager) findViewById(R.id.viewPager);
         mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(),
                 mNavigationController,mRemindSetViewManager);
+        viewPager.setScanScroll(false);
         viewPager.setAdapter(mViewPagerAdapter);
 
         mNavigationController.setupWithViewPager(viewPager);
@@ -385,6 +391,22 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
         if(resultCode == SHUTDOWNACTIVITY){
             finish();
+        }
+    }
+
+    @TargetApi(23)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // TODO Auto-generated method stub
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+            SDKInitializer.initialize(getApplicationContext());
+        }
+
+        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED &&
+                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)  {
+            FullMapFragment fullFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
+            fullFragment.updateCity();
         }
     }
 

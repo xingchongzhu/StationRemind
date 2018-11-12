@@ -101,7 +101,7 @@ public class CommonFuction {
     public static boolean isEmptyColloctionFolder(Context context) {
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(context, CommonFuction.FAVOURITE);
         String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
-        if (string.length <= 0) {
+        if (TextUtils.isEmpty(allFavoriteLine) || string.length <= 0) {
             return true;
         } else {
             return false;
@@ -192,12 +192,6 @@ public class CommonFuction {
         if(lineObject == null){
             return transferlist;
         }
-        /*StringBuffer str = new StringBuffer();
-        for (int i = 0; i < lineObject.transferList.size(); i++) {
-            StationInfo stationInfo = (StationInfo) lineObject.transferList.get(i);
-            str.append(stationInfo.lineid + " " + stationInfo.getCname());
-        }
-        Log.d("zxc", str.toString());*/
         return lineObject.transferList;
     }
 

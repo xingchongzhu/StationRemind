@@ -266,7 +266,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                                 tempList = mDataHelper.getLineList( LineInfo.LINEID, "ASC");
                                 if (tempList != null) {
                                     for (Map.Entry<Integer,LineInfo> entry : tempList.entrySet()) {
-                                        entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
+                                        entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey()));
                                     }
                                 }
                                 mLineInfoList.clear();
@@ -343,7 +343,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
                 if(entry.getKey() > maxLineid){
                     maxLineid = entry.getKey();
                 }
-                entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
+                entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey()));
             }
             maxLineid+= 1;//找出路线最大编号加一
             currentIndex = CommonFuction.convertToInt(CommonFuction.getSharedPreferencesValue(MainViewActivity.this, CommonFuction.CURRENTLINEID), firstLineid);
@@ -380,7 +380,7 @@ public class MainViewActivity extends CommonActivity implements ReadExcelDataUti
         //Log.d(TAG, "disx = "+disx+this.getResources().getColor(lineColor[0]));
         float dis = this.getResources().getDimension(R.dimen.btn_size) + this.getResources().getDimension(R.dimen.magin_left);
         for (Map.Entry<Integer,LineInfo> entry : mLineInfoList.entrySet()) {
-            entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
+            entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey()));
         }
 
         int n = 0;

@@ -31,10 +31,7 @@ import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
 import com.traffic.locationremind.baidu.location.adapter.ColorLineAdapter;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
 import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
-import com.traffic.locationremind.common.util.CharSort;
-import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.common.util.MapComparator;
-import com.traffic.locationremind.common.util.ReadExcelDataUtil;
+import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -47,7 +44,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
              , OnGetBusLineSearchResultListener,OnGetPoiSearchResultListener,OnGetRoutePlanResultListener {
 
     private final static String TAG = "LineMapFragment";
-
     private GridView sceneMap;
     private GridView lineMap;
     private TextView currentLineInfoText;
@@ -90,21 +86,27 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             rootView = inflater.inflate(R.layout.line_map_layout, container, false);
             initView(rootView);// 控件初始化
         }
-        if(savedInstanceState != null){
-            upadaData();
-            setCurrentLine(currentIndex);
-        }
         Log.d(TAG, "onCreateView rootView = "+rootView+" savedInstanceState = "+savedInstanceState);
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG,"onResume sceneMap = "+sceneMap);
+        if (sceneMap != null) {
+            Log.d(TAG,"onResume getChildCount = "+sceneMap.getChildCount());
+        }
+        upadaData();
+        setCurrentLine(currentIndex);
+    }
+
     private void initView(View rootView) {
-        Log.d(TAG, "initView rootView = "+rootView);
-        sceneMap = (GridView) rootView.findViewById(R.id.sceneMap);
+        sceneMap = (GridView) rootView.findViewById(R.id.scene_map);
         currentLineInfoText = (TextView) rootView.findViewById(R.id.text);
         Log.d(TAG, "initView currentLineInfoText = "+currentLineInfoText);
         lineMap = (GridView) rootView.findViewById(R.id.lineMap);
-        //linenail = getResources().getString(R.string.line_tail);
+        Log.d(TAG, "initView rootView = "+rootView+" lineMap = "+lineMap);
         mDataManager = ((MainActivity) getActivity()).getDataManager();
 
         colorLineAdapter = new ColorLineAdapter(this.getActivity());
@@ -384,6 +386,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             currentLineInfoText.setText(string);
             currentLineInfoText.setBackgroundColor(list.get(index).colorid);
         }
+        Log.d(TAG,"setCurrentLine index = "+index+" sceneMap = "+sceneMap);
         if (sceneMap != null) {
             sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));
             int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (list.get(index).getStationInfoList().size() / 5 + 1);
@@ -391,18 +394,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
         }
-        /*currentLineName = list.get(index).linename.split("/")[0];
-
-        if(currentLineName.contains("号线")){
-            currentLineName = currentLineName+"地铁";
-        }
-        searchInCity(currentLineName);*/
-        /*if(sceneMapAdapter.getLineInfo() != null && sceneMapAdapter.getLineInfo().size() > 1) {
-            int result = mDataManager.getDataHelper().updateLineInfo(list.get(index).lineid,
-                    sceneMapAdapter.getLineInfo().get(0).getCname(),
-                    sceneMapAdapter.getLineInfo().get(sceneMapAdapter.getLineInfo().size() - 1).getCname());
-            Log.d(TAG,"update currentLineName = "+currentLineName+" result = "+result);
-        }*/
     }
 
     @Override

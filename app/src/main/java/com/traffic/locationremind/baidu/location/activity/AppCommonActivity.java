@@ -123,15 +123,4 @@ public class AppCommonActivity extends AppCompatActivity {
         }
     }
 
-    @TargetApi(23)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        // TODO Auto-generated method stub
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
-            SDKInitializer.initialize(getApplicationContext());
-        }
-    }
-
-
 }

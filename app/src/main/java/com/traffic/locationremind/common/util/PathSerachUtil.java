@@ -267,7 +267,7 @@ public class PathSerachUtil {
                 for(StationInfo stationInfo:min.stationList){
                     map.put(stationInfo.lineid,stationInfo.lineid);
                 }
-                Log.d("zxc002", "list " + list + "  " + map.size());
+                //Log.d("zxc002", "list " + list + "  " + map.size());
                 if(map.size() == list.size()) {
                     currentAllStationList.add(min);
                 }
@@ -648,16 +648,6 @@ public class PathSerachUtil {
 
     public static void startThread(final SearchResultListener mSearchResultListener, final int startlineid,
                                    final int endlineid, final DataManager mDataManager, final StationInfo start, final StationInfo end) {
-        /*//final SearchPath SearchPath = new SearchPath();
-        GeekRunnable geekRunnable = new GeekRunnable(ThreadPriority.HIGH) {
-            @Override
-            public void run() {
-                searchPath.serach(startlineid, endlineid, mDataManager.getNodeRalation());
-            }
-        };
-        geekRunnable.searchPath = new SearchPath(mSearchResultListener,startlineid, endlineid, mDataManager.getNodeRalation());
-        GeekThreadManager.getInstance().addGeekRunnable(geekRunnable);
-        GeekThreadManager.getInstance().execute(geekRunnable, ThreadType.NORMAL_THREAD);*/
         SearchPath searchPath = new SearchPath(mSearchResultListener,startlineid, endlineid, mDataManager.getNodeRalation());
         AsyncTaskManager.getInstance().addGeekRunnable(searchPath);
         searchPath.execute("");

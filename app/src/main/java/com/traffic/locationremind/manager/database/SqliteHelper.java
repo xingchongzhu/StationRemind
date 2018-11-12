@@ -16,6 +16,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
     public static final String TB_EXIT_INFO = "exitinfo";
     public static final String TB_CITY_INFO = "city";
     public static final String TB_ADD_EXTRA_INFO = "addinfo";
+    public static final String TB_LINE_RESULT_INFO = "line_search_result";
 
     public SqliteHelper(Context context, String name, CursorFactory factory, int version) {
         super(context, name, factory, version);

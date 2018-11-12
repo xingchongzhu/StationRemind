@@ -12,6 +12,7 @@ import android.support.annotation.CallSuper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -31,9 +32,7 @@ import com.traffic.locationremind.baidu.location.object.NotificationObject;
 import com.traffic.locationremind.baidu.location.utils.NotificationUtils;
 import com.traffic.locationremind.baidu.location.view.LineNodeView;
 import com.traffic.locationremind.baidu.location.view.RemindLineColorView;
-import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.common.util.NotificationUtil;
-import com.traffic.locationremind.common.util.PathSerachUtil;
+import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.ScrollFavoriteManager;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -59,6 +58,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     private View rootView;
     private LineNodeView currentStationView;
+
+    private boolean isDefaultLine = false;
 
     private TextView hint_text;
     private TextView start_and_end;
@@ -101,6 +102,21 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             rootView = inflater.inflate(R.layout.remind_layout, container, false);
             initView(rootView);// 控件初始化
         }
+        if (CommonFuction.isEmptyColloctionFolder(getActivity())) {
+            favtor_btn.setTextColor(getResources().getColor(R.color.black));
+            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor));
+            initDefaultEmptyLine();
+        } else {
+            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
+            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor_select));
+            List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(), mDataManager);
+            Log.d(TAG,"initDefaultEmptyLine lineObjects.size = "+lineObjects.size());
+            if (lineObjects.size() > 0) {
+                initdata(lineObjects.get(0));
+            }else{
+                initDefaultEmptyLine();
+            }
+        }
         return rootView;
     }
 
@@ -141,7 +157,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     }
 
     public void upadaData() {
-        list = null;
+        Log.d(TAG,"upadaData");
+        /*list = null;
         if (linearlayout != null)
             linearlayout.removeAllViews();
         if (needChangeStationList != null)
@@ -167,6 +184,14 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         }
         if (current_info_text != null) {
             current_info_text.setText("");
+        }*/
+        if(getActivity() != null) {
+            List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(), mDataManager);
+            if (lineObjects.size() > 0) {
+                initdata(lineObjects.get(0));
+            } else {
+                initDefaultEmptyLine();
+            }
         }
     }
 
@@ -174,7 +199,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         if (list == null || list.size() <= 0) {
             return;
         }
-
+        if(!NetWorkUtils.isGPSEnabled(activity) || !activity.getPersimmions()){
+            NetWorkUtils.openGPS(activity);
+            isRemind = false;
+        }
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -220,10 +248,12 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                             Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(RemindFragment.this.getResources(), R.drawable.cm_route_map_pin_dottransfer), size, size);
                             textView.setTransFerBitmap(bitmap);
                         }
-                        if (preStationInfo.pm < stationInfo.pm) {
-                            lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
-                        } else {
-                            lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getForwad());
+                        if(preStationInfo != null) {
+                            if (preStationInfo.pm < stationInfo.pm) {
+                                lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
+                            } else {
+                                lineDirection.put(preStationInfo.lineid, mDataManager.getLineInfoList().get(preStationInfo.lineid).getForwad());
+                            }
                         }
                     }
                     int lineid = list.get(i).lineid;
@@ -252,6 +282,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 nextStation = list.get(0);
                 updateColloctionView();
                 tempChangeStationList = new ArrayList<>(needChangeStationList);
+                if (CommonFuction.isEmptyColloctionFolder(getActivity()) && !isDefaultLine) {
+                    saveFavourite();
+                }
+                isDefaultLine = false;
             }
         });
         if (getMainActivity() != null) {
@@ -262,7 +296,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     public void updateColloctionView() {
         String lineStr = CommonFuction.convertStationToString(lineObject);
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity, CommonFuction.FAVOURITE);
-        if (allFavoriteLine.contains(lineStr)) {
+        if (!TextUtils.isEmpty(lineStr) && allFavoriteLine.contains(lineStr)) {
             collection_btn.setTextColor(getResources().getColor(R.color.blue));
             setCompoundDrawables(collection_btn, activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
         } else {
@@ -314,15 +348,29 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
         mScrollFavoriteManager = new ScrollFavoriteManager(this, rootView);
         mScrollFavoriteManager.setRemindSetViewListener(mRemindSetViewListener);
-        if (CommonFuction.isEmptyColloctionFolder(getActivity())) {
-            favtor_btn.setTextColor(getResources().getColor(R.color.black));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor));
-        } else {
-            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor_select));
-            List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(), mDataManager);
-            if (lineObjects.size() > 0) {
-                initdata(lineObjects.get(0));
+    }
+
+    private void initDefaultEmptyLine(){
+        Log.d(TAG,"initDefaultEmptyLine mDataManager = "+mDataManager+" mDataManager.getAllLineCane() = "+mDataManager.getAllLineCane());
+        if(mDataManager != null && mDataManager.getAllLineCane() != null) {
+            LineInfo lineInfo = mDataManager.getLineInfoList().get(mDataManager.getMinLineid());
+            Log.d(TAG,"initDefaultEmptyLine Lineid = "+mDataManager.getMinLineid()+" lineInfo = "+lineInfo);
+
+            if(lineInfo != null) {
+                list = lineInfo.getStationInfoList();
+                LineObject lineObject = new LineObject();
+                lineObject.stationList = list;
+                List<Integer> lineidList = new ArrayList<>();
+                lineidList.add(mDataManager.getMinLineid());
+                lineObject.lineidList = lineidList;
+                List transferList = new ArrayList<>();
+                int endStation = list.size() > 1 ? list.size()-1:0;
+                if(list.size() > endStation) {
+                    transferList.add(list.get(endStation));
+                    lineObject.transferList = transferList;
+                    isDefaultLine = true;
+                    initdata(lineObject);
+                }
             }
         }
     }
@@ -367,6 +415,14 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                         setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
                     }
                 } else {
+                    if(!NetWorkUtils.isGPSEnabled(activity) || !activity.getPersimmions()){
+                        ToastUitl.showText(activity,activity.getString(R.string.please_open_location));
+                        return;
+                    }
+                    activity.getPersimmions();
+                    if(!NetWorkUtils.isGPSEnabled(activity) || !NetWorkUtils.isNetworkConnected(activity)){
+                        ToastUitl.showText(activity,activity.getString(R.string.please_open_location));
+                    }
                     tempChangeStationList = new ArrayList<>(needChangeStationList);
                     isRemind = true;
                     if (getMainActivity() != null) {

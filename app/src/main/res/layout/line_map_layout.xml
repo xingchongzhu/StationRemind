@@ -39,7 +39,7 @@
                     android:orientation="vertical">
 
                 <GridView
-                        android:id="@+id/sceneMap"
+                        android:id="@+id/scene_map"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"

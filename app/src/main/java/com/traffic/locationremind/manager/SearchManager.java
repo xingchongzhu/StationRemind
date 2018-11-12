@@ -20,6 +20,7 @@ import com.traffic.locationremind.baidu.location.search.adapter.CardAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.GridViewAdapter;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
 import com.traffic.locationremind.baidu.location.search.widge.SearchView;
+import com.traffic.locationremind.common.util.ToastUitl;
 import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.PathSerachUtil;
@@ -243,6 +244,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
      */
     @Override
     public void onSearch(final Context context, String start, String end) {
+
         AsyncTaskManager.getInstance().stopAllGeekRunable();
         if(allstations == null || allstations.size() <= 0){
             getDbData();
@@ -257,11 +259,12 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             //更新result数据
             if (TextUtils.isEmpty(start) || TextUtils.isEmpty(end))
                 return;
-
             String current = context.getResources().getString(R.string.current_location);
+
             if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity) ||
                     (prestartStation != null && preendStation != null && prestartStation.getCname().equals(start) &&
                             preendStation.getCname().equals(end))) {
+                ToastUitl.showText(activity,activity.getString(R.string.hint_open_network_gps));
                 return;
             }
             if (start.equals(current)) {
@@ -349,6 +352,10 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         mCardAdapter.setData(lastLinesLast);
     }
 
+    @Override
+    public void updateResultList( List<List<Integer>> list){
+
+    }
     @Override
     public void updateResult(List<LineObject> lines) {
         if (mSearchLoadingDialog != null) {

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.item.LineSearchItem;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
@@ -71,8 +72,7 @@ public class DBHelper extends SQLiteOpenHelper {
 	}
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-
-		db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_LINE + "("
+		/*db.execSQL("CREATE TABLE IF NOT EXISTS " + TB_LINE + "("
 				+ LineInfo.LINEID + " integer primary key autoincrement ,"
 				+ LineInfo.LINENAME + " varchar,"
 				+ LineInfo.LINEINFO + " varchar,"
@@ -97,6 +97,15 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ ExitInfo.CNAME + " varchar,"
 				+ ExitInfo.EXITNAME + " varchar,"
 				+ ExitInfo.ADDR + " varchar"
+				+ ")");*/
+	}
+
+	public void creaLineSearchTable(SQLiteDatabase db){
+		db.execSQL("CREATE TABLE IF NOT EXISTS " + SqliteHelper.TB_LINE_RESULT_INFO + "("
+				+ LineSearchItem.ID + " integer primary key autoincrement ,"
+				+ LineSearchItem.STARTLINE + " integer,"
+				+ LineSearchItem.ENDLINE + " integer,"
+				+ LineSearchItem.LINELIST + " varchar"
 				+ ")");
 	}
 

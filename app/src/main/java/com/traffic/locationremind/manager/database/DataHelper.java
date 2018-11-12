@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.item.LineSearchItem;
+import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.manager.bean.*;
 
 import java.io.File;
@@ -54,6 +56,7 @@ public class DataHelper {
         }
         dbHelper = new DBHelper(context,dbName+".db");
         db = dbHelper.getWritableDatabase();
+        dbHelper.creaLineSearchTable(db);
     }
 
     public void Close() {
@@ -65,6 +68,23 @@ public class DataHelper {
         if(cityDb != null){
             cityDb.close();
         }
+    }
+
+    public LineInfo getLineListById( int id) {
+        if (db == null) {
+            return null;
+        }
+        LineInfo lineInfo = null;
+        String selection = LineInfo.LINEID + "=?" ;
+        Cursor cursor = db.query(SqliteHelper.TB_LINE, null, selection, new String[]{""+id}, null,
+                null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            lineInfo = convertCursorToLineInfo(cursor);
+        }
+        if (cursor != null)
+            cursor.close();
+        return lineInfo;
     }
 
     public Map<Integer,LineInfo> getLineList( String sortType, String asc) {
@@ -107,21 +127,21 @@ public class DataHelper {
             return lineList;
         while (cursor.moveToNext()) {
             if(!lineList.containsKey(cursor.getInt(0))){
-                LineInfo lineInfo = new LineInfo();
-                lineInfo.setLineid(cursor.getInt(0));
-                lineInfo.setLinename(cursor.getString(1));
-                lineInfo.setLineinfo(cursor.getString(2));
-                lineInfo.setRGBCOOLOR(cursor.getString(3));
-                lineInfo.setForward(cursor.getString(4));
-                lineInfo.setReverse(cursor.getString(5));
-                lineList.put(cursor.getInt(0),lineInfo);
+                lineList.put(cursor.getInt(0),convertCursorToLineInfo(cursor));
             }
-
         }
-
-        //Log.e(TAG, "convertCursorToList");
         return lineList;
+    }
 
+    public LineInfo convertCursorToLineInfo(Cursor cursor){
+        LineInfo lineInfo = new LineInfo();
+        lineInfo.setLineid(cursor.getInt(0));
+        lineInfo.setLinename(cursor.getString(1));
+        lineInfo.setLineinfo(cursor.getString(2));
+        lineInfo.setRGBCOOLOR(cursor.getString(3));
+        lineInfo.setForward(cursor.getString(4));
+        lineInfo.setReverse(cursor.getString(5));
+        return  lineInfo;
     }
 
     public ArrayList<LineInfo> convertCursorToLineList(Cursor cursor) {
@@ -129,16 +149,8 @@ public class DataHelper {
         if (cursor == null)
             return lineList;
         while (cursor.moveToNext()) {
-            LineInfo lineInfo = new LineInfo();
-            lineInfo.setLineid(cursor.getInt(0));
-            lineInfo.setLinename(cursor.getString(1));
-            lineInfo.setLineinfo(cursor.getString(2));
-            lineInfo.setRGBCOOLOR(cursor.getString(3));
-            lineInfo.setForward(cursor.getString(4));
-            lineInfo.setReverse(cursor.getString(5));
-            lineList.add(lineInfo);
+            lineList.add(convertCursorToLineInfo(cursor));
         }
-
         //Log.e(TAG, "convertCursorToList");
         return lineList;
 
@@ -253,10 +265,28 @@ public class DataHelper {
             cityInfo.setCityNo(cursor.getString(4));
             cityInfoList.add(cityInfo);
         }
-
         //Log.e(TAG, "convertCursorToList");
         return cityInfoList;
+    }
 
+    public List<LineSearchItem> convertCursorToLineSearchItemList(Cursor cursor) {
+        List<LineSearchItem> LineSearchItemList = new ArrayList<>();
+        if (cursor == null)
+            return LineSearchItemList;
+        while (cursor.moveToNext()) {
+            LineSearchItem lineSearchItem = new LineSearchItem();
+            lineSearchItem.setStartLine(cursor.getInt(1));
+            lineSearchItem.setEndLine(cursor.getInt(2));
+            String[] lines = cursor.getString(3).split(CommonFuction.TRANSFER_SPLIT);
+            List<Integer> list = new ArrayList<>();
+            for(String id:lines){
+                list.add(Integer.parseInt(id));
+            }
+            lineSearchItem.setLineList(list);
+            LineSearchItemList.add(lineSearchItem);
+        }
+        //Log.e(TAG, "convertCursorToList");
+        return LineSearchItemList;
     }
 
     public Map<String,CityInfo> convertCursorToCityInfoMap(Cursor cursor) {
@@ -276,6 +306,31 @@ public class DataHelper {
         Log.e(TAG, "convertCursorToList");
         return cityInfoList;
 
+    }
+
+    public boolean insetLineSearchItem(LineSearchItem item) {
+        ContentValues values = new ContentValues();
+        values.put(LineSearchItem.STARTLINE, item.getStartLine());
+        values.put(LineSearchItem.ENDLINE,item.getEndLine());
+        values.put(LineSearchItem.LINELIST,item.getLineString());
+        long rowid = db.insert(SqliteHelper.TB_LINE_RESULT_INFO, null, values);
+        Log.d(TAG, "insetLineSearchItem rowid = " + rowid);
+        if (rowid > 0)
+            return true;
+        return false;
+    }
+
+    public List<LineSearchItem> QueryLineSearchItemBy(int startId,int endId) {
+
+        List<LineSearchItem> lineSearchItemList;
+        String selection = LineSearchItem.STARTLINE+"=? and"+LineSearchItem.ENDLINE+"=?";
+        Cursor cursor = db.query(SqliteHelper.TB_LINE_RESULT_INFO, null,  selection
+                , new String[]{""+startId,""+endId}, null, null,
+                null);
+        lineSearchItemList = convertCursorToLineSearchItemList(cursor);
+        if (cursor != null)
+            cursor.close();
+        return lineSearchItemList;
     }
 
     public boolean insetCityInfo(CityInfo cityInfo) {
@@ -435,7 +490,7 @@ public class DataHelper {
         return false;
     }
 
-    public  List<StationInfo> QueryByStationLineNo(int lineNo, String cityNo) {
+    public  List<StationInfo> QueryByStationLineNo(int lineNo) {
 
         List<StationInfo> StationInfoList;
 

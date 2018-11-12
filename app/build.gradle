@@ -5,13 +5,13 @@ android {
         debugkey {
             keyAlias 'mysigned'
             keyPassword 'yezi82231'
-            storeFile file('/home/zhuxingchong/WorkSpace/myProject/StationRemind/keystore/debugkey.jks')
+            storeFile file('/keystore/debugkey.jks')
             storePassword 'yezi82231'
         }
         releasekey {
             keyAlias 'releasekey'
             keyPassword 'yezi82231'
-            storeFile file('/home/zhuxingchong/WorkSpace/myProject/StationRemind/keystore/releasekey.jks')
+            storeFile file('/keystore/releasekey.jks')
             storePassword 'yezi82231'
         }
     }
@@ -27,12 +27,12 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.releasekey
         }
         debug {
-            debuggable false
+            debuggable true
             signingConfig signingConfigs.debugkey
             minifyEnabled false
         }

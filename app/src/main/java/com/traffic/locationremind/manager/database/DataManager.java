@@ -8,7 +8,11 @@ import android.util.Log;
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.*;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
+import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
+import com.traffic.locationremind.baidu.location.object.LineObject;
+import com.traffic.locationremind.baidu.location.utils.SearchPath;
 import com.traffic.locationremind.common.util.*;
+import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -34,6 +38,7 @@ public class DataManager{
     private Integer allLineNodes[];
 
 	private int maxLineid = 0;
+	private int minLineid = Integer.MAX_VALUE;
 	GeoCoder mSearch ;
 	OnGetGeoCoderResultListener listener = new OnGetGeoCoderResultListener() {
 		public void onGetGeoCodeResult(GeoCodeResult result) {
@@ -91,6 +96,7 @@ public class DataManager{
 	public CityInfo getCurrentCityNo(){
 		return currentCityNo;
 	}
+
 	public DataManager(Context context){
 
 	}
@@ -130,6 +136,7 @@ public class DataManager{
 			loadDataListener.loadFinish();
 		}
 	}
+
 	public static DataManager getInstance(Context context){
 		if(mDataManager == null){
 			mDataManager = new DataManager(context);
@@ -153,6 +160,10 @@ public class DataManager{
 
 	public int getMaxLineid(){
 		return maxLineid;
+	}
+
+	public int getMinLineid(){
+		return minLineid;
 	}
 	public DataHelper getDataHelper(){
 		return mDataHelper;
@@ -195,13 +206,15 @@ public class DataManager{
 			Map<Integer,LineInfo> list= mDataHelper.getLineList(LineInfo.LINEID, "ASC");
 
 			for (Map.Entry<Integer,LineInfo> entry : list.entrySet()) {
-				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey(), currentCityNo.getCityNo()));
+				entry.getValue().setStationInfoList(mDataHelper.QueryByStationLineNo(entry.getKey()));
 				List<StationInfo> canTransferlist = mDataHelper.QueryByStationLineNoCanTransfer(entry.getValue().lineid, currentCityNo.getCityNo());
 				allLineCane.put(entry.getKey(), PathSerachUtil.getLineAllLined(canTransferlist));
 				if(entry.getKey() > maxLineid){
 					maxLineid = entry.getKey();
 				}
-
+				if(entry.getKey() < minLineid){
+					minLineid = entry.getKey();
+				}
 			}
 			maxLineid+= 1;//找出路线最大编号加一
 			mLineInfoList = list;
@@ -223,7 +236,73 @@ public class DataManager{
 		protected void onPostExecute(Map<Integer,LineInfo> list) {
 			super.onPostExecute(list);
 			notificationUpdata();
+			ArrayList<LineInfo> alllist= mDataHelper.getLineLists(LineInfo.LINEID, "ASC");
+			int size = alllist.size();
+			for(int i = 0;i < size;i++){
+				for(int j = 0;j < size;j++){
+					if(i != j){
+						searchThread(alllist.get(i).lineid,alllist.get(j).lineid, nodeRalation);
+					}
+				}
+			}
 		}
+	}
+
+	public void searchThread(final int startlineid,final int endlineid, int[][] nodeRalation) {
+		SearchPath searchPath = new SearchPath(new SearchResultListener(){
+			@Override
+			public void updateSingleResult(List<Integer> list){
+
+			}
+			@Override
+			public void updateResultList(List<List<Integer>> list){
+				if(list != null && list.size() > 0) {
+					Collections.sort(list, new Comparator<List<Integer>>() {
+						public int compare(List<Integer> p1, List<Integer> p2) {
+							//按照换乘次数
+							if (p1.size() > p2.size()) {
+								return 1;
+							}
+							if (p1.size() == p2.size()) {
+								return 0;
+							}
+							return -1;
+						}
+					});
+					int n = 0;
+					int preNum = list.get(0).size();
+					List<List<Integer>> needRemove = new ArrayList<>();
+					for(List<Integer> single:list){
+						if(preNum != single.size()){
+							n++;
+						}
+						if(n > 1){
+							needRemove.add(single);
+						}
+						preNum = single.size();
+					}
+					list.removeAll(needRemove);
+					//Log.d(TAG,  "needRemove = "+needRemove.toString());
+					Log.d(TAG,"updateResultList startlineid = "+startlineid+" endlineid = "+endlineid+" list.size = "+list.size()+"  "+list.toString());
+
+				}
+			}
+			@Override
+			public void updateResult(List<LineObject> lastLinesLast){
+
+			}
+			@Override
+			public void cancleDialog(List<LineObject> lastLinesLast){
+
+			}
+			@Override
+			public void setLineNumber(int number){
+
+			}
+		}
+		,startlineid, endlineid, nodeRalation);
+		AsyncTaskManager.getInstance().addGeekRunnable(searchPath);
+		searchPath.execute("");
 	}
 
 	public void getAddr(Context context,String city){

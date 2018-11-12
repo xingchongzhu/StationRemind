@@ -25,10 +25,7 @@ import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.activity.WebMainActivity;
 import com.traffic.locationremind.baidu.location.utils.Utils;
 import com.traffic.locationremind.baidu.location.view.FullMapView;
-import com.traffic.locationremind.common.util.CommonFuction;
-import com.traffic.locationremind.common.util.FileUtil;
-import com.traffic.locationremind.common.util.IDef;
-import com.traffic.locationremind.common.util.StreamUtils;
+import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 
@@ -79,7 +76,7 @@ public class FullMapFragment extends Fragment {
             webView.post(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("zxc", "JsInterface");
+                    Log.d(TAG, "JsInterface");
                     //webView.loadUrl("javascript:callJS(" + "'" + msg + "'" + ")");
                 }
             });
@@ -101,11 +98,11 @@ public class FullMapFragment extends Fragment {
 
             webView.addJavascriptInterface(new JsInterface(), "show");
             String cityName = cityList.get(0).getPingying()+".json";
-            Log.d("zxc","initData "+" cityName = "+cityName);
+            Log.d(TAG,"initData "+" cityName = "+cityName);
             String url = "file:///android_asset/src/index.html?cityCode="+cityName;
             webView.loadUrl(url);
             webView.setWebChromeClient(new MyWebChromeClient());
-            if(Utils.isGpsOPen(getContext())){
+            if(NetWorkUtils.isGPSEnabled(getActivity()) && NetWorkUtils.isNetworkConnected(getActivity())){
                 text.setVisibility(View.GONE);
             }
         }
@@ -123,7 +120,7 @@ public class FullMapFragment extends Fragment {
             List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);
             if (cityList != null && cityList.size() > 0) {
                 String cityName = cityList.get(0).getPingying() + ".json";
-                Log.d("zxc", "updateCity " + " cityName = " + cityName);
+                Log.d(TAG, "updateCity " + " cityName = " + cityName);
                 String url = "file:///android_asset/src/index.html?cityCode=" + cityName;
                 webView.loadUrl(url);
             }
@@ -133,7 +130,7 @@ public class FullMapFragment extends Fragment {
     final class MyWebChromeClient extends WebChromeClient {
         @Override
         public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-            Log.d("zxc", message);
+            Log.d(TAG, message);
             result.confirm();
             return true;
         }

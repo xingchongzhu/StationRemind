@@ -53,6 +53,9 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
     protected void onPostExecute(List<List<Integer>> list) {
         super.onPostExecute(list);
         stopRun = true;
+        if( mSearchResultListener != null){
+            mSearchResultListener.updateResultList(list);
+        }
         stack.clear();
         stack = null;
         list.clear();
@@ -105,7 +108,7 @@ public class SearchPath extends AsyncTask<String, List<Integer>, List<List<Integ
                 //System.out.print(nNode.getName() + "->");
             } else {
                 str.append(nNode.getName() + "->");
-                System.out.print(nNode.getName());
+                //System.out.print(nNode.getName());
             }
         }
         for (List<Integer> entry : sers) {

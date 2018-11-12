@@ -3,6 +3,7 @@ package com.traffic.locationremind.baidu.location.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -36,16 +37,24 @@ public class AllLineAdapter extends BaseAdapter {
     }
 
     public void setData(LineInfo data) {
-        this.data = data;
+        if(data != null && mDataManager != null){
+            this.data = mDataManager.getDataHelper().getLineListById(data.lineid);
+            if(data != null){
+                this.data.setStationInfoList(mDataManager.getDataHelper().QueryByStationLineNo(data.lineid));
+            }else {
+                this.data = data;
+            }
+        }else {
+            this.data = data;
+        }
         notifyDataSetChanged();
-    }
-
-    public List<StationInfo> getLineInfo(){
-        return data.getStationInfoList();
     }
 
     @Override
     public int getCount() {
+        /*if(data != null || data.getStationInfoList() == null .size() <= 0 && mDataManager != null && mDataManager.getLineInfoList() != null){
+            data = mDataManager.getLineInfoList().get(data.lineid);
+        }*/
         return data == null ? 0 : data.getStationInfoList().size();
     }
 
@@ -66,7 +75,6 @@ public class AllLineAdapter extends BaseAdapter {
         if (null == convertView) {
             convertView = View.inflate(mContext, R.layout.single_node_item, null);
             viewholder = new ViewHolder(convertView);
-            convertView.setTag(viewholder);
         } else {
             viewholder = (ViewHolder) convertView.getTag();
         }
@@ -80,7 +88,7 @@ public class AllLineAdapter extends BaseAdapter {
             }
             viewholder.singleNodeView.setColor(data.colorid);
         }
-
+        convertView.setTag(viewholder);
         return convertView;
     }
 

@@ -79,4 +79,5 @@
     <string name="please_open_location">保持gps定位和网络连接</string>
     <string name="password_toggle_content_description">Toggle password visibility</string>
     <string name="background_location">后台定位</string>
+    <string name="hint_open_network_gps">无法定位，请开启网络电话权限</string>
 </resources>

@@ -15,9 +15,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.search.adapter.SearchAdapter;
 import com.traffic.locationremind.baidu.location.view.SearchEditView;
 import com.traffic.locationremind.common.util.CommonFuction;
+import com.traffic.locationremind.common.util.NetWorkUtils;
+import com.traffic.locationremind.common.util.ToastUitl;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 
@@ -236,7 +239,12 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         }
         if(startInput != null) {
             startInput.setText("");
-            startInput.setText(getResources().getString(R.string.current_location));
+            if(!((MainActivity)mContext).getPersimmions() || !NetWorkUtils.isGPSEnabled(mContext)){
+                ToastUitl.showText(getContext(),getContext().getString(R.string.hint_open_network_gps));
+                startInput.setText("");
+            }else{
+                startInput.setText(getResources().getString(R.string.current_location));
+            }
             startInput.setSelection(startInput.getText().toString().length());
         }
 
