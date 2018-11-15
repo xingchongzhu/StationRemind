@@ -519,6 +519,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     int size = (int) getResources().getDimension(R.dimen.current_bitmap_siez);
                     Bitmap bitmap = CommonFuction.getbitmap(BitmapFactory.decodeResource(this.getResources(), R.drawable.cm_main_map_pin_location), size, size);
                     lineNodeView.setBitMap(bitmap);
+                    lineNodeView.pass = true;
                     currentStationView = lineNodeView;
                     int n = 0;
                     for (StationInfo stationInfo : list) {
@@ -541,7 +542,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                         nextStation = list.get(n + 1);
                     }
 
-                    //Log.d(TAG, "loactionStation getCname = " + nerstStationInfo.getCname() + " isRemind = " + isRemind + " n = " + n + " size = " + size);
                     if (isRemind) {
                         for (StationInfo stationInfo : tempChangeStationList) {
                             if (list.get(list.size() - 1).getCname().equals(stationInfo.getCname()) &&
@@ -562,7 +562,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                                 break;
                             }
                         }
-                        //updataNotification(createNotificationObject(currentStation, nextStation));
                     }
                 }
             }

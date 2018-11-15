@@ -100,14 +100,7 @@ public class DBHelper extends SQLiteOpenHelper {
 				+ ")");*/
 	}
 
-	public void creaLineSearchTable(SQLiteDatabase db){
-		db.execSQL("CREATE TABLE IF NOT EXISTS " + SqliteHelper.TB_LINE_RESULT_INFO + "("
-				+ LineSearchItem.ID + " integer primary key autoincrement ,"
-				+ LineSearchItem.STARTLINE + " integer,"
-				+ LineSearchItem.ENDLINE + " integer,"
-				+ LineSearchItem.LINELIST + " varchar"
-				+ ")");
-	}
+
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

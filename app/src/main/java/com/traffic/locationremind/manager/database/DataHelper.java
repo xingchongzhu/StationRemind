@@ -56,7 +56,17 @@ public class DataHelper {
         }
         dbHelper = new DBHelper(context,dbName+".db");
         db = dbHelper.getWritableDatabase();
-        dbHelper.creaLineSearchTable(db);
+        creaLineSearchTable(db);
+    }
+
+    public void creaLineSearchTable(SQLiteDatabase db){
+        //cityDb.execSQL("CREATE TABLE IF NOT EXISTS "+DBHelper.TB_RECENT_CITY+" (id integer primary key autoincrement, name varchar(40), date INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + SqliteHelper.TB_LINE_RESULT_INFO + "("
+                + LineSearchItem.ID + " integer primary key autoincrement ,"
+                + LineSearchItem.STARTLINE + " integer,"
+                + LineSearchItem.ENDLINE + " integer,"
+                + LineSearchItem.LINELIST + " varchar"
+                + ")");
     }
 
     public void Close() {
@@ -320,8 +330,24 @@ public class DataHelper {
         return false;
     }
 
-    public List<LineSearchItem> QueryLineSearchItemBy(int startId,int endId) {
+    public boolean lineItemExist(LineSearchItem item) {
+        ContentValues values = new ContentValues();
+        values.put(LineSearchItem.STARTLINE, item.getStartLine());
+        values.put(LineSearchItem.ENDLINE,item.getEndLine());
+        values.put(LineSearchItem.LINELIST,item.getLineString());
+        String selection = LineSearchItem.STARTLINE+" =? and "+LineSearchItem.ENDLINE+" =? and "+LineSearchItem.LINELIST+" =?";
+        Cursor cursor = db.query(SqliteHelper.TB_LINE_RESULT_INFO, null,  selection
+                , new String[]{""+item.getStartLine(),""+item.getEndLine(),item.getLineString()}, null, null,
+                null);
+        if (cursor != null && cursor.getCount() > 0) {
+            Log.d(TAG, "lineItemExist  (" + item.getStartLine() + "," + item.getEndLine());
+            cursor.close();
+            return true;
+        }
+        return false;
+    }
 
+    public List<LineSearchItem> queryLineSearchItemBy(int startId,int endId) {
         List<LineSearchItem> lineSearchItemList;
         String selection = LineSearchItem.STARTLINE+"=? and"+LineSearchItem.ENDLINE+"=?";
         Cursor cursor = db.query(SqliteHelper.TB_LINE_RESULT_INFO, null,  selection

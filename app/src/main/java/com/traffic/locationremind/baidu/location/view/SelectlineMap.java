@@ -213,7 +213,7 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
 
     private void drawLine(Canvas canvas, int left, int top, int right, int bottom, int color) {
         int offext = 10;
-        mPaint.setStrokeWidth(20);
+        mPaint.setStrokeWidth(getContext().getResources().getDimension(R.dimen.line_height_size));
         mPaint.setColor(color);
         canvas.drawLine(left, top - offext, right, bottom, mPaint);
         mPaint.setColor(Color.WHITE);

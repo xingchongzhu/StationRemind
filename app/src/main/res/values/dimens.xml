@@ -72,4 +72,5 @@
     <dimen name="rect_text">13sp</dimen>
     <dimen name="icon_size">20dp</dimen>
     <dimen name="line_height">8dp</dimen>
+    <dimen name="line_height_size">3dp</dimen>
 </resources>

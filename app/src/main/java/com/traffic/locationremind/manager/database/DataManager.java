@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.baidu.mapapi.search.core.SearchResult;
 import com.baidu.mapapi.search.geocode.*;
+import com.traffic.locationremind.baidu.location.item.LineSearchItem;
 import com.traffic.locationremind.baidu.location.listener.LoadDataListener;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
@@ -187,7 +188,6 @@ public class DataManager{
 			}
 			//merageAllCity((Context) params[0]);
 			String shpno = CommonFuction.getSharedPreferencesValue((Context) params[0], CityInfo.CITYNAME);
-
 			maxLineid = 0;
 			if (!TextUtils.isEmpty(shpno)) {
 				currentCityNo = cityInfoList.get(shpno);
@@ -283,8 +283,13 @@ public class DataManager{
 					}
 					list.removeAll(needRemove);
 					//Log.d(TAG,  "needRemove = "+needRemove.toString());
-					Log.d(TAG,"updateResultList startlineid = "+startlineid+" endlineid = "+endlineid+" list.size = "+list.size()+"  "+list.toString());
-
+					for(List<Integer> single:list){
+						LineSearchItem item = new LineSearchItem(startlineid,endlineid,single);
+						if(!mDataHelper.lineItemExist(item)) {
+							mDataHelper.insetLineSearchItem(item);
+							Log.d(TAG,"updateResultList startlineid = "+startlineid+" endlineid = "+endlineid+"  "+item.getLineString());
+						}
+					}
 				}
 			}
 			@Override

@@ -83,15 +83,16 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         }
     }
 
-    public void setSearchText(String start,String end){
-        if(searchView != null){
+    public void setSearchText(String start, String end) {
+        if (searchView != null) {
             searchView.setStartInput(start);
             searchView.setendInput(end);
         }
-        if(autoCompleteData != null){
+        if (autoCompleteData != null) {
             autoCompleteData.clear();
         }
     }
+
     /**
      * 搜索过程中自动补全数据
      */
@@ -199,17 +200,17 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
      */
     private void getAutoCompleteData(Context context, String text) {
         //Log.d(TAG, "getAutoCompleteData text = "+text);
-        if (TextUtils.isEmpty(text)){
+        if (TextUtils.isEmpty(text)) {
             return;
         }
         if (autoCompleteData == null) {
             //初始化
             autoCompleteData = new ArrayList<>();
         }
-        if(true){
+        if (true) {
             // 根据text 获取auto data
             autoCompleteData.clear();
-            Log.d(TAG, "getAutoCompleteData text = "+text);
+            Log.d(TAG, "getAutoCompleteData text = " + text);
             for (Map.Entry<String, StationInfo> entry : allstations.entrySet()) {
                 if (!TextUtils.isEmpty(text) && (entry.getKey().contains(text.trim())) ||
                         entry.getValue().getPname().toLowerCase().contains(text.trim().toLowerCase()) ||
@@ -246,7 +247,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
     public void onSearch(final Context context, String start, String end) {
 
         AsyncTaskManager.getInstance().stopAllGeekRunable();
-        if(allstations == null || allstations.size() <= 0){
+        if (allstations == null || allstations.size() <= 0) {
             getDbData();
         }
         synchronized (lock) {
@@ -264,7 +265,7 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
             if ((start.equals(current) || end.equals(current)) && !currentCity.equals(locationCity) ||
                     (prestartStation != null && preendStation != null && prestartStation.getCname().equals(start) &&
                             preendStation.getCname().equals(end))) {
-                ToastUitl.showText(activity,activity.getString(R.string.hint_open_network_gps));
+                ToastUitl.showText(activity, activity.getString(R.string.hint_open_network_gps));
                 return;
             }
             if (start.equals(current)) {
@@ -332,9 +333,9 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         if (mSearchLoadingDialog != null && (lastLinesLast.size() > 0)) {
             mSearchLoadingDialog.cancel();
         }
-        Message message =myHandler.obtainMessage();
-        message.what =0;
-        myHandler.sendMessageDelayed(message,100);
+        Message message = myHandler.obtainMessage();
+        message.what = 0;
+        myHandler.sendMessageDelayed(message, 100);
     }
 
     @Override
@@ -342,20 +343,33 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         if (mSearchLoadingDialog != null) {
             mSearchLoadingDialog.cancel();
         }
-        if(!AsyncTaskManager.getInstance().isSearch() && lastLinesLast== null || lastLinesLast.size() <= 0){
-            Toast.makeText(activity,activity.getResources().getString(R.string.search_result_empty),Toast.LENGTH_LONG).show();
+        if (!AsyncTaskManager.getInstance().isSearch() && lastLinesLast == null || lastLinesLast.size() <= 0) {
+            Toast.makeText(activity, activity.getResources().getString(R.string.search_result_empty), Toast.LENGTH_LONG).show();
         }
     }
 
-    public void clearResult(){
+    public void clearResult() {
         lastLinesLast.clear();
         mCardAdapter.setData(lastLinesLast);
     }
 
     @Override
-    public void updateResultList( List<List<Integer>> list){
-
+    public void updateResultList(List<List<Integer>> lists) {
+        allLines.clear();
+        for (List<Integer> list : lists) {
+            allLinesMap.put(list.toString(), list);
+            allLines.add(list);
+        }
+        lastLinesLast.addAll(PathSerachUtil.getReuslt(allLines, mDataManager, startStation, endStation));
+        PathSerachUtil.getRecomendLines(lastLinesLast);
+        if (mSearchLoadingDialog != null && (lastLinesLast.size() > 0)) {
+            mSearchLoadingDialog.cancel();
+        }
+        Message message = myHandler.obtainMessage();
+        message.what = 0;
+        myHandler.sendMessageDelayed(message, 100);
     }
+
     @Override
     public void updateResult(List<LineObject> lines) {
         if (mSearchLoadingDialog != null) {
@@ -363,11 +377,11 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
         }
         lastLinesLast.addAll(lines);
         PathSerachUtil.getRecomendLines(lastLinesLast);
-        Message message =myHandler.obtainMessage();
-        message.what =0;
-        myHandler.sendMessageDelayed(message,100);
-        if(!AsyncTaskManager.getInstance().isSearch() && (lastLinesLast== null || lastLinesLast.size() <= 0)){
-            Toast.makeText(activity,activity.getResources().getString(R.string.search_result_empty),Toast.LENGTH_LONG).show();
+        Message message = myHandler.obtainMessage();
+        message.what = 0;
+        myHandler.sendMessageDelayed(message, 100);
+        if (!AsyncTaskManager.getInstance().isSearch() && (lastLinesLast == null || lastLinesLast.size() <= 0)) {
+            Toast.makeText(activity, activity.getResources().getString(R.string.search_result_empty), Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -35,6 +35,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     private StationInfo mStationInfo;
     private int color = Color.LTGRAY;
     private Bitmap transFerBitmap;
+    public boolean pass = false;
 
     public StationInfo getStationInfo(){
         return mStationInfo;
@@ -92,9 +93,9 @@ public class LineNodeView extends TextView implements View.OnClickListener {
         textSize =  (int)getContext().getResources().getDimension(R.dimen.rect_text);
         iconSize =  (int)getContext().getResources().getDimension(R.dimen.icon_size);
         paddingLine = iconSize+10;
-        lineHeight =  (int)getContext().getResources().getDimension(R.dimen.line_height);
         // 本控件的点击事件
         setOnClickListener(this);
+        lineHeight =  (int)getContext().getResources().getDimension(R.dimen.line_height);
     }
 
     @Override
@@ -121,10 +122,14 @@ public class LineNodeView extends TextView implements View.OnClickListener {
         }
         height+= 1.1*iconSize;
         //height+= paddingLine;
-        mPaint.setColor(color);
-        mPaint.setStrokeWidth(lineHeight);
+        if(pass) {
+            mPaint.setColor(Color.GRAY);
+        }else{
+            mPaint.setColor(color);
+        }
+        mPaint.setStrokeWidth(getContext().getResources().getDimension(R.dimen.line_height_size));
         canvas.drawLine(0,height,getWidth(),height,mPaint);
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(norrowHeight);
 
         if(transFerBitmap != null){
@@ -143,8 +148,11 @@ public class LineNodeView extends TextView implements View.OnClickListener {
             canvas.drawLine(start+narroWidth/2,height+narroHeight,end+offset,height+norrowHeight/2,mPaint);;
         }
         height+= 4*lineHeight;
-
-        mPaint.setColor(Color.BLACK);
+        if(pass) {
+            mPaint.setColor(Color.GRAY);
+        }else{
+            mPaint.setColor(Color.BLACK);
+        }
         mPaint.setTextSize(textSize);
         mPaint.setStrokeWidth(5);
         String text = mStationInfo.getCname();
@@ -172,8 +180,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(getContext(),mStationInfo.getCname(),Toast.LENGTH_SHORT).show();
-        //invalidate();
+        //Toast.makeText(getContext(),mStationInfo.getCname(),Toast.LENGTH_SHORT).show();
     }
 
 }
