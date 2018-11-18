@@ -231,24 +231,33 @@ public class DataManager{
 			return list;
 		}
 
-		//onPostExecute用于UI的更新.此方法的参数为doInBackground方法返回的值.
 		@Override
 		protected void onPostExecute(Map<Integer,LineInfo> list) {
 			super.onPostExecute(list);
 			notificationUpdata();
 			ArrayList<LineInfo> alllist= mDataHelper.getLineLists(LineInfo.LINEID, "ASC");
 			int size = alllist.size();
-			for(int i = 0;i < size;i++){
-				for(int j = 0;j < size;j++){
-					if(i != j){
-						searchThread(alllist.get(i).lineid,alllist.get(j).lineid, nodeRalation);
+			map.clear();
+			for(SearchPath searchPath:allTaskList){
+				searchPath.cancel(true);
+			}
+
+			allTaskList.clear();
+			for(int i = 13;i < size;i++){
+				for(int j = 5;j < 12;j++){
+					if(i != j && j < size && i < size){
+						allTaskList.add(searchThread(alllist.get(i).lineid,alllist.get(j).lineid, nodeRalation));
 					}
 				}
 			}
+			if(allTaskList.size() > 0){
+				allTaskList.get(0).execute("");;
+			}
 		}
 	}
-
-	public void searchThread(final int startlineid,final int endlineid, int[][] nodeRalation) {
+	List<SearchPath> allTaskList = new ArrayList<>();
+	Map<String,String> map = new HashMap<>();
+	public SearchPath searchThread(final int startlineid,final int endlineid, int[][] nodeRalation) {
 		SearchPath searchPath = new SearchPath(new SearchResultListener(){
 			@Override
 			public void updateSingleResult(List<Integer> list){
@@ -256,6 +265,12 @@ public class DataManager{
 			}
 			@Override
 			public void updateResultList(List<List<Integer>> list){
+				if(allTaskList.size() > 0) {
+					allTaskList.remove(0);
+				}
+				if(allTaskList.size() > 0){
+					allTaskList.get(0).execute("");;
+				}
 				if(list != null && list.size() > 0) {
 					Collections.sort(list, new Comparator<List<Integer>>() {
 						public int compare(List<Integer> p1, List<Integer> p2) {
@@ -307,7 +322,8 @@ public class DataManager{
 		}
 		,startlineid, endlineid, nodeRalation);
 		AsyncTaskManager.getInstance().addGeekRunnable(searchPath);
-		searchPath.execute("");
+		//searchPath.execute("");
+		return searchPath;
 	}
 
 	public void getAddr(Context context,String city){

@@ -279,21 +279,21 @@ public class DataHelper {
         return cityInfoList;
     }
 
-    public List<LineSearchItem> convertCursorToLineSearchItemList(Cursor cursor) {
-        List<LineSearchItem> LineSearchItemList = new ArrayList<>();
+    public List<List<Integer>> convertCursorToLineSearchItemList(Cursor cursor) {
+        List<List<Integer>> LineSearchItemList = new ArrayList<>();
         if (cursor == null)
             return LineSearchItemList;
         while (cursor.moveToNext()) {
-            LineSearchItem lineSearchItem = new LineSearchItem();
+            /*LineSearchItem lineSearchItem = new LineSearchItem();
             lineSearchItem.setStartLine(cursor.getInt(1));
-            lineSearchItem.setEndLine(cursor.getInt(2));
+            lineSearchItem.setEndLine(cursor.getInt(2));*/
             String[] lines = cursor.getString(3).split(CommonFuction.TRANSFER_SPLIT);
             List<Integer> list = new ArrayList<>();
             for(String id:lines){
                 list.add(Integer.parseInt(id));
             }
-            lineSearchItem.setLineList(list);
-            LineSearchItemList.add(lineSearchItem);
+            //lineSearchItem.setLineList(list);
+            LineSearchItemList.add(list);
         }
         //Log.e(TAG, "convertCursorToList");
         return LineSearchItemList;
@@ -347,8 +347,8 @@ public class DataHelper {
         return false;
     }
 
-    public List<LineSearchItem> queryLineSearchItemBy(int startId,int endId) {
-        List<LineSearchItem> lineSearchItemList;
+    public List<List<Integer>> queryLineSearchItemBy(int startId,int endId) {
+        List<List<Integer>> lineSearchItemList;
         String selection = LineSearchItem.STARTLINE+"=? and"+LineSearchItem.ENDLINE+"=?";
         Cursor cursor = db.query(SqliteHelper.TB_LINE_RESULT_INFO, null,  selection
                 , new String[]{""+startId,""+endId}, null, null,

@@ -3,6 +3,7 @@ package com.traffic.locationremind.common.util;
 import android.util.Log;
 import com.baidu.location.BDLocation;
 import com.traffic.locationremind.baidu.location.item.IteratorNodeTool;
+import com.traffic.locationremind.baidu.location.item.LineSearchItem;
 import com.traffic.locationremind.baidu.location.item.Node;
 import com.traffic.locationremind.baidu.location.listener.SearchResultListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
@@ -556,7 +557,12 @@ public class PathSerachUtil {
                     mSearchResultListener.updateResult(getReuslt(transferLine, mDataManager, start, end));
                 } else {
                     mSearchResultListener.setLineNumber(1);
-                    startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager, start, end);
+                    List<List<Integer>> list = mDataManager.getDataHelper().queryLineSearchItemBy(start.lineid, end.lineid);
+                    if(list == null || list.size() <= 0) {
+                        startThread(mSearchResultListener, start.lineid, end.lineid, mDataManager);
+                    }else{
+                        mSearchResultListener.updateResultList(list);
+                    }
                 }
             } else if (start.canTransfer() && !end.canTransfer()) {
                 int lined = PathSerachUtil.isSameLine(start, end.lineid);
@@ -569,12 +575,26 @@ public class PathSerachUtil {
                 } else {
                     String lines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
                     int n = 0;
+                    List<List<Integer>> list = new ArrayList<>();
                     for (int i = 0; i < lines.length; i++) {
                         int startid = CommonFuction.convertToInt(lines[i], -1);
                         if (startid >= 0) {
-                            n++;
-                            startThread(mSearchResultListener, startid, end.lineid, mDataManager, start, end);
+                            List<List<Integer>> temp = mDataManager.getDataHelper().queryLineSearchItemBy(startid, end.lineid);
+                            if(temp != null){
+                                list.addAll(temp);
+                            }
                         }
+                    }
+                    if(list == null || list.size() == 0) {
+                        for (int i = 0; i < lines.length; i++) {
+                            int startid = CommonFuction.convertToInt(lines[i], -1);
+                            if (startid >= 0) {
+                                n++;
+                                startThread(mSearchResultListener, startid, end.lineid, mDataManager);
+                            }
+                        }
+                    }else{
+                        mSearchResultListener.updateResultList(list);
                     }
                     mSearchResultListener.setLineNumber(n);
                 }
@@ -589,12 +609,27 @@ public class PathSerachUtil {
                 } else {
                     String lines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
                     int n = 0;
+                    List<List<Integer>> list = new ArrayList<>();
                     for (int i = 0; i < lines.length; i++) {
-                        int startid = CommonFuction.convertToInt(lines[i], -1);
-                        if (startid >= 0) {
-                            n++;
-                            startThread(mSearchResultListener, start.lineid, startid, mDataManager, start, end);
+                        int endid = CommonFuction.convertToInt(lines[i], -1);
+                        if (endid >= 0) {
+                            List<List<Integer>> temp = mDataManager.getDataHelper().queryLineSearchItemBy(start.lineid, endid);
+                            if(temp != null){
+                                list.addAll(temp);
+                            }
                         }
+                    }
+
+                    if(list == null || list.size() == 0) {
+                        for (int i = 0; i < lines.length; i++) {
+                            int startid = CommonFuction.convertToInt(lines[i], -1);
+                            if (startid >= 0) {
+                                n++;
+                                startThread(mSearchResultListener, start.lineid, startid, mDataManager);
+                            }
+                        }
+                    }else{
+                        mSearchResultListener.updateResultList(list);
                     }
                     mSearchResultListener.setLineNumber(n);
                 }
@@ -610,17 +645,36 @@ public class PathSerachUtil {
                     String startLines[] = start.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
                     String endLines[] = end.getTransfer().split(CommonFuction.TRANSFER_SPLIT);
                     int n = 0;
+                    List<List<Integer>> list = new ArrayList<>();
                     for (int i = 0; i < startLines.length; i++) {//遍历所有情况
                         int startid = CommonFuction.convertToInt(startLines[i], -1);
                         if (startid > 0) {
                             for (int j = 0; j < endLines.length; j++) {
                                 int endid = CommonFuction.convertToInt(endLines[j], -1);
                                 if (endid > 0) {
-                                    n++;
-                                    startThread(mSearchResultListener, startid, endid, mDataManager, start, end);
+                                    List<List<Integer>> temp = mDataManager.getDataHelper().queryLineSearchItemBy(startid, endid);
+                                    if(temp != null){
+                                        list.addAll(temp);
+                                    }
                                 }
                             }
                         }
+                    }
+                    if(list == null || list.size() == 0) {
+                        for (int i = 0; i < startLines.length; i++) {//遍历所有情况
+                            int startid = CommonFuction.convertToInt(startLines[i], -1);
+                            if (startid > 0) {
+                                for (int j = 0; j < endLines.length; j++) {
+                                    int endid = CommonFuction.convertToInt(endLines[j], -1);
+                                    if (endid > 0) {
+                                        n++;
+                                        startThread(mSearchResultListener, startid, endid, mDataManager);
+                                    }
+                                }
+                            }
+                        }
+                    }else{
+                        mSearchResultListener.updateResultList(list);
                     }
                     mSearchResultListener.setLineNumber(n);
                 }
@@ -647,7 +701,7 @@ public class PathSerachUtil {
     }
 
     public static void startThread(final SearchResultListener mSearchResultListener, final int startlineid,
-                                   final int endlineid, final DataManager mDataManager, final StationInfo start, final StationInfo end) {
+                                   final int endlineid, final DataManager mDataManager) {
         SearchPath searchPath = new SearchPath(mSearchResultListener,startlineid, endlineid, mDataManager.getNodeRalation());
         AsyncTaskManager.getInstance().addGeekRunnable(searchPath);
         searchPath.execute("");
