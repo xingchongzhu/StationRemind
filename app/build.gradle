@@ -5,13 +5,13 @@ android {
         debugkey {
             keyAlias 'mysigned'
             keyPassword 'yezi82231'
-            storeFile file('/keystore/debugkey.jks')
+            storeFile file('debugkey.jks')
             storePassword 'yezi82231'
         }
         releasekey {
             keyAlias 'releasekey'
             keyPassword 'yezi82231'
-            storeFile file('/keystore/releasekey.jks')
+            storeFile file('releasekey.jks')
             storePassword 'yezi82231'
         }
     }
@@ -40,6 +40,11 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['libs']
+        }
+    }
+    android {
+        lintOptions {
+            abortOnError false
         }
     }
 }

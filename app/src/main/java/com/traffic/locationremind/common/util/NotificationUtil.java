@@ -112,7 +112,7 @@ public class NotificationUtil {
 				remoteViews.setTextViewText(R.id.start, mNotificationObject.getStartStation());
 				remoteViews.setTextViewText(R.id.end, mNotificationObject.getEndStation());
 				remoteViews.setTextViewText(R.id.next, mNotificationObject.getNextStation());
-				remoteViews.setTextViewText(R.id.time, mNotificationObject.getTime());
+				//remoteViews.setTextViewText(R.id.time, mNotificationObject.getTime());
 			}
 
 			// 设置暂停按钮的点击事件
@@ -259,7 +259,7 @@ public class NotificationUtil {
             notify.contentView.setTextViewText(R.id.start,mNotificationObject.getStartStation());
             notify.contentView.setTextViewText(R.id.end,mNotificationObject.getEndStation());
             notify.contentView.setTextViewText(R.id.next,mNotificationObject.getNextStation());
-            notify.contentView.setTextViewText(R.id.time,mNotificationObject.getTime());
+            //notify.contentView.setTextViewText(R.id.time,mNotificationObject.getTime());
 			//manager.notify(notificationId, notify);
 		}
 		return notify;

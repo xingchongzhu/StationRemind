@@ -235,26 +235,29 @@ public class DataManager{
 		protected void onPostExecute(Map<Integer,LineInfo> list) {
 			super.onPostExecute(list);
 			notificationUpdata();
-			ArrayList<LineInfo> alllist= mDataHelper.getLineLists(LineInfo.LINEID, "ASC");
-			int size = alllist.size();
-			map.clear();
-			for(SearchPath searchPath:allTaskList){
-				searchPath.cancel(true);
-			}
-
-			allTaskList.clear();
-			for(int i = 13;i < size;i++){
-				for(int j = 5;j < 12;j++){
-					if(i != j && j < size && i < size){
-						allTaskList.add(searchThread(alllist.get(i).lineid,alllist.get(j).lineid, nodeRalation));
-					}
-				}
-			}
-			if(allTaskList.size() > 0){
-				allTaskList.get(0).execute("");;
-			}
 		}
 	}
+
+	public void preLineResult(){
+        ArrayList<LineInfo> alllist= mDataHelper.getLineLists(LineInfo.LINEID, "ASC");
+        int size = alllist.size();
+        map.clear();
+        for(SearchPath searchPath:allTaskList){
+            searchPath.cancel(true);
+        }
+
+        allTaskList.clear();
+        for(int i = 0;i < size;i++){
+            for(int j = 0;j < size;j++){
+                if(i != j && j < size && i < size){
+                    allTaskList.add(searchThread(alllist.get(i).lineid,alllist.get(j).lineid, nodeRalation));
+                }
+            }
+        }
+        if(allTaskList.size() > 0){
+            allTaskList.get(0).execute("");;
+        }
+    }
 	List<SearchPath> allTaskList = new ArrayList<>();
 	Map<String,String> map = new HashMap<>();
 	public SearchPath searchThread(final int startlineid,final int endlineid, int[][] nodeRalation) {

@@ -4,8 +4,11 @@
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
-.DS_Store
 /build
 /captures
 .externalNativeBuild
 keystore/
+/app/keystore
+/app/debugkey.jks
+/app/releasekey.jks
+将删除 app/src/main/assets/jason/

@@ -349,7 +349,7 @@ public class DataHelper {
 
     public List<List<Integer>> queryLineSearchItemBy(int startId,int endId) {
         List<List<Integer>> lineSearchItemList;
-        String selection = LineSearchItem.STARTLINE+"=? and"+LineSearchItem.ENDLINE+"=?";
+        String selection = LineSearchItem.STARTLINE+"=? and "+LineSearchItem.ENDLINE+"=?";
         Cursor cursor = db.query(SqliteHelper.TB_LINE_RESULT_INFO, null,  selection
                 , new String[]{""+startId,""+endId}, null, null,
                 null);

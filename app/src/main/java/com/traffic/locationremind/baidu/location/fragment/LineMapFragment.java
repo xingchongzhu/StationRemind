@@ -259,7 +259,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         }
         if (sceneMap != null) {
             sceneMapAdapter.setData(lineInfo);
-            int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (lineInfo.getStationInfoList().size() / 5 + 1);
+            int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (sceneMapAdapter.getCount() / 5 + 1);
             ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件
@@ -389,7 +389,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         Log.d(TAG,"setCurrentLine index = "+index+" sceneMap = "+sceneMap);
         if (sceneMap != null) {
             sceneMapAdapter.setData(mDataManager.getLineInfoList().get(list.get(index).lineid));
-            int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (list.get(index).getStationInfoList().size() / 5 + 1);
+            int height = (int) activity.getResources().getDimension(R.dimen.count_line_node_rect_height) * (sceneMapAdapter.getCount() / 5 + 1);
             ViewGroup.LayoutParams linearParams = sceneMap.getLayoutParams();
             linearParams.height = height;
             sceneMap.setLayoutParams(linearParams); //使设置好的布局参数应用到控件

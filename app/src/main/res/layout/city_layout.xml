@@ -10,5 +10,4 @@
             android:layout_height="wrap_content"
             android:text="城市图" />
 
-
 </LinearLayout>
