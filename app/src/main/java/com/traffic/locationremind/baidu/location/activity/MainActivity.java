@@ -117,6 +117,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(),
                 mNavigationController,mRemindSetViewManager);
         viewPager.setScanScroll(false);
+        viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(mViewPagerAdapter);
 
         mNavigationController.setupWithViewPager(viewPager);

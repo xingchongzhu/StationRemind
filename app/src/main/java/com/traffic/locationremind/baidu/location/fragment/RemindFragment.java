@@ -160,33 +160,6 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     public void upadaData() {
         Log.d(TAG,"upadaData");
-        /*list = null;
-        if (linearlayout != null)
-            linearlayout.removeAllViews();
-        if (needChangeStationList != null)
-            needChangeStationList.clear();
-        if (mScrollFavoriteManager != null)
-            mScrollFavoriteManager.closeScrollView();
-        cancleRemind();
-        if (getMainActivity() != null) {
-            getMainActivity().setRemindState(false);
-        }
-
-        if (cancle_remind_btn != null)
-            cancle_remind_btn.setEnabled(false);
-        currentStation = null;
-        nextStation = null;
-        if (start_and_end != null)
-            start_and_end.setText(getResources().getString(R.string.select_remind_line));
-        if (line_change_introduce != null) {
-            line_change_introduce.setText("");
-        }
-        if (line_color_view != null) {
-            line_color_view.setLineInfoMap(null);
-        }
-        if (current_info_text != null) {
-            current_info_text.setText("");
-        }*/
         if(getActivity() != null) {
             List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(), mDataManager);
             if (lineObjects.size() > 0) {
@@ -533,7 +506,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
                     String surplusNum = String.format(getResources().getString(R.string.surples_station), (list.size() - n) - 1 + "");
                     String currenStr = getResources().getString(R.string.current_station) + lineNodeView.getStationInfo().getCname();
-                    String line = CommonFuction.getLineNo(DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid).linename)[0];
+                    LineInfo lineInfo = DataManager.getInstance(getActivity()).getLineInfoList().get(lineNodeView.getStationInfo().lineid);
+                    String line = lineInfo == null ? "":CommonFuction.getLineNo(lineInfo.linename)[0];
                     String direction = lineDirection.get(lineNodeView.getStationInfo().lineid) + getResources().getString(R.string.direction);
                     current_info_text.setText(surplusNum + "   " + currenStr + "   " + line + "   " + direction);
                     currentStation = lineNodeView.getStationInfo();

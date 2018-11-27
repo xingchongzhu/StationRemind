@@ -35,7 +35,6 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
 
     private List<StationInfo> list = null;
     private Map<Integer, LineInfo> mLineInfoList;
-    ;
     private LineObject lineObject;
     private int PADDLEFT = 0;
     private int LINEPADDLEFT = 0;
@@ -59,7 +58,7 @@ public class SelectlineMap extends TextView implements View.OnClickListener {
             int number = 0;
             int lineid = lineObject.lineidList.get(number);
             for (StationInfo stationInfo : lineObject.stationList) {
-                if (CommonFuction.containTransfer(transferList, stationInfo)) {
+                if (preStationInfo != null && CommonFuction.containTransfer(transferList, stationInfo)) {
                     if (preStationInfo.pm < stationInfo.pm) {
                         lineDirection.put(preStationInfo.lineid, dataManager.getLineInfoList().get(preStationInfo.lineid).getReverse());
                     } else {
