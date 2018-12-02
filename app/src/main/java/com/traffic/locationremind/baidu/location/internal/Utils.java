@@ -32,7 +32,7 @@ public class Utils {
 		Resources res = context.getResources();
 		int attrRes =res.getIdentifier("Royal_blue","attr",context.getPackageName());
 		if(attrRes == 0){
-			return context.getResources().getColor(R.color.colorPrimary);
+			return context.getResources().getColor(R.color.blue);
 		}
 		return ContextCompat.getColor(context,getResourceId(context,attrRes));
 	}

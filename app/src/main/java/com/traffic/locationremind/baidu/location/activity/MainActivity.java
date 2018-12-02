@@ -2,6 +2,7 @@ package com.traffic.locationremind.baidu.location.activity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -22,7 +23,7 @@ import android.widget.TextView;
 import com.baidu.location.BDLocation;
 import com.baidu.mapapi.SDKInitializer;
 import com.traffic.location.remind.R;
-
+import android.support.v4.app.Fragment;
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
 import com.traffic.locationremind.baidu.location.fragment.FullMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.LineMapFragment;
@@ -107,11 +108,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mRemindSetViewManager.initView(this, mDataManager);
 
         mNavigationController = pageBottomTabLayout.material()
-                .addItem(R.drawable.all_icon, getString(R.string.full_subway_title))
-                .addItem(R.drawable.line_icon, getString(R.string.line_title))
-                .addItem(R.drawable.remind_icon, getString(R.string.remind_title))
+                .addItem(R.drawable.ic_passport, getString(R.string.full_subway_title))
+                .addItem(R.drawable.ic_audio_order_pressed, getString(R.string.line_title))
+                .addItem(R.drawable.personal_more_share, getString(R.string.remind_title))
                 .build();
-
         root = (ViewGroup) findViewById(R.id.root);
         CustomViewPager viewPager = (CustomViewPager) findViewById(R.id.viewPager);
         mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(),
@@ -371,6 +371,11 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         if (mRemonderLocationService != null) {
             mRemonderLocationService.setStartReminder(state);
         }
+        if(mNavigationController != null && state){
+            mNavigationController.setHasMessage(2,true);
+        }else if(mNavigationController != null){
+            mNavigationController.setHasMessage(2,false);
+        }
     }
 
     public void setRemindList(List<StationInfo> list, List<StationInfo> needChangeStationList,Map<Integer, String> lineDirection){
@@ -409,6 +414,15 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             FullMapFragment fullFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
             fullFragment.updateCity();
         }
+    }
+
+    public void setFragment(int index){
+        mNavigationController.setSelect(index);
+    }
+
+    public Fragment getFragment(int index){
+        Fragment fragment = mViewPagerAdapter.getFragment(index);
+        return  fragment;
     }
 
     public void setNewCity(String city){

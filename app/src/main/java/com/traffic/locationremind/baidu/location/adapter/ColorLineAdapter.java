@@ -18,6 +18,7 @@ import com.traffic.locationremind.manager.bean.StationInfo;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * @function listviewadapter
  * @auther: Created by yinglan
@@ -28,8 +29,10 @@ public class ColorLineAdapter extends BaseAdapter {
     private final static String TAG = "ColorLineAdapter";
     private Context mContext;
     private int size = 0;
+    private boolean isOpen = false;
+    public final static int ROWNUM = 5;
 
-    List<Integer> dataList = new ArrayList<>();
+    //List<Integer> dataList = new ArrayList<>();
 
     List<LineInfo> data = new ArrayList<>();
     public ColorLineAdapter(Context context) {
@@ -37,14 +40,33 @@ public class ColorLineAdapter extends BaseAdapter {
         this.size = (int)mContext.getResources().getDimension(R.dimen.single_node_bitmap_size);
     }
 
+    public void setOpen(boolean open) {
+        isOpen = open;
+        notifyDataSetChanged();
+    }
+    public boolean getOpen(){
+        return isOpen;
+    }
+
     public void setData(List<LineInfo> data){
         this.data = data;
+        isOpen = false;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return data == null?0:data.size();
+        if(data == null){
+            return 0;
+        }
+        if(data.size() <= ROWNUM){
+            return data.size();
+        }
+        if(isOpen){
+            return data.size();
+        }else{
+            return ROWNUM;
+        }
     }
 
     @Override

@@ -137,7 +137,7 @@
                 android:drawableTop="@drawable/locationbar_fav_btn"
                 android:text="@string/collection_line"
                 android:layout_gravity="center"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:gravity="center"
                 android:textColor="@color/blue"
         />
@@ -149,7 +149,7 @@
                 android:drawableTop="@drawable/set_remind"
                 android:text="@string/set_remind"
                 android:layout_gravity="center"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:gravity="center"
                 android:textColor="@color/blue"
         />

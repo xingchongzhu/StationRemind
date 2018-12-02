@@ -91,7 +91,7 @@ public class NotificationUtil {
 			notification.setChannelId(id);
 			// 设置通知显示的图标
 			//notification.icon = R.drawable.cm_mainmap_notice_green;
-			notification.setSmallIcon(R.mipmap.notification_icon);
+			notification.setSmallIcon(R.drawable.location);
 			notification.setColor(Color.parseColor("#880000FF"));
 			notification.setContentText(context.getString(R.string.line_background_hint));
 			// 设置通知的特性: 通知被点击后，自动消失
@@ -171,7 +171,7 @@ public class NotificationUtil {
 		notification.setChannelId(id);
 		// 设置通知显示的图标
 		//notification.icon = R.drawable.cm_mainmap_notice_green;
-		notification.setSmallIcon(R.mipmap.notification_icon);
+		notification.setSmallIcon(R.drawable.location);
 		notification.setColor(Color.parseColor("#880000FF"));
 		// 设置通知的特性: 通知被点击后，自动消失
 		notification.setAutoCancel(false);
@@ -219,7 +219,7 @@ public class NotificationUtil {
 			notification.setChannelId(id);
 			// 设置通知显示的图标
 			//notification.icon = R.drawable.cm_mainmap_notice_green;
-			notification.setSmallIcon(R.mipmap.notification_icon);
+			notification.setSmallIcon(R.drawable.location);
 			notification.setColor(Color.parseColor("#880000FF"));
 			// 设置通知的特性: 通知被点击后，自动消失
 			notification.setAutoCancel(false);

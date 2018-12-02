@@ -10,7 +10,8 @@
     <dimen name="text_size">10dp</dimen>
     <dimen name="map_height">150dp</dimen>
     <dimen name="btn_size">35dp</dimen>
-    <dimen name="notif_size">12dp</dimen>
+    <dimen name="notif_size">16dp</dimen>
+    <dimen name="notif_station_size">12dp</dimen>
     <dimen name="notif_text_pad">5dp</dimen>
     <dimen name="magin_left">12dp</dimen>
     <dimen name="bottom_navigation_height">56dp</dimen>
@@ -44,7 +45,7 @@
     <dimen name="color_line_node_width">80dp</dimen>
     <dimen name="color_line_width">20dp</dimen>
     <dimen name="color_line_height">10dp</dimen>
-    <dimen name="color_line_margin_bottom">125dp</dimen>
+    <dimen name="color_line_margin_bottom">95dp</dimen>
 
     <dimen name="line_node_rect_height">40dp</dimen>
     <dimen name="line_node_bitmap_size">16dp</dimen>
@@ -72,5 +73,7 @@
     <dimen name="rect_text">13sp</dimen>
     <dimen name="icon_size">20dp</dimen>
     <dimen name="line_height">8dp</dimen>
-    <dimen name="line_height_size">3dp</dimen>
+    <dimen name="line_height_size">5dp</dimen>
+    <dimen name="bottom_line_more_height">25dp</dimen>
+    <dimen name="drwable_size">25dp</dimen>
 </resources>

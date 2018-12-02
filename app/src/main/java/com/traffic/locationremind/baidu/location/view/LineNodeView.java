@@ -108,7 +108,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // 绘制一个填充色为蓝色的矩形
-        int height = iconSize/3;
+        int height = iconSize;
         if(start != null){
             Matrix matrix = new Matrix();
             matrix.setScale(1.0f, 1.0f);
@@ -120,7 +120,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
             matrix.postTranslate(getWidth()/2-bitmap.getWidth()/2,height);
             canvas.drawBitmap(bitmap,matrix,mPaint);
         }
-        height+= 1.1*iconSize;
+        height+= 1.2*iconSize;
         //height+= paddingLine;
         if(pass) {
             mPaint.setColor(Color.GRAY);

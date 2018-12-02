@@ -269,9 +269,9 @@ public class PathSerachUtil {
                     map.put(stationInfo.lineid,stationInfo.lineid);
                 }
                 //Log.d("zxc002", "list " + list + "  " + map.size());
-                if(map.size() == list.size()) {
+                //if(map.size() == list.size()) {
                     currentAllStationList.add(min);
-                }
+                //}
                 map.clear();
                 map = null;
                 all.clear();

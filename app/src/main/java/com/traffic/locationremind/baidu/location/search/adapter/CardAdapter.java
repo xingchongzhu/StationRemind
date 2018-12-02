@@ -2,7 +2,11 @@ package com.traffic.locationremind.baidu.location.search.adapter;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 import com.traffic.location.remind.R;
+import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
+import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
 import com.traffic.locationremind.baidu.location.object.LineObject;
 import com.traffic.locationremind.baidu.location.search.util.CommonAdapter;
 import com.traffic.locationremind.baidu.location.search.util.ViewHolder;
@@ -27,8 +31,12 @@ public class CardAdapter extends CommonAdapter<LineObject> {
     String endstation = "";
     DataManager dataManager;
     Object object = new Object();
-    public CardAdapter(Context context, List<LineObject> data, int layoutId) {
+    MainActivity activity;
+    RemindFragment mRemindFragment;
+    public CardAdapter(MainActivity context, List<LineObject> data, int layoutId) {
         super(context, data, layoutId);
+        activity = context;
+        mRemindFragment = (RemindFragment)context.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         dataManager = DataManager.getInstance(context);
         //lineTail = context.getResources().getString(R.string.line_tail);
         lineChange = context.getResources().getString(R.string.change_number);
@@ -47,9 +55,7 @@ public class CardAdapter extends CommonAdapter<LineObject> {
                     for (StationInfo stationInfo : entry.stationList) {
                         str.append("" + stationInfo.lineid + " " + stationInfo.getCname() + " ->");
                     }
-                    //Log.d("zxc", entry.getKey() + "---- " + str.toString());
                 }
-
             }
             notifyDataSetChanged();
         }
@@ -61,7 +67,7 @@ public class CardAdapter extends CommonAdapter<LineObject> {
     }
 
     @Override
-    public void convert(ViewHolder holder, int position) {
+    public void convert(ViewHolder holder,final int position) {
         synchronized (object) {
             if (mData.size() <= 0) {
                 return;
@@ -81,7 +87,6 @@ public class CardAdapter extends CommonAdapter<LineObject> {
             }
 
             String str = "";
-
             if(data.lineidList.size() >1 ) {
                 holder.setText(R.id.change_numner, String.format(lineChange, data.lineidList.size() - 1 + ""));
             }
@@ -91,6 +96,15 @@ public class CardAdapter extends CommonAdapter<LineObject> {
             holder.setText(R.id.change_lineid, change.toString())
                     .setText(R.id.station_number, String.format(staionsCNumber, data.stationList.size() + "") + "")
                     .setText(R.id.station_start_end, str);
+            holder.getView(R.id.delete).setVisibility(View.GONE);
+            holder.getView(R.id.set_remind).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRemindFragment.setData(getItem(position));
+                    activity.setFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
+                    activity.hideSerachView();
+                }
+            });
         }
     }
 }

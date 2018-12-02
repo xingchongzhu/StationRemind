@@ -3,6 +3,7 @@ package com.traffic.locationremind.manager;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -12,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.internal.Utils;
 import com.traffic.locationremind.baidu.location.listener.GoToFragmentListener;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
 import com.traffic.locationremind.baidu.location.object.LineObject;
@@ -47,6 +49,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
     private DataManager dataManager;
     private ViewGroup serachLayoutRoot;
     private LineObject lastLines;
+    private int drawableSize = 50;
+    private int pressColor = Color.BLUE;
+    private int normalColor = Color.BLACK;
     public RemindSetViewManager(){
 
     }
@@ -57,6 +62,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
     public void initView(final MainActivity activity, DataManager dataManager) {
         this.activity = activity;
+        pressColor = activity.getResources().getColor(R.color.blue);
+        normalColor = activity.getResources().getColor(R.color.gray);
+        drawableSize = (int)activity.getResources().getDimension(R.dimen.drwable_size);
         this.dataManager = dataManager;
         pageBottomTabLayout = (PageNavigationView) activity.findViewById(R.id.tab);
         set_remind_layout = (ViewGroup)activity.findViewById(R.id.set_remind_layout);
@@ -79,6 +87,8 @@ public class RemindSetViewManager implements RemindSetViewListener {
             }
         });
 
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.set_remind);
+        setCompoundDrawables(setRemindBtn,drawable);
         setRemindBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +107,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
                 String lineStr = CommonFuction.convertStationToString(mSelectlineMap.getDataList());
                 String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
                 Log.d(TAG,"lineStr = "+lineStr+" allFavoriteLine = "+allFavoriteLine);
+                Drawable drawable = activity.getResources().getDrawable(R.drawable.hwpush_no_collection);
                 if(allFavoriteLine.contains(lineStr)){
                     String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
                     StringBuffer newLine = new StringBuffer();
@@ -106,15 +117,17 @@ public class RemindSetViewManager implements RemindSetViewListener {
                             newLine.append(string[i] + CommonFuction.TRANSFER_SPLIT);
                         }
                     }
-                    setCompoundDrawables(activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
+                    drawable = Utils.tint(drawable,normalColor);
+                    setCompoundDrawables(collectionBtn,drawable);
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
                     Log.d(TAG,"remove newLine = "+newLine);
                 }else{
                     String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
                     StringBuffer newLine = new StringBuffer();
                     newLine.append(allFavoriteLines+CommonFuction.TRANSFER_SPLIT+lineStr);
+                    drawable = Utils.tint(drawable,pressColor);
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
-                    setCompoundDrawables(activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+                    setCompoundDrawables(collectionBtn,drawable);
                     Log.d(TAG,"add newLine = "+newLine);
                 }
             }
@@ -129,9 +142,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
 
     }
 
-    public void setCompoundDrawables(Drawable drawable){
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), (int) (drawable.getMinimumHeight()));
-        collectionBtn.setCompoundDrawables(null,drawable,null,null);
+    public void setCompoundDrawables(TextView view,Drawable drawable){
+        drawable.setBounds(0, 0, drawableSize, drawableSize);
+        view.setCompoundDrawables(null,drawable,null,null);
     }
 
     public boolean getRemindWindowState(){
@@ -169,10 +182,13 @@ public class RemindSetViewManager implements RemindSetViewListener {
             mSelectlineMap.setLineInfoList(dataManager.getLineInfoList());
             String lineStr = CommonFuction.convertStationToString(lastLines);
             String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity,CommonFuction.FAVOURITE);
+            Drawable drawable = activity.getResources().getDrawable(R.drawable.hwpush_no_collection);
             if(allFavoriteLine.contains(lineStr)){
-                setCompoundDrawables(activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+                drawable = Utils.tint(drawable,pressColor);
+                setCompoundDrawables(collectionBtn,drawable);
             }else{
-                setCompoundDrawables(activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
+                drawable = Utils.tint(drawable,normalColor);
+                setCompoundDrawables(collectionBtn,drawable);
             }
             pageBottomTabLayout.setVisibility(View.GONE);
         }

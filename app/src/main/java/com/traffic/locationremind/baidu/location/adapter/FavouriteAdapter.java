@@ -64,7 +64,6 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
         int n = 0;
         for (Integer i : data.lineidList) {
             if (n < data.lineidList.size() - 1) {
-
                 change.append( CommonFuction.getLineNo(DataManager.getInstance(fragment.getActivity()).getLineInfoList().get(i).linename)[0]+ "->");
             }
             else {
@@ -108,7 +107,7 @@ public class FavouriteAdapter extends CommonAdapter<LineObject> {
                 .setOnClickListener(R.id.set_remind, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        fragment.setData(new LineObject(mData.get(position).stationList,mData.get(position).lineidList));
+                        fragment.setData(getItem(position));
                     }
                 });
     }

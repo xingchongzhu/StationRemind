@@ -31,6 +31,8 @@ import com.traffic.locationremind.baidu.location.adapter.AllLineAdapter;
 import com.traffic.locationremind.baidu.location.adapter.ColorLineAdapter;
 import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
 import com.traffic.locationremind.baidu.location.dialog.SettingReminderDialog;
+import com.traffic.locationremind.baidu.location.notification.AnimatorUtils;
+import com.traffic.locationremind.baidu.location.utils.AnimationUtil;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.bean.ExitInfo;
 import com.traffic.locationremind.manager.bean.LineInfo;
@@ -63,7 +65,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     private List<String> busLineIDList = new ArrayList<>();
     private int busLineIndex = 0;
     private String currentLineName = "";
-
+    private View loadMore;
     RoutePlanSearch mRoutePlanSearch;
 
     private Handler handler = new Handler() {
@@ -106,6 +108,8 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         currentLineInfoText = (TextView) rootView.findViewById(R.id.text);
         Log.d(TAG, "initView currentLineInfoText = "+currentLineInfoText);
         lineMap = (GridView) rootView.findViewById(R.id.lineMap);
+        LinearLayout moreLinearLayout = (LinearLayout) rootView.findViewById(R.id.more_line_view);
+        loadMore = (View) rootView.findViewById(R.id.loadMore);
         Log.d(TAG, "initView rootView = "+rootView+" lineMap = "+lineMap);
         mDataManager = ((MainActivity) getActivity()).getDataManager();
 
@@ -135,7 +139,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
         mRoutePlanSearch = RoutePlanSearch.newInstance();
         mRoutePlanSearch.setOnGetRoutePlanResultListener(this);
-
+        moreLinearLayout.setOnClickListener(this);
     }
 
     private void showDialog(final StationInfo stationInfo) {
@@ -172,20 +176,6 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
                             String endText = end==null?LineMapFragment.this.getActivity().getResources().getString(R.string.current_location):
                                     end.getCname();
                             ((MainActivity)LineMapFragment.this.getActivity()).searchStation(startText,endText);
-
-                            /*LatLng startLat =new LatLng(CommonFuction.convertToDouble(start.getLat(), 0),
-                                    CommonFuction.convertToDouble(start.getLot(), 0));
-                            LatLng endLat =new LatLng(CommonFuction.convertToDouble(end.getLat(), 0),
-                                    CommonFuction.convertToDouble(end.getLot(), 0));
-
-                            PlanNode stNode = PlanNode.withCityNameAndPlaceName(mDataManager.getCurrentCityNo().getCityName(), start.getCname()+"地铁站");
-                            PlanNode enNode = PlanNode.withCityNameAndPlaceName(mDataManager.getCurrentCityNo().getCityName(), end.getCname()+"地铁站");
-
-                            PlanNode stNode = PlanNode.withLocation(startLat);
-                            PlanNode enNode = PlanNode.withLocation(endLat);
-                            Log.d(TAG,"startText = "+startText+" endText = "+endText);
-                            mRoutePlanSearch.transitSearch(
-                                    new TransitRoutePlanOption().city(mDataManager.getCurrentCityNo().getCityName()).from(stNode).to(enNode));*/
                             start = null;
                             end = null;
                             break;
@@ -230,17 +220,12 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         setCurrentLine(0);
         if (colorLineAdapter != null) {
             colorLineAdapter.setData(list);
-        }
-        if (mDataManager != null && mDataManager.getLineInfoList() != null) {
-            if (mDataManager.getLineInfoList().size() < 6) {
-                ViewGroup.LayoutParams linearParams = lineMap.getLayoutParams();
-                linearParams.height = (int) getResources().getDimension(R.dimen.single_color_height);
-                lineMap.setLayoutParams(linearParams);
-            }else{
-                ViewGroup.LayoutParams linearParams = lineMap.getLayoutParams();
-                linearParams.height = (int) getResources().getDimension(R.dimen.line_color_height);
-                lineMap.setLayoutParams(linearParams);
+            /*if(list != null && list.size() <=ColorLineAdapter.ROWNUM ){
+                loadMore.setVisibility(View.GONE);
+            }else {
+                loadMore.setVisibility(View.VISIBLE);
             }
+*/
         }
     }
 
@@ -405,7 +390,17 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()){
+            case R.id.more_line_view:
+                if(colorLineAdapter.getOpen()){
+                    AnimationUtil.rotateClose(loadMore,300);
+                    colorLineAdapter.setOpen(false);
+                }else{
+                    AnimationUtil.rotateOpen(loadMore,300);
+                    colorLineAdapter.setOpen(true);
+                }
+                break;
+        }
     }
 
     public void dbWriteFinishNotif() {

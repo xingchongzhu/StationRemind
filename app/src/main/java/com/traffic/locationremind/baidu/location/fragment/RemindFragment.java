@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
@@ -23,6 +24,7 @@ import android.widget.*;
 import com.baidu.location.BDLocation;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
+import com.traffic.locationremind.baidu.location.internal.Utils;
 import com.traffic.locationremind.baidu.location.listener.ActivityListener;
 import com.traffic.locationremind.baidu.location.listener.LocationChangerListener;
 import com.traffic.locationremind.baidu.location.listener.RemindSetViewListener;
@@ -80,8 +82,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     private boolean isRemind = false;
     private boolean isPause = false;
     private MainActivity activity;
+    private int pressColor = Color.BLUE;
+    private int normalColor = Color.BLACK;
 
     private ScrollFavoriteManager mScrollFavoriteManager;
+    private int drawableSize = 50;
 
     //起点，当前站，换乘点，终点
     private List<StationInfo> needChangeStationList = new ArrayList<>();
@@ -92,6 +97,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
+        drawableSize = (int)getContext().getResources().getDimension(R.dimen.drwable_size);
+        pressColor = getContext().getResources().getColor(R.color.blue);
+        normalColor = getContext().getResources().getColor(R.color.gray);
+        normalColor = Color.BLACK;
         if (null != rootView) {
             ViewGroup parent = (ViewGroup) rootView.getParent();
             if (null != parent) {
@@ -102,13 +111,16 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             rootView = inflater.inflate(R.layout.remind_layout, container, false);
             initView(rootView);// 控件初始化
         }
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.favtor);
         if (CommonFuction.isEmptyColloctionFolder(getActivity())) {
-            favtor_btn.setTextColor(getResources().getColor(R.color.black));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor));
+            favtor_btn.setTextColor(normalColor);
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(favtor_btn, drawable);
             initDefaultEmptyLine();
         } else {
-            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor_select));
+            favtor_btn.setTextColor(pressColor);
+            drawable = Utils.tint(drawable,pressColor);
+            setCompoundDrawables(favtor_btn, drawable);
             List<LineObject> lineObjects = CommonFuction.getAllFavourite(getActivity(), mDataManager);
             Log.d(TAG,"initDefaultEmptyLine lineObjects.size = "+lineObjects.size());
             if (lineObjects.size() > 0) {
@@ -187,8 +199,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                 Map<Integer, LineInfo> lineInfoMap = new HashMap<>();
                 StationInfo preStationInfo = null;
                 StringBuffer str = new StringBuffer();
-                for(StationInfo stationInfo:transferList){
-                    str.append(stationInfo.getCname()+" ->");
+                if(transferList != null) {
+                    for (StationInfo stationInfo : transferList) {
+                        str.append(stationInfo.getCname() + " ->");
+                    }
                 }
                 Log.d("","createLine "+str.toString());
                 for (int i = 0; i < list.size(); i++) {
@@ -271,27 +285,37 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     public void updateColloctionView() {
         String lineStr = CommonFuction.convertStationToString(lineObject);
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity, CommonFuction.FAVOURITE);
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.hwpush_no_collection);
         if (!TextUtils.isEmpty(lineStr) && allFavoriteLine.contains(lineStr)) {
-            collection_btn.setTextColor(getResources().getColor(R.color.blue));
-            setCompoundDrawables(collection_btn, activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+            collection_btn.setTextColor(pressColor);
+            drawable = Utils.tint(drawable,pressColor);
+            setCompoundDrawables(collection_btn, drawable);
         } else {
-            collection_btn.setTextColor(getResources().getColor(R.color.black));
-            setCompoundDrawables(collection_btn, activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
+            collection_btn.setTextColor(normalColor);
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(collection_btn,drawable);
         }
 
+        drawable = activity.getResources().getDrawable(R.drawable.favtor);
         if (CommonFuction.isEmptyColloctionFolder(getActivity())) {
-            favtor_btn.setTextColor(getResources().getColor(R.color.black));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor));
+            favtor_btn.setTextColor(normalColor);
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(favtor_btn, drawable);
         } else {
-            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor_select));
+            favtor_btn.setTextColor(pressColor);
+            drawable = Utils.tint(drawable,pressColor);
+            setCompoundDrawables(favtor_btn, drawable);
         }
+
+        drawable = activity.getResources().getDrawable(R.drawable.set_remind);
         if (!isRemind) {
-            cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
-            setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+            cancle_remind_btn.setTextColor(normalColor);
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(cancle_remind_btn, drawable);
         } else {
-            cancle_remind_btn.setTextColor(getResources().getColor(R.color.blue));
-            setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.is_remind));
+            cancle_remind_btn.setTextColor(pressColor);
+            drawable = Utils.tint(drawable,pressColor);
+            setCompoundDrawables(cancle_remind_btn, drawable);
         }
     }
 
@@ -327,7 +351,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
     private void initDefaultEmptyLine(){
         Log.d(TAG,"initDefaultEmptyLine mDataManager = "+mDataManager+" mDataManager.getAllLineCane() = "+mDataManager.getAllLineCane());
-        if(mDataManager != null && mDataManager.getAllLineCane() != null) {
+        if(mDataManager != null && mDataManager.getAllLineCane() != null && mDataManager.getLineInfoList() != null) {
             LineInfo lineInfo = mDataManager.getLineInfoList().get(mDataManager.getMinLineid());
             Log.d(TAG,"initDefaultEmptyLine Lineid = "+mDataManager.getMinLineid()+" lineInfo = "+lineInfo);
 
@@ -355,7 +379,8 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
     }
 
     public void setCompoundDrawables(TextView view, Drawable drawable) {
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), (int) (drawable.getMinimumHeight()));
+        drawable.setBounds(0,0,drawableSize,drawableSize);
+        //drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), (int) (drawable.getMinimumHeight()));
         view.setCompoundDrawables(null, drawable, null, null);
     }
 
@@ -379,15 +404,17 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
 
                 break;
             case R.id.cancle_remind_btn:
+                Drawable drawable = activity.getResources().getDrawable(R.drawable.set_remind);
                 if (isRemind) {
                     isRemind = false;
                     if (getMainActivity() != null) {
                         getMainActivity().setRemindState(false);
                     }
                     if (cancle_remind_btn != null) {
-                        cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
+                        drawable = Utils.tint(drawable,normalColor);
+                        cancle_remind_btn.setTextColor(normalColor);
                         cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
-                        setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+                        setCompoundDrawables(cancle_remind_btn, drawable);
                     }
                 } else {
                     if(!NetWorkUtils.isGPSEnabled(activity) || !activity.getPersimmions()){
@@ -403,9 +430,10 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     if (getMainActivity() != null) {
                         getMainActivity().setRemindState(true);
                     }
-                    cancle_remind_btn.setTextColor(getResources().getColor(R.color.blue));
+                    drawable = Utils.tint(drawable,pressColor);
+                    cancle_remind_btn.setTextColor(pressColor);
                     cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
-                    setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.is_remind));
+                    setCompoundDrawables(cancle_remind_btn, drawable);
                 }
                 break;
         }
@@ -415,8 +443,9 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         String lineStr = CommonFuction.convertStationToString(lineObject);
         String allFavoriteLine = CommonFuction.getSharedPreferencesValue(activity, CommonFuction.FAVOURITE);
         Log.d(TAG, "lineStr = " + lineStr + " allFavoriteLine = " + allFavoriteLine);
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.hwpush_no_collection);
         if (allFavoriteLine.contains(lineStr)) {
-            collection_btn.setTextColor(getResources().getColor(R.color.black));
+            collection_btn.setTextColor(normalColor);
             String string[] = allFavoriteLine.split(CommonFuction.TRANSFER_SPLIT);
             StringBuffer newLine = new StringBuffer();
             int size = string.length;
@@ -425,24 +454,29 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     newLine.append(string[i] + CommonFuction.TRANSFER_SPLIT);
                 }
             }
-            setCompoundDrawables(collection_btn, activity.getResources().getDrawable(R.drawable.locationbar_fav_btn));
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(collection_btn,drawable );
             CommonFuction.writeSharedPreferences(activity, CommonFuction.FAVOURITE, newLine.toString());
             Log.d(TAG, "remove newLine = " + newLine);
         } else {
-            collection_btn.setTextColor(getResources().getColor(R.color.blue));
+            collection_btn.setTextColor(pressColor);
             String allFavoriteLines = CommonFuction.getSharedPreferencesValue(activity, CommonFuction.FAVOURITE);
             StringBuffer newLine = new StringBuffer();
             newLine.append(allFavoriteLines + CommonFuction.TRANSFER_SPLIT + lineStr);
             CommonFuction.writeSharedPreferences(activity, CommonFuction.FAVOURITE, newLine.toString());
-            setCompoundDrawables(collection_btn, activity.getResources().getDrawable(R.drawable.saveas_fav_btn));
+            drawable = Utils.tint(drawable,pressColor);
+            setCompoundDrawables(collection_btn, drawable);
             Log.d(TAG, "add newLine = " + newLine);
         }
+        drawable = activity.getResources().getDrawable(R.drawable.favtor);
         if (CommonFuction.isEmptyColloctionFolder(getActivity())) {
-            favtor_btn.setTextColor(getResources().getColor(R.color.black));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor));
+            favtor_btn.setTextColor(normalColor);
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(favtor_btn, drawable);
         } else {
-            favtor_btn.setTextColor(getResources().getColor(R.color.blue));
-            setCompoundDrawables(favtor_btn, activity.getResources().getDrawable(R.drawable.favtor_select));
+            favtor_btn.setTextColor(pressColor);
+            drawable = Utils.tint(drawable,pressColor);
+            setCompoundDrawables(favtor_btn, drawable);
         }
     }
 
@@ -463,10 +497,12 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         if (getMainActivity() != null) {
             getMainActivity().setRemindState(false);
         }
+        Drawable drawable = activity.getResources().getDrawable(R.drawable.set_remind);
         if (cancle_remind_btn != null) {
-            cancle_remind_btn.setTextColor(getResources().getColor(R.color.black));
+            cancle_remind_btn.setTextColor(normalColor);
             cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
-            setCompoundDrawables(cancle_remind_btn, getResources().getDrawable(R.drawable.set_remind));
+            drawable = Utils.tint(drawable,normalColor);
+            setCompoundDrawables(cancle_remind_btn, drawable);
         }
         getActivity().finish();
     }

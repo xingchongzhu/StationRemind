@@ -84,11 +84,13 @@ public class CommonFuction {
             line.append(str);
         }
         StringBuffer transfer = new StringBuffer();
-        for (StationInfo stationInfo : lineObject.transferList) {
-            String str = stationInfo.getCname() + TRANSFER_STATION_LAST_SPLIT;
-            transfer.append(str);
+        if(lineObject.transferList != null) {
+            for (StationInfo stationInfo : lineObject.transferList) {
+                String str = stationInfo.getCname() + TRANSFER_STATION_LAST_SPLIT;
+                transfer.append(str);
+            }
+            line.append(TRANSFER_STATION_SPLIT + transfer.toString());
         }
-        line.append(TRANSFER_STATION_SPLIT + transfer.toString());
         /*transfer.delete(0,transfer.length());
         for (Integer id : lineObject.lineidList) {
             String str = id + TRANSFER_NUM_SPLIT;
@@ -196,6 +198,9 @@ public class CommonFuction {
     }
 
     public static boolean containTransfer(List<StationInfo> list, StationInfo stationInfo) {
+        if(list == null){
+            return false;
+        }
         for (StationInfo info : list) {
             if (info.getCname().equals(stationInfo.getCname())) {
                 return true;
