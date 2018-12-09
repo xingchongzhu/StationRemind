@@ -35,6 +35,7 @@ import com.traffic.locationremind.common.util.NotificationUtil;
 import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
+import com.umeng.analytics.MobclickAgent;
 
 import java.io.IOException;
 import java.util.*;
@@ -174,6 +175,11 @@ public class RemonderLocationService extends Service {
                                     if (list.get(list.size() - 1).getCname().equals(stationInfo.getCname()) &&
                                             stationInfo.getCname().equals(currentStation.getCname())) {
                                         Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
+                                        if(location != null) {
+                                            HashMap<String, String> map = new HashMap<String, String>();
+                                            map.put("arrived", stationInfo.getCname());
+                                            MobclickAgent.onEvent(getApplicationContext(), getResources().getString(R.string.event_arrived), map);
+                                        }
                                         tempChangeStationList.remove(stationInfo);
                                         isReminder = false;
                                         cancleNotification();
@@ -184,6 +190,11 @@ public class RemonderLocationService extends Service {
                                         break;
                                     } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
                                         tempChangeStationList.remove(stationInfo);
+                                        if(location != null) {
+                                            HashMap<String, String> map = new HashMap<String, String>();
+                                            map.put("changeStation", currentStation.getCname());
+                                            MobclickAgent.onEvent(getApplicationContext(), getResources().getString(R.string.event_changeStation), map);
+                                        }
                                         String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
                                                 DataManager.getInstance(getApplicationContext()).getLineInfoList().get(currentStation.lineid).linename;
                                         NotificationUtils.sendHint(getApplicationContext(), false, getResources().getString(R.string.change), str,

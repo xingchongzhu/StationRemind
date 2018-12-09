@@ -40,6 +40,7 @@ import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.baidu.location.view.MyLetterListView;
+import com.umeng.analytics.MobclickAgent;
 //import com.traffic.locationremind.baidu.location.utils.PingYinUtil;
 
 public class LocationCityActivity extends AppCommonActivity implements OnScrollListener {
@@ -616,6 +617,20 @@ public class LocationCityActivity extends AppCommonActivity implements OnScrollL
     }
 
     private boolean mReady;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart("LocationCityActivity"); //手动统计页面("SplashScreen"为页面名称，可自定义)
+        MobclickAgent.onResume(this); //统计时长
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("LocationCityActivity"); //手动统计页面("SplashScreen"为页面名称，可自定义)，必须保证 onPageEnd 在 onPause 之前调用，因为SDK会在 onPause 中保存onPageEnd统计到的页面数据。
+        MobclickAgent.onPause(this);
+    }
 
     // 初始化汉语拼音首字母弹出提示框
     private void initOverlay() {

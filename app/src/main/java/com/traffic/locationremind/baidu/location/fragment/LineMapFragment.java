@@ -39,6 +39,7 @@ import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataHelper;
 import com.traffic.locationremind.manager.database.DataManager;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.*;
 
@@ -95,12 +96,19 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
     @Override
     public void onResume() {
         super.onResume();
+        MobclickAgent.onPageStart("LineMapFragment"); //统计页面("MainScreen"为页面名称，可自定义)
         Log.d(TAG,"onResume sceneMap = "+sceneMap);
         if (sceneMap != null) {
             Log.d(TAG,"onResume getChildCount = "+sceneMap.getChildCount());
         }
         upadaData();
         setCurrentLine(currentIndex);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd("LineMapFragment");
     }
 
     private void initView(View rootView) {

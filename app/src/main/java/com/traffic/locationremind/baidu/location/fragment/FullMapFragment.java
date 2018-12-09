@@ -2,6 +2,7 @@ package com.traffic.locationremind.baidu.location.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 
 import android.view.WindowManager;
 import android.webkit.*;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.traffic.location.remind.R;
@@ -28,6 +30,9 @@ import com.traffic.locationremind.baidu.location.view.FullMapView;
 import com.traffic.locationremind.common.util.*;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.database.DataManager;
+import com.traffic.locationremind.share.SharePlatformActivity;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.message.inapp.InAppMessageManager;
 
 import java.util.List;
 
@@ -39,6 +44,8 @@ public class FullMapFragment extends Fragment {
     private DataManager mDataManager;
     private TextView text;
     private WebView webView;
+    private ImageView share;
+    private String currentCity;
 //https://stavinli.github.io/the-subway-of-china/dest/index.html?cityCode=131
     private final String URL = "https://stavinli.github.io/the-subway-of-china/dest/index.html?cityCode=";
     @Nullable
@@ -67,6 +74,14 @@ public class FullMapFragment extends Fragment {
         mDataManager = ((MainActivity) getActivity()).getDataManager();
         webView = (WebView) rootView.findViewById(R.id.web_wv);
         text = (TextView) rootView.findViewById(R.id.text);
+        share = (ImageView) rootView.findViewById(R.id.share_btn);
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FullMapFragment.this.getActivity(),SharePlatformActivity.class);
+                startActivity(intent);
+            }
+        });
         initData();
     }
 
@@ -116,6 +131,10 @@ public class FullMapFragment extends Fragment {
         if (TextUtils.isEmpty(shpno)) {
             shpno = IDef.DEFAULTCITY;
         }
+        if(!TextUtils.isEmpty(currentCity) && currentCity.equals(shpno)){
+            return;
+        }
+        currentCity= shpno;
         if(mDataManager != null && mDataManager.getDataHelper() != null) {
             List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);
             if (cityList != null && cityList.size() > 0) {
@@ -142,12 +161,19 @@ public class FullMapFragment extends Fragment {
         super.onResume();
         webView.getSettings().setJavaScriptEnabled(true);
         webView.onResume();
+        MobclickAgent.onPageStart("FullMapFragment"); //统计页面("MainScreen"为页面名称，可自定义)
+
+        //弹屏幕字体广告
+       InAppMessageManager.getInstance(getContext()).setPlainTextSize( (int)getContext().getResources().getDimension(R.dimen.notif_station_size),
+                (int) getContext().getResources().getDimension(R.dimen.notif_station_size),
+                (int)getContext().getResources().getDimension(R.dimen.notif_station_size));
     }
 
     @Override
     public void onPause() {
         super.onPause();
         webView.onPause();
+        MobclickAgent.onPageEnd("FullMapFragment");
     }
 
     @Override
