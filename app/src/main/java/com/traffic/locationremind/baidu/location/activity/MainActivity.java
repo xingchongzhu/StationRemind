@@ -47,8 +47,13 @@ import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
 import com.traffic.locationremind.manager.SearchManager;
+import com.traffic.locationremind.share.utils.Constants;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.commonsdk.UMConfigure;
+import com.umeng.message.PushAgent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -92,6 +97,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 打开统计SDK调试模式
+        UMConfigure.setLogEnabled(true);
+        PushAgent.getInstance(this).onAppStart();
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_behavior);
         mDataManager = DataManager.getInstance(this);
@@ -115,14 +123,14 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         root = (ViewGroup) findViewById(R.id.root);
         CustomViewPager viewPager = (CustomViewPager) findViewById(R.id.viewPager);
         mViewPagerAdapter = new ViewPagerAdapter(this, getSupportFragmentManager(),
-                mNavigationController,mRemindSetViewManager);
+                mNavigationController, mRemindSetViewManager);
         viewPager.setScanScroll(false);
         viewPager.setOffscreenPageLimit(3);
         viewPager.setAdapter(mViewPagerAdapter);
 
         mNavigationController.setupWithViewPager(viewPager);
 
-        set_remind_layout = (ViewGroup)findViewById(R.id.set_remind_layout);
+        set_remind_layout = (ViewGroup) findViewById(R.id.set_remind_layout);
 
         serachLayoutRoot = (ViewGroup) findViewById(R.id.serach_layout_manager_root);
         searchBackButton = (ImageButton) findViewById(R.id.search_back);
@@ -143,6 +151,12 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
 
     }
 
+/*    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }*/
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // super.onSaveInstanceState(outState);
@@ -161,27 +175,34 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         Intent intent = getIntent();
-        if(intent.getAction() != null && intent.getAction().equals(RemonderLocationService.CLOSE_REMINDER_SERVICE)){
+        if (intent.getAction() != null && intent.getAction().equals(RemonderLocationService.CLOSE_REMINDER_SERVICE)) {
             RemindFragment remindFragment = (RemindFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.REMINDFRAGMENTINDEX);
             remindFragment.cancleRemind();
         }
-        if(getRemindState()) {
+        if (getRemindState()) {
             mNavigationController.setSelect(ViewPagerAdapter.REMINDFRAGMENTINDEX);
         }
         if (mRemonderLocationService != null) {
             mRemonderLocationService.moveInForeground();
         }
+        //  MobclickAgent.onPageStart("MainActivity"); //手动统计页面("SplashScreen"为页面名称，可自定义)
+        MobclickAgent.onResume(this); //统计时长
         /*if (mRemonderLocationService != null) {
             mRemonderLocationService.cancleNotification();
         }*/
-
     }
 
-    public void useForground(){
+    public void onPause() {
+        super.onPause();
+        //MobclickAgent.onPageEnd("MainActivity"); //手动统计页面("SplashScreen"为页面名称，可自定义)，必须保证 onPageEnd 在 onPause 之前调用，因为SDK会在 onPause 中保存onPageEnd统计到的页面数据。
+        MobclickAgent.onPause(this);
+    }
+
+    public void useForground() {
         NotificationUtil mNotificationUtils = new NotificationUtil(this);
 
         LocationService locationService = ((LocationApplication) getApplication()).locationService;
-        locationService.getLocationClient().enableLocInForeground(1001,mNotificationUtils.arrivedNotification(this,1));
+        locationService.getLocationClient().enableLocInForeground(1001, mNotificationUtils.arrivedNotification(this, 1));
     }
 
     @Override
@@ -219,15 +240,15 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 break;
             case R.id.city_select:
                 Intent intent = new Intent(this, LocationCityActivity.class);
-                this.startActivityForResult(intent,SELECTCITYREQUEST);
+                this.startActivityForResult(intent, SELECTCITYREQUEST);
                 overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_open_exit);
                 break;
         }
     }
 
-    public void searchStation(String start,String end){
+    public void searchStation(String start, String end) {
         showSerachView();
-        mSearchManager.setSearchText(start,end);
+        mSearchManager.setSearchText(start, end);
     }
 
     public void showSerach(View view) {
@@ -344,9 +365,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                     @Override
                     public void loactionStation(BDLocation location) {
                         if (location.getCity() != null) {
-                            String tempCity = location.getCity().substring(0,location.getCity().length() - 1);
-                            CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.LOCATIONNAME,tempCity);
-                            if(!hasLocation && FileUtil.dbIsExist(MainActivity.this,mDataManager.getCityInfoList().get(tempCity)) &&
+                            String tempCity = location.getCity().substring(0, location.getCity().length() - 1);
+                            CommonFuction.writeSharedPreferences(MainActivity.this, CityInfo.LOCATIONNAME, tempCity);
+                            if (!hasLocation && FileUtil.dbIsExist(MainActivity.this, mDataManager.getCityInfoList().get(tempCity)) &&
                                     mDataManager.getCityInfoList() != null && mDataManager.getCityInfoList().get(tempCity) != null) {
                                 setNewCity(tempCity);
                             }
@@ -357,7 +378,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public void stopRemind(){
+                    public void stopRemind() {
                         for (LocationChangerListener locationChangerListener : locationChangerListenerList) {
                             locationChangerListener.stopRemind();
                         }
@@ -367,35 +388,35 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
     };
 
-    public void setRemindState(boolean state){
+    public void setRemindState(boolean state) {
         if (mRemonderLocationService != null) {
             mRemonderLocationService.setStartReminder(state);
         }
-        if(mNavigationController != null && state){
-            mNavigationController.setHasMessage(2,true);
-        }else if(mNavigationController != null){
-            mNavigationController.setHasMessage(2,false);
+        if (mNavigationController != null && state) {
+            mNavigationController.setHasMessage(2, true);
+        } else if (mNavigationController != null) {
+            mNavigationController.setHasMessage(2, false);
         }
     }
 
-    public void setRemindList(List<StationInfo> list, List<StationInfo> needChangeStationList,Map<Integer, String> lineDirection){
+    public void setRemindList(List<StationInfo> list, List<StationInfo> needChangeStationList, Map<Integer, String> lineDirection) {
         if (mRemonderLocationService != null) {
-            mRemonderLocationService.setStationInfoList(list,needChangeStationList,lineDirection);
+            mRemonderLocationService.setStationInfoList(list, needChangeStationList, lineDirection);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode ==SELECTCITYRESULTCODE){
+        if (resultCode == SELECTCITYRESULTCODE) {
             if (data != null && !TextUtils.isEmpty(data.getAction())) {
                 String tempCity = data.getAction();
-                if(FileUtil.dbIsExist(this,mDataManager.getCityInfoList().get(tempCity)) && !currentCity.equals(tempCity)){
+                if (FileUtil.dbIsExist(this, mDataManager.getCityInfoList().get(tempCity)) && !currentCity.equals(tempCity)) {
                     setNewCity(tempCity);
                 }
             }
         }
-        if(resultCode == SHUTDOWNACTIVITY){
+        if (resultCode == SHUTDOWNACTIVITY) {
             finish();
         }
     }
@@ -410,27 +431,34 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         }
 
         if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)  {
+                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             FullMapFragment fullFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
             fullFragment.updateCity();
         }
     }
 
-    public void setFragment(int index){
+    public void setFragment(int index) {
         mNavigationController.setSelect(index);
     }
 
-    public Fragment getFragment(int index){
+    public Fragment getFragment(int index) {
         Fragment fragment = mViewPagerAdapter.getFragment(index);
-        return  fragment;
+        return fragment;
     }
 
-    public void setNewCity(String city){
+    public String getCurrentCity() {
+        return currentCity;
+    }
+
+    public void setNewCity(String city) {
         //city = "北京";
-        Log.d(TAG,"setNewCity tempCity = "+city);
+        Log.d(TAG, "setNewCity tempCity = " + city);
         citySelect.setText(city);
         currentCity = city;
-        CommonFuction.writeSharedPreferences(MainActivity.this,CityInfo.CITYNAME,currentCity);
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("city", city);
+        MobclickAgent.onEvent(getApplicationContext(), "城市", map);
+        CommonFuction.writeSharedPreferences(MainActivity.this, CityInfo.CITYNAME, currentCity);
         mDataManager.loadData(MainActivity.this);
         hasLocation = true;
         FullMapFragment fullMapFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
@@ -452,10 +480,10 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     }
 
 
-    public boolean notificationOnKeyDown(int keyCode, KeyEvent event){
-        boolean result =false;
+    public boolean notificationOnKeyDown(int keyCode, KeyEvent event) {
+        boolean result = false;
         for (ActivityListener activityListener : activityListenerList) {
-            if(activityListener.onKeyDown( keyCode,  event)){
+            if (activityListener.onKeyDown(keyCode, event)) {
                 result = true;
             }
         }
@@ -484,7 +512,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
                 return true;
             }
         }
-        if(notificationOnKeyDown(keyCode,event)){
+        if (notificationOnKeyDown(keyCode, event)) {
             return true;
         }
         if (getRemindState()) {
@@ -492,6 +520,9 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    map.put("moveTaskToBack", "move background");
+                    MobclickAgent.onEvent(getApplicationContext(), "移动到后台定位", map);
                     return true;
                 }
             }

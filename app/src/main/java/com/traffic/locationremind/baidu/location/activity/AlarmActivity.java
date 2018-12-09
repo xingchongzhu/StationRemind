@@ -41,6 +41,7 @@ import com.traffic.locationremind.baidu.location.activity.BaseActivity;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
 import com.traffic.locationremind.baidu.location.view.CircleView;
 import com.traffic.locationremind.baidu.location.utils.TimerKlaxon;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.List;
 
@@ -214,11 +215,15 @@ public class AlarmActivity extends BaseActivity
     protected void onResume() {
         super.onResume();
         resetAnimations();
+        MobclickAgent.onPageStart("AlarmActivity"); //手动统计页面("SplashScreen"为页面名称，可自定义)
+        MobclickAgent.onResume(this); //统计时长
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        MobclickAgent.onPageEnd("AlarmActivity"); //手动统计页面("SplashScreen"为页面名称，可自定义)，必须保证 onPageEnd 在 onPause 之前调用，因为SDK会在 onPause 中保存onPageEnd统计到的页面数据。
+        MobclickAgent.onPause(this);
     }
 
     @Override

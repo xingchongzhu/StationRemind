@@ -24,6 +24,7 @@ import com.traffic.locationremind.common.util.CommonFuction;
 import com.traffic.locationremind.common.util.ToastUitl;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
+import com.umeng.analytics.MobclickAgent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -128,6 +129,9 @@ public class RemindSetViewManager implements RemindSetViewListener {
                     drawable = Utils.tint(drawable,pressColor);
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
                     setCompoundDrawables(collectionBtn,drawable);
+                    HashMap<String, String> map = new HashMap<String, String>();
+                    map.put("saveLine", newLine.toString());
+                    MobclickAgent.onEvent(activity, activity.getResources().getString(R.string.event_saveLine), map);
                     Log.d(TAG,"add newLine = "+newLine);
                 }
             }

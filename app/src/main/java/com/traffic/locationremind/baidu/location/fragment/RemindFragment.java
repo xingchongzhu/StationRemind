@@ -39,6 +39,9 @@ import com.traffic.locationremind.manager.ScrollFavoriteManager;
 import com.traffic.locationremind.manager.bean.LineInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.message.inapp.IUmengInAppMsgCloseCallback;
+import com.umeng.message.inapp.InAppMessageManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -143,6 +146,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         createLine(list);
         if (getMainActivity() != null) {
             getMainActivity().setRemindState(true);
+        }
+        if(this.lineObject != null) {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("startLocationLine", this.lineObject.toString());
+            MobclickAgent.onEvent(activity, getResources().getString(R.string.event_startLocationLine), map);
         }
     }
 
@@ -416,6 +424,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                         cancle_remind_btn.setText(getResources().getString(R.string.startlocation));
                         setCompoundDrawables(cancle_remind_btn, drawable);
                     }
+                    if(this.lineObject != null) {
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("cancleLocationLine", this.lineObject.toString());
+                        MobclickAgent.onEvent(activity, getResources().getString(R.string.event_cancleLocationLine), map);
+                    }
                 } else {
                     if(!NetWorkUtils.isGPSEnabled(activity) || !activity.getPersimmions()){
                         ToastUitl.showText(activity,activity.getString(R.string.please_open_location));
@@ -434,6 +447,11 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     cancle_remind_btn.setTextColor(pressColor);
                     cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
                     setCompoundDrawables(cancle_remind_btn, drawable);
+                    if(this.lineObject != null) {
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("startLocationLine", this.lineObject.toString());
+                        MobclickAgent.onEvent(activity, getResources().getString(R.string.event_startLocationLine), map);
+                    }
                 }
                 break;
         }
@@ -585,12 +603,24 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
         //cancleNotification();
         super.onResume();
         this.isPause = false;
+        MobclickAgent.onPageStart("RemindFragment"); //统计页面("MainScreen"为页面名称，可自定义)
+        if(isRemind){
+            InAppMessageManager.getInstance(activity).showCardMessage(activity, "main",
+                    new IUmengInAppMsgCloseCallback() {
+                        //插屏消息关闭时，会回调该方法
+                        @Override
+                        public void onColse() {
+                            Log.i(TAG, "card message close");
+                        }
+                    });
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         this.isPause = true;
+        MobclickAgent.onPageEnd("RemindFragment");
     }
 
     @Override

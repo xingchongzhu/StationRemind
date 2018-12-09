@@ -14,11 +14,11 @@
     <dimen name="notif_station_size">12dp</dimen>
     <dimen name="notif_text_pad">5dp</dimen>
     <dimen name="magin_left">12dp</dimen>
-    <dimen name="bottom_navigation_height">56dp</dimen>
+    <dimen name="bottom_navigation_height">53dp</dimen>
     <dimen name="search_height_btn">35dp</dimen>
     <dimen name="search_height">50dp</dimen>
     <dimen name="search_all_height">90dp</dimen>
-    <dimen name="search_top">50dp</dimen>
+    <dimen name="search_top">43dp</dimen>
     <dimen name="search_delete">20dp</dimen>
 
     <dimen name="serach_view_height">50dp</dimen>
@@ -76,4 +76,10 @@
     <dimen name="line_height_size">5dp</dimen>
     <dimen name="bottom_line_more_height">25dp</dimen>
     <dimen name="drwable_size">25dp</dimen>
+    <dimen name="titlebar">54dp</dimen>
+    <dimen name="actionbar_item_height">45dip</dimen>
+    <dimen name="actionbar_item_width">45dip</dimen>
+    <dimen name="item_height">45dp</dimen>
+    <dimen name="TitleTextSize">18dp</dimen>
+    <dimen name="LargeTextSize">16dp</dimen>
 </resources>

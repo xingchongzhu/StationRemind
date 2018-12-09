@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/search_top"
-            android:layout_marginBottom="@dimen/bottom_navigation_height"
+            android:layout_marginBottom="48dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
 
     <com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView

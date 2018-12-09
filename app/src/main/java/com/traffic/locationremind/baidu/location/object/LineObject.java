@@ -23,4 +23,24 @@ public class LineObject {
         this.lineidList = lineidList;
         this.transferList = transferList;
     }
+
+    public String toString(){
+        StringBuffer stringBuffer = new StringBuffer();
+        if(transferList != null){
+            stringBuffer.append("[");
+            for(StationInfo stationInfo:transferList){
+                stringBuffer.append(stationInfo.lineid+" "+stationInfo.cname+" ->");
+            }
+            stringBuffer.append("]");
+        }
+        if(stationList != null){
+            stringBuffer.append("===");
+            stringBuffer.append("(");
+            for(StationInfo stationInfo:stationList){
+                stringBuffer.append(stationInfo.cname+" ->");
+            }
+            stringBuffer.append(")");
+        }
+        return stringBuffer.toString();
+    }
 }

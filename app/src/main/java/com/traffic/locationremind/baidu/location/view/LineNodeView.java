@@ -36,6 +36,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     private int color = Color.LTGRAY;
     private Bitmap transFerBitmap;
     public boolean pass = false;
+    private int bitmapSize;
 
     public StationInfo getStationInfo(){
         return mStationInfo;
@@ -96,6 +97,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
         // 本控件的点击事件
         setOnClickListener(this);
         lineHeight =  (int)getContext().getResources().getDimension(R.dimen.line_height);
+        bitmapSize = (int) getResources().getDimension(R.dimen.transfer_bitmap_size);
     }
 
     @Override
@@ -108,7 +110,7 @@ public class LineNodeView extends TextView implements View.OnClickListener {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         // 绘制一个填充色为蓝色的矩形
-        int height = iconSize;
+        int height = iconSize+ bitmapSize;
         if(start != null){
             Matrix matrix = new Matrix();
             matrix.setScale(1.0f, 1.0f);

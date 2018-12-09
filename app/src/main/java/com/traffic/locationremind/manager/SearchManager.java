@@ -27,6 +27,7 @@ import com.traffic.locationremind.common.util.PathSerachUtil;
 import com.traffic.locationremind.manager.bean.CityInfo;
 import com.traffic.locationremind.manager.bean.StationInfo;
 import com.traffic.locationremind.manager.database.DataManager;
+import com.umeng.analytics.MobclickAgent;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -293,6 +294,9 @@ public class SearchManager implements SearchView.SearchViewListener, SearchResul
                 return;
             }
             searchView.hideSoftInput();
+            HashMap<String,String> map = new HashMap<String,String>();
+            map.put("start_station_and_end_station",startStation.getCname()+"  "+endStation.getCname());
+            MobclickAgent.onEvent(activity, activity.getResources().getString(R.string.event_start_station_and_end_station), map);
             Log.d(TAG, "onSearch start = " + start + " end = " + end + " startStation.getCname() = " + startStation.getCname() + " endStation.getCname() = " + endStation.getCname());
             if (mSearchLoadingDialog == null) {
                 mSearchLoadingDialog = new SearchLoadingDialog(activity, R.style.Dialog);
