@@ -176,9 +176,7 @@ public class RemonderLocationService extends Service {
                                             stationInfo.getCname().equals(currentStation.getCname())) {
                                         Log.d(TAG, "arrive stationInfo.getCname()" + stationInfo.getCname());
                                         if(location != null) {
-                                            HashMap<String, String> map = new HashMap<String, String>();
-                                            map.put("arrived", stationInfo.getCname());
-                                            MobclickAgent.onEvent(getApplicationContext(), getResources().getString(R.string.event_arrived), map);
+                                            MobclickAgent.onEvent(getApplicationContext(), getResources().getString(R.string.event_arrived), "到站");
                                         }
                                         tempChangeStationList.remove(stationInfo);
                                         isReminder = false;
@@ -191,9 +189,7 @@ public class RemonderLocationService extends Service {
                                     } else if (stationInfo.getCname().equals(currentStation.getCname())) {//换乘点
                                         tempChangeStationList.remove(stationInfo);
                                         if(location != null) {
-                                            HashMap<String, String> map = new HashMap<String, String>();
-                                            map.put("changeStation", currentStation.getCname());
-                                            MobclickAgent.onEvent(getApplicationContext(), getResources().getString(R.string.event_changeStation), map);
+                                            MobclickAgent.onEvent(getApplicationContext(), getResources().getString(R.string.event_changeStation), "换乘");
                                         }
                                         String str = String.format(getResources().getString(R.string.change_station_hint), stationInfo.getCname()) +
                                                 DataManager.getInstance(getApplicationContext()).getLineInfoList().get(currentStation.lineid).linename;

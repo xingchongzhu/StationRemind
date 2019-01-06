@@ -45,12 +45,12 @@ public class GridViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.item, null);
+            convertView = LayoutInflater.from(context).inflate(R.layout.grid_item, null);
         }
-
-        TextView textView = (TextView) convertView.findViewById(R.id.tv_name);
-
-        textView.setText(listitem.get(position));
+        TextView textView = (TextView) convertView.findViewById(R.id.title);
+        if(textView != null) {
+            textView.setText(listitem.get(position));
+        }
         return convertView;
     }
 

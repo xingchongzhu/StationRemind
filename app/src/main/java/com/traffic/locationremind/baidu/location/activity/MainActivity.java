@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PersistableBundle;
 import android.support.v4.view.ViewPager;
@@ -25,6 +26,7 @@ import com.baidu.mapapi.SDKInitializer;
 import com.traffic.location.remind.R;
 import android.support.v4.app.Fragment;
 import com.traffic.locationremind.baidu.location.adapter.ViewPagerAdapter;
+import com.traffic.locationremind.baidu.location.dialog.AutoManagerHintDialog;
 import com.traffic.locationremind.baidu.location.fragment.FullMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.LineMapFragment;
 import com.traffic.locationremind.baidu.location.fragment.RemindFragment;
@@ -38,6 +40,7 @@ import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.NavigationC
 import com.traffic.locationremind.baidu.location.pagerbottomtabstrip.PageNavigationView;
 import com.traffic.locationremind.baidu.location.service.LocationService;
 import com.traffic.locationremind.baidu.location.service.RemonderLocationService;
+import com.traffic.locationremind.baidu.location.utils.UWhiteListSettingUtils;
 import com.traffic.locationremind.baidu.location.view.CustomViewPager;
 import com.traffic.locationremind.manager.AsyncTaskManager;
 import com.traffic.locationremind.common.util.*;
@@ -91,7 +94,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
     //private Toolbar mToolbarSet;
     private ImageView colloction_btn;
     private String currentCity = "北京";
-
+    private Handler mHandler = new Handler();
     public boolean hasLocation = false;
 
     @Override
@@ -104,7 +107,13 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         setContentView(R.layout.activity_behavior);
         mDataManager = DataManager.getInstance(this);
         mDataManager.addLoadDataListener(this);
+        initView();
+        initData();
+        Intent bindIntent = new Intent(this, RemonderLocationService.class);
+        bindService(bindIntent, connection, BIND_AUTO_CREATE);
+    }
 
+    private void initView(){
         //mToolbarSet = (Toolbar)findViewById(R.id.toolbar);
         citySelect = (TextView) findViewById(R.id.city_select);
         editButton = (SearchEditView) findViewById(R.id.edit_button);
@@ -144,13 +153,27 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         mSearchManager.initData(this, mDataManager);
         mSearchManager.setRemindSetViewListener(mRemindSetViewManager);
         currentCity = CommonFuction.getSharedPreferencesValue(this, CityInfo.CITYNAME);
-        initData();
-
-        Intent bindIntent = new Intent(this, RemonderLocationService.class);
-        bindService(bindIntent, connection, BIND_AUTO_CREATE);
-
     }
 
+    private void setBackgroudRun(){
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(!CommonFuction.getSharedPreferencesBooleanValue(MainActivity.this, IDef.AUTO_MANAGER_FLAG)) {
+                    CommonFuction.writeBooleanSharedPreferences(MainActivity.this, IDef.AUTO_MANAGER_FLAG, true);
+                    UWhiteListSettingUtils.enterWhiteListSetting(MainActivity.this);
+                }
+            }
+        }, 5000);
+    }
+
+    private AutoManagerHintDialog mAutoManagerHintDialog;
+    public void showAutoManagerDialog(){
+        if (mAutoManagerHintDialog == null) {
+            mAutoManagerHintDialog = new AutoManagerHintDialog(MainActivity.this, R.style.Dialog);
+        }
+        mAutoManagerHintDialog.show();
+    }
 /*    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -430,11 +453,14 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             SDKInitializer.initialize(getApplicationContext());
         }
 
-        if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED &&
+        /*if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED &&
                 checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             FullMapFragment fullFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
             fullFragment.updateCity();
-        }
+        }*/
+        FullMapFragment fullFragment = (FullMapFragment) mViewPagerAdapter.getFragment(ViewPagerAdapter.FULLMAPFRAGMENTINDEX);
+        fullFragment.updateCity();
+        setBackgroudRun();
     }
 
     public void setFragment(int index) {
@@ -455,9 +481,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
         Log.d(TAG, "setNewCity tempCity = " + city);
         citySelect.setText(city);
         currentCity = city;
-        HashMap<String, String> map = new HashMap<String, String>();
-        map.put("city", city);
-        MobclickAgent.onEvent(getApplicationContext(), "城市", map);
+        MobclickAgent.onEvent(getApplicationContext(), "城市", city);
         CommonFuction.writeSharedPreferences(MainActivity.this, CityInfo.CITYNAME, currentCity);
         mDataManager.loadData(MainActivity.this);
         hasLocation = true;
@@ -520,9 +544,7 @@ public class MainActivity extends AppCommonActivity implements View.OnClickListe
             if (keyCode == KeyEvent.KEYCODE_BACK) {
                 if (serachLayoutRoot.getVisibility() == View.GONE && !mRemindSetViewManager.getRemindWindowState()) {
                     moveTaskToBack(true);
-                    HashMap<String, String> map = new HashMap<String, String>();
-                    map.put("moveTaskToBack", "move background");
-                    MobclickAgent.onEvent(getApplicationContext(), "移动到后台定位", map);
+                    MobclickAgent.onEvent(getApplicationContext(), "移动到后台定位", "move background");
                     return true;
                 }
             }

@@ -37,6 +37,25 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
+    <style name="MyDialog" parent="@android:style/Theme.Holo.Dialog">
+        <!-- 是否有边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!--是否在悬浮Activity之上  -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!--阴影  -->
+        <item name="android:windowIsTranslucent">true</item><!--半透明-->
+        <!--背景透明-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 还可以加入一些弹出和退出的动画 (lan)-->
+    </style>
+    ---------------------
+    作者：zhao_doubi
+    来源：CSDN
+    原文：https://blog.csdn.net/zhao_doubi/article/details/77895028
+    版权声明：本文为博主原创文章，转载请附上博文链接！
+
     <style name="dialog_animation">
         <item name="android:windowEnterAnimation">@anim/enter</item>
         <item name="android:windowExitAnimation">@anim/exit</item>

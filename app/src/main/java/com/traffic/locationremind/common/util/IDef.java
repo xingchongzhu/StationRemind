@@ -25,6 +25,8 @@ public interface IDef {
 	public static final String Extra_Recog_Result = "_recog_result";
 	public static final String Extra_Recog_License = "_recog_license";
 	public static final String Extra_Recog_Color = "_recog_color";
+
+	public static final String AUTO_MANAGER_FLAG = "auto_manager_flag";
 	
 	public static final int Default_Width = 640;
 	public static final int Default_Height = 480;		

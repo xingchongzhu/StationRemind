@@ -91,6 +91,7 @@
     <string name="event_cancleLocationLine">取消定位路线</string>
     <string name="event_moveTaskToBack">移动到后台定位	</string>
     <string name="app_ok">确定</string>
+    <string name="set_up_immediately">立刻设置</string>
     <string name="app_cancel">取消</string>
     <string name="app_share">分享</string>
 

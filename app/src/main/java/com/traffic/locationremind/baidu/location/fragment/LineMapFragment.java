@@ -167,7 +167,7 @@ public class LineMapFragment extends Fragment implements ReadExcelDataUtil.DbWri
         } else {
         }
         mSettingReminderDialog = new SettingReminderDialog(getActivity(),
-                R.style.Dialog, new SettingReminderDialog.NoticeDialogListener() {
+                R.style.MyDialog, new SettingReminderDialog.NoticeDialogListener() {
             @Override
             public void onClick(View view) {
                 try {

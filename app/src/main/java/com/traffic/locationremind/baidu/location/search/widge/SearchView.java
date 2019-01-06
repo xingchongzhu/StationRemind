@@ -396,7 +396,6 @@ public class SearchView extends LinearLayout implements View.OnClickListener {
         void onSearch(Context context,String start,String end);
 
         void notificationRecentSerachChange(Context context);
-
     }
 
 }

@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:orientation="vertical">
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="10dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="28dp"
             android:background="@drawable/radius_btn"
+            android:layout_gravity="center_vertical"
             android:orientation="vertical">
-
         <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="5dp"
                 android:gravity="center"
                 android:text="提醒"
                 android:textAppearance="?android:attr/textAppearanceLarge"
@@ -24,70 +25,54 @@
                 android:textSize="18dp"
                 android:textStyle="bold"/>
 
-
-        <ScrollView
+        <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scrollbars="none"
-                android:layout_marginBottom="20dp"
-                android:layout_margin="5dp">
+                android:layout_height="wrap_content"
+                android:background="@drawable/radius_btn"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:orientation="vertical">
 
-
-            <LinearLayout
+            <TextView
+                    android:id="@+id/transfer_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/transfer_hint"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/brown"
+                    android:textSize="12dp"
+                    android:textStyle="bold"/>
+            <GridView
+                    android:id="@+id/transfer"
                     android:layout_width="match_parent"
-                    android:layout_height="150dp"
-                    android:layout_margin="1dp"
-                    android:background="@drawable/radius_btn"
-                    android:orientation="vertical"
-                    android:padding="5dp">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:horizontalSpacing="5dp"
+                    android:listSelector="@android:color/transparent"
+                    android:numColumns="3"
+                    android:verticalSpacing="10dp"/>
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/station_exit"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textColor="@color/brown"
+                    android:textSize="12dp"
+                    android:textStyle="bold"/>
+            <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:scrollbars="none">
 
                 <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical">
-
-                    <TextView
-                            android:id="@+id/transfer_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/transfer_hint"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:textColor="@color/brown"
-                            android:textSize="12dp"
-                            android:textStyle="bold"/>
-                    <GridView
-                            android:id="@+id/transfer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="5dp"
-                            android:horizontalSpacing="5dp"
-                            android:listSelector="@android:color/transparent"
-                            android:numColumns="3"
-                            android:verticalSpacing="10dp" />
-                    <!--<TextView
-                            android:id="@+id/transfer"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:textColor="@color/black"
-                            android:textSize="12dp"/>-->
-                </LinearLayout>
-
-
-                <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:orientation="vertical">
-
-                    <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/station_exit"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
-                            android:textColor="@color/brown"
-                            android:textSize="12dp"
-                            android:textStyle="bold"/>
+                        android:layout_margin="1dp"
+                        android:orientation="vertical"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="2dp"
+                        android:paddingBottom="5dp">
 
                     <TextView
                             android:id="@+id/exit_info"
@@ -97,41 +82,38 @@
                             android:textColor="@color/black"
                             android:textSize="12dp"/>
                 </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-
-
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-            <Button
-                    android:id="@+id/start"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/start"
-                    android:padding="8dp"
-                    android:background="@drawable/shap_left_radio"
-                    android:textColor="@color/white"
-                    android:textSize="15dp"/>
-
-            <Button
-                    android:id="@+id/end"
-                    android:layout_width="80dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    android:background="@drawable/shap_right_radio"
-                    android:text="@string/end"
-                    android:textColor="@color/white"
-                    android:textSize="15dp"/>
+            </ScrollView>
         </LinearLayout>
-
     </LinearLayout>
-</LinearLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/radius_btn"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+        <Button
+                android:id="@+id/start"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1"
+                android:text="@string/start"
+                android:padding="4dp"
+                android:background="@drawable/shap_left_radio"
+                android:textColor="@color/white"
+                android:textSize="15dp"/>
+
+        <Button
+                android:id="@+id/end"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_weight="1"
+                android:padding="4dp"
+                android:background="@drawable/shap_right_radio"
+                android:text="@string/end"
+                android:textColor="@color/white"
+                android:textSize="15dp"/>
+    </LinearLayout>
+</FrameLayout>

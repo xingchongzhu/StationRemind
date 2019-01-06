@@ -129,9 +129,7 @@ public class RemindSetViewManager implements RemindSetViewListener {
                     drawable = Utils.tint(drawable,pressColor);
                     CommonFuction.writeSharedPreferences(activity,CommonFuction.FAVOURITE,newLine.toString());
                     setCompoundDrawables(collectionBtn,drawable);
-                    HashMap<String, String> map = new HashMap<String, String>();
-                    map.put("saveLine", newLine.toString());
-                    MobclickAgent.onEvent(activity, activity.getResources().getString(R.string.event_saveLine), map);
+                    MobclickAgent.onEvent(activity, activity.getResources().getString(R.string.event_saveLine), "收藏路径");
                     Log.d(TAG,"add newLine = "+newLine);
                 }
             }

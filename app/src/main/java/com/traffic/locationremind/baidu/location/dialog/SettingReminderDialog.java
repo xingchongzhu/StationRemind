@@ -3,7 +3,9 @@ package com.traffic.locationremind.baidu.location.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.constraint.Constraints;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -92,6 +94,7 @@ public class SettingReminderDialog extends Dialog implements OnClickListener{
         WindowManager.LayoutParams p = getWindow().getAttributes();
         p.width = d.getWidth();
         getWindow().setAttributes(p);
+        getWindow().setGravity(Gravity.BOTTOM);
     }
     private String convertString() {
         return CommonFuction.getLineNo(DataManager.getInstance(context).getLineInfoList().get(lineId).linename)[0]

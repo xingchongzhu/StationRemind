@@ -148,9 +148,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
             getMainActivity().setRemindState(true);
         }
         if(this.lineObject != null) {
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("startLocationLine", this.lineObject.toString());
-            MobclickAgent.onEvent(activity, getResources().getString(R.string.event_startLocationLine), map);
+            MobclickAgent.onEvent(activity, getResources().getString(R.string.event_startLocationLine), "开始定位");
         }
     }
 
@@ -425,9 +423,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                         setCompoundDrawables(cancle_remind_btn, drawable);
                     }
                     if(this.lineObject != null) {
-                        HashMap<String, String> map = new HashMap<String, String>();
-                        map.put("cancleLocationLine", this.lineObject.toString());
-                        MobclickAgent.onEvent(activity, getResources().getString(R.string.event_cancleLocationLine), map);
+                        MobclickAgent.onEvent(activity, getResources().getString(R.string.event_cancleLocationLine), "取消定位");
                     }
                 } else {
                     if(!NetWorkUtils.isGPSEnabled(activity) || !activity.getPersimmions()){
@@ -448,9 +444,7 @@ public class RemindFragment extends Fragment implements LocationChangerListener,
                     cancle_remind_btn.setText(getResources().getString(R.string.cancle_remind));
                     setCompoundDrawables(cancle_remind_btn, drawable);
                     if(this.lineObject != null) {
-                        HashMap<String, String> map = new HashMap<String, String>();
-                        map.put("startLocationLine", this.lineObject.toString());
-                        MobclickAgent.onEvent(activity, getResources().getString(R.string.event_startLocationLine), map);
+                        MobclickAgent.onEvent(activity, getResources().getString(R.string.event_startLocationLine), "开始定位");
                     }
                 }
                 break;

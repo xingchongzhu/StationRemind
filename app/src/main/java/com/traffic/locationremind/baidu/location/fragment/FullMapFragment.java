@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -25,6 +26,9 @@ import android.widget.Toast;
 import com.traffic.location.remind.R;
 import com.traffic.locationremind.baidu.location.activity.MainActivity;
 import com.traffic.locationremind.baidu.location.activity.WebMainActivity;
+import com.traffic.locationremind.baidu.location.dialog.AutoManagerHintDialog;
+import com.traffic.locationremind.baidu.location.dialog.SearchLoadingDialog;
+import com.traffic.locationremind.baidu.location.utils.UWhiteListSettingUtils;
 import com.traffic.locationremind.baidu.location.utils.Utils;
 import com.traffic.locationremind.baidu.location.view.FullMapView;
 import com.traffic.locationremind.common.util.*;
@@ -45,6 +49,7 @@ public class FullMapFragment extends Fragment {
     private TextView text;
     private WebView webView;
     private ImageView share;
+    private ImageView autoManger;
     private String currentCity;
 //https://stavinli.github.io/the-subway-of-china/dest/index.html?cityCode=131
     private final String URL = "https://stavinli.github.io/the-subway-of-china/dest/index.html?cityCode=";
@@ -75,11 +80,20 @@ public class FullMapFragment extends Fragment {
         webView = (WebView) rootView.findViewById(R.id.web_wv);
         text = (TextView) rootView.findViewById(R.id.text);
         share = (ImageView) rootView.findViewById(R.id.share_btn);
+        autoManger = (ImageView) rootView.findViewById(R.id.auto_manger);
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(FullMapFragment.this.getActivity(),SharePlatformActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        autoManger.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)FullMapFragment.this.getActivity()).showAutoManagerDialog();
+                //UWhiteListSettingUtils.enterWhiteListSetting(FullMapFragment.this.getActivity());
             }
         });
         initData();
@@ -131,9 +145,9 @@ public class FullMapFragment extends Fragment {
         if (TextUtils.isEmpty(shpno)) {
             shpno = IDef.DEFAULTCITY;
         }
-        if(!TextUtils.isEmpty(currentCity) && currentCity.equals(shpno)){
+        /*if(!TextUtils.isEmpty(currentCity) && currentCity.equals(shpno)){
             return;
-        }
+        }*/
         currentCity= shpno;
         if(mDataManager != null && mDataManager.getDataHelper() != null) {
             List<CityInfo> cityList = mDataManager.getDataHelper().QueryCityByCityNo(shpno);

@@ -14,8 +14,17 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="right|bottom"
+            android:visibility="gone"
             android:layout_margin="10dp"
             android:background="@drawable/um_sharedemo"
+    />
+    <ImageView
+            android:id="@+id/auto_manger"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right|bottom"
+            android:layout_margin="10dp"
+            android:background="@drawable/auto_manger"
     />
     <TextView
             android:id="@+id/text"
