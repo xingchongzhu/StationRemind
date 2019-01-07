@@ -21,8 +21,8 @@ android {
         applicationId "com.traffic.location.remind"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 11
+        versionName "1.1.0"
         testInstrumentationRunner "android.support.SearchPath.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -77,6 +77,7 @@ dependencies {
     //PushSDK必须依赖utdid库，所以需要加入对应依赖
     implementation 'com.umeng.sdk:utdid:1.1.5.3'
     //PushSDK
+
     implementation 'com.umeng.sdk:push:4.2.0'
     /*implementation files('libs/umeng-share-core-6.9.4.jar')
         implementation files('libs/umeng-sharetool-6.9.4.jar')*/

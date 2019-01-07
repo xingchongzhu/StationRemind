@@ -60,6 +60,7 @@ public class RemonderLocationService extends Service {
 
     private NotificationUtil mNotificationUtil;
     private boolean isReminder = false;
+    private boolean notificationState = false;
     private boolean locationServiceHasStart = false;
     List<StationInfo> list, tempChangeStationList;
     StationInfo nextStation, currentStation,preStation;
@@ -119,8 +120,8 @@ public class RemonderLocationService extends Service {
      * 定位结果回调，重写onReceiveLocation方法，可以直接拷贝如下代码到自己工程中修改
      *
      */
-    int n = 0;
-    int number = 0;
+    //int n = 0;
+    //int number = 0;
     private BDAbstractLocationListener mListener = new BDAbstractLocationListener() {
         @Override
         public void onReceiveLocation(BDLocation location) {
@@ -150,7 +151,7 @@ public class RemonderLocationService extends Service {
                             n++;
                         }
                     }*/
-                    number++;
+                   // number++;
                     if (nerstStationInfo != null) {
                         currentStation = nerstStationInfo;
                         int n = 0;
@@ -200,8 +201,10 @@ public class RemonderLocationService extends Service {
                                     }
                                 }
                             }
-                            if(preStation != currentStation)
+                            if(isBacrground && (!notificationState || preStation != currentStation)) {
+                                notificationState = true;
                                 updataNotification(NotificationUtils.createNotificationObject(getApplicationContext(), lineDirection, currentStation, nextStation));
+                            }
                         }
                         preStation = currentStation;
                     }
@@ -251,8 +254,9 @@ public class RemonderLocationService extends Service {
      * @param
      */
     public void setStartReminder(Boolean state) {
-        n = 0;
+        //n = 0;
         isReminder = state;
+        notificationState = false;
         if (!isReminder) {
             cancleNotification();
         } else if (needChangeStationList != null) {
@@ -272,6 +276,7 @@ public class RemonderLocationService extends Service {
 
     public void setCancleReminder() {
         isReminder = false;
+        notificationState = false;
         if(wakeLock != null) {
             wakeLock.release();
             wakeLock = null;
@@ -283,6 +288,7 @@ public class RemonderLocationService extends Service {
     }
 
     public void cancleNotification() {
+        notificationState = false;
         stopForeground(true);
         if(wakeLock != null) {
             wakeLock.release();

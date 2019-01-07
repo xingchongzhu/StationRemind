@@ -198,11 +198,11 @@ public class CommonFuction {
     }
 
     public static boolean containTransfer(List<StationInfo> list, StationInfo stationInfo) {
-        if(list == null){
+        if(list == null || TextUtils.isEmpty(stationInfo.getCname())){
             return false;
         }
         for (StationInfo info : list) {
-            if (info.getCname().equals(stationInfo.getCname())) {
+            if (!TextUtils.isEmpty(info.getCname()) && info.getCname().equals(stationInfo.getCname())) {
                 return true;
             }
         }
